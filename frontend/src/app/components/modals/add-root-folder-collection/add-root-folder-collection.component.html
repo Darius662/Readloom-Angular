@@ -1,0 +1,35 @@
+<!-- Add Root Folder to Collection Modal -->
+<div class="modal fade" id="addRootFolderToCollectionModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="addRootFolderToCollectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addRootFolderToCollectionModalLabel">Add Root Folder to Collection</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="selectRootFolder" class="form-label">Select Root Folder</label>
+            <select class="form-select" id="selectRootFolder" [(ngModel)]="selectedRootFolder" name="rootFolder" required>
+              <option [value]="null">Select a root folder</option>
+              @for (folder of rootFolders; track folder) {
+                <option [value]="folder.id">{{ folder.name }} ({{ folder.path }})</option>
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onAdd()" [disabled]="isLoading">
+          {{ isLoading ? 'Adding...' : 'Add' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

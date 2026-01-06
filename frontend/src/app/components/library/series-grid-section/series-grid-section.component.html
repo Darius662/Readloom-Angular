@@ -1,0 +1,20 @@
+<div class="series-header">
+  <p class="series-count">
+    Found <strong>{{ resultCount }}</strong> series
+  </p>
+</div>
+
+<div class="series-grid">
+  @for (s of series; track s) {
+    <app-series-card [series]="s"></app-series-card>
+  }
+</div>
+
+@if (series.length === 0) {
+  <mat-card class="empty-state">
+    <mat-card-content>
+      <mat-icon class="empty-icon">info</mat-icon>
+      <p>No series found. Try adjusting your filters or <a href="/settings">add new series</a>.</p>
+    </mat-card-content>
+  </mat-card>
+}

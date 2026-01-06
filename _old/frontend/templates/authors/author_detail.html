@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Readloom - {{ author.name }}{% endblock %}
+
+{% block content %}
+<!-- Toast container -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11" id="toast-container"></div>
+
+<!-- Store authors page URL for smart redirect -->
+<script>
+    // Always redirect to authors page after deletion
+    sessionStorage.setItem('authorsRedirectUrl', '/authors');
+</script>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">{{ author.name }}</h5>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-sm btn-outline-primary rounded-circle" id="edit-author-btn-header" title="Edit Author">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary rounded-circle" id="view-books-btn-header" title="View Books">
+                        <i class="fas fa-book"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger rounded-circle" id="delete-author-btn-header" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <img src="{{ author.photo_url or '/static/img/no-cover.png' }}" class="img-fluid rounded" alt="{{ author.name }}">
+                    </div>
+                    <div class="col-md-9">
+                        <h2>{{ author.name }}</h2>
+                        <p class="text-muted">
+                            {% if author.birth_date %}Born: {{ author.birth_date }}{% endif %}
+                            {% if author.death_date %} | Died: {{ author.death_date }}{% endif %}
+                        </p>
+                        <p>{{ author.biography or 'No biography available' }}</p>
+                        <div class="mb-3">
+                            <span class="badge bg-secondary">{{ author.provider or 'Unknown' }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <p class="mb-1"><strong>Books in Collection:</strong> <span id="book-count">{{ books|length }}</span></p>
+                            <p class="mb-1"><strong>Folder:</strong> <code>{{ author.folder_path or 'Not set' }}</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Books Section -->
+<div class="card mb-4" id="books-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Books by Author</h5>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#booksCollapse" aria-expanded="false" aria-controls="booksCollapse">
+            <i class="fas fa-chevron-down"></i>
+        </button>
+    </div>
+    <div class="collapse" id="booksCollapse">
+        <div class="card-body">
+            <div class="row" id="author-books">
+                {% if books %}
+                    {% for book in books %}
+                        <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                            <div class="card h-100">
+                                {% if book.cover_url %}
+                                    <img src="{{ book.cover_url }}" class="card-img-top" alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <i class="fas fa-book fa-3x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ book.title }}</h6>
+                                    <p class="card-text small text-muted">{{ book.content_type or 'Unknown Type' }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="/books/{{ book.id }}" class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">No books found</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Quick Actions Footer -->
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Quick Actions</span>
+        <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-outline-secondary" id="view-all-books-btn" title="View All Books">
+                <i class="fas fa-list"></i> View All
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Author</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this author? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const authorId = {{ author.id }};
+        
+        // Button handlers
+        document.getElementById('view-books-btn-header').addEventListener('click', function() {
+            window.location.href = `/authors/${authorId}/books`;
+        });
+        
+        document.getElementById('view-all-books-btn').addEventListener('click', function() {
+            window.location.href = `/authors/${authorId}/books`;
+        });
+        
+        document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+            const $btn = document.getElementById('confirm-delete-btn');
+            const originalText = $btn.textContent;
+            
+            // Disable button and show loading
+            $btn.disabled = true;
+            $btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+            
+            fetch(`/api/authors/${authorId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success toast
+                        notificationManager.success('Author deleted successfully');
+                        // Redirect to authors page after a short delay
+                        setTimeout(() => {
+                            window.location.href = '/authors';
+                        }, 1000);
+                    } else {
+                        // Reset button
+                        $btn.disabled = false;
+                        $btn.textContent = originalText;
+                        notificationManager.error(data.error || 'Failed to delete author');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting author:', error);
+                    // Reset button
+                    $btn.disabled = false;
+                    $btn.textContent = originalText;
+                    notificationManager.error('Failed to delete author');
+                });
+        });
+        
+        // Helper function to show toast notifications
+        function showToast(title, message, type = 'info') {
+            const toastHtml = `
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                    <div class="toast-header bg-${type} text-white">
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            
+            // Create toast container if it doesn't exist
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'position-fixed bottom-0 end-0 p-3';
+                container.style.zIndex = '11';
+                document.body.appendChild(container);
+            }
+            
+            // Add toast to container and show it
+            const toastElement = document.createElement('div');
+            toastElement.innerHTML = toastHtml;
+            container.appendChild(toastElement.firstElementChild);
+            
+            const toast = new bootstrap.Toast(container.lastElementChild);
+            toast.show();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,92 @@
+<div class="books-container">
+  <div class="books-header">
+    <h1>{{ title }}</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="primary">
+        <mat-icon>search</mat-icon> Search Books
+      </button>
+      <button mat-raised-button color="success" (click)="scanForBooks()" [disabled]="isScanning">
+        <mat-icon>{{ isScanning ? 'hourglass_empty' : 'qr_code' }}</mat-icon>
+        {{ isScanning ? 'Scanning...' : 'Scan for Books' }}
+      </button>
+    </div>
+  </div>
+
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  @if (!error) {
+    <!-- Books Library Section -->
+    <div class="books-section">
+      <div class="section-header">
+        <h2>Books Library</h2>
+        <div class="controls">
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Filter by name...</mat-label>
+            <input matInput [value]="filterBy" (input)="onFilterInput($event)" name="filterBy">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="sort-select">
+            <mat-label>Sort by</mat-label>
+            <mat-select [value]="sortBy" (selectionChange)="onSortChange($event.value)" name="sortBy">
+              <mat-option value="name">Sort by Name</mat-option>
+              <mat-option value="rating">Sort by Rating</mat-option>
+              <mat-option value="date">Sort by Date</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      @if (filteredBooks.length > 0) {
+        <div class="books-grid">
+          @for (book of filteredBooks; track book.id) {
+            <app-series-card [series]="book" (click)="onViewSeries(book)"></app-series-card>
+          }
+        </div>
+      }
+      @if (filteredBooks.length === 0) {
+        <mat-card class="empty-state-card">
+          <mat-card-content>
+            <div class="empty-state">
+              <mat-icon class="empty-icon">menu_book</mat-icon>
+              <h5>No books found</h5>
+              <p>Try adjusting your filters or add books to your collection</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Popular Books This Week Section -->
+    <div class="popular-section">
+      <div class="section-header">
+        <h2>Popular This Week</h2>
+        <div class="section-subtitle">Trending books recommended by our AI</div>
+      </div>
+      @if (isLoadingPopular) {
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading popular books...</p>
+        </div>
+      }
+      @if (popularBooks.length > 0 && !isLoadingPopular) {
+        <div class="popular-books-grid">
+          @for (book of popularBooks; track book.id) {
+            <app-series-card [series]="book" (click)="onViewSeries(book)"></app-series-card>
+          }
+        </div>
+      }
+      @if (popularBooks.length === 0 && !isLoadingPopular) {
+        <mat-card class="empty-state-card">
+          <mat-card-content>
+            <div class="empty-state">
+              <mat-icon class="empty-icon">trending_up</mat-icon>
+              <h5>No popular books available</h5>
+              <p>Check back later for trending recommendations</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

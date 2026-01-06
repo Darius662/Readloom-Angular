@@ -1,0 +1,90 @@
+<!-- Setup Wizard Modal -->
+<div class="modal fade" id="setupWizardModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="setupWizardModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="setupWizardModalLabel">Readloom Setup Wizard</h5>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info">
+          <p><strong>Welcome to Readloom!</strong></p>
+          <p>Before you can start using Readloom, you need to set up at least one collection and one root folder.</p>
+          <p>This wizard will guide you through the initial setup process.</p>
+        </div>
+
+        <!-- Step 1: Create Collection -->
+        @if (currentStep === 1) {
+          <div class="setup-step">
+            <h5>Step 1: Create Your First Collection</h5>
+            <form>
+              <div class="mb-3">
+                <label for="setupCollectionName" class="form-label">Collection Name</label>
+                <input type="text" class="form-control" id="setupCollectionName" [(ngModel)]="collectionName" [ngModelOptions]="{standalone: true}" name="collectionName" value="My Collection" required>
+              </div>
+              <div class="mb-3">
+                <label for="setupCollectionDescription" class="form-label">Description (Optional)</label>
+                <textarea class="form-control" id="setupCollectionDescription" [(ngModel)]="collectionDescription" [ngModelOptions]="{standalone: true}" name="collectionDescription" rows="2">My first collection</textarea>
+              </div>
+            </form>
+            <button type="button" class="btn btn-primary" (click)="onNextStep1()">Next</button>
+          </div>
+        }
+
+        <!-- Step 2: Add Root Folder -->
+        @if (currentStep === 2) {
+          <div class="setup-step">
+            <h5>Step 2: Add a Root Folder</h5>
+            <form>
+              <div class="mb-3">
+                <label for="setupRootFolderName" class="form-label">Root Folder Name</label>
+                <input type="text" class="form-control" id="setupRootFolderName" [(ngModel)]="rootFolderName" [ngModelOptions]="{standalone: true}" name="rootFolderName" value="Manga Library" required>
+              </div>
+              <div class="mb-3">
+                <label for="setupRootFolderPath" class="form-label">Root Folder Path</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="setupRootFolderPath" [(ngModel)]="rootFolderPath" [ngModelOptions]="{standalone: true}" name="rootFolderPath" required>
+                  <button class="btn btn-outline-secondary" type="button" (click)="onBrowseFolder()">
+                    <i class="fas fa-folder-open"></i> Browse
+                  </button>
+                </div>
+                <small class="form-text text-muted">Enter the full path to the folder where your manga/comics will be stored (e.g., C:\Manga or /home/user/manga)</small>
+                <input type="file" id="setup-folder-picker" style="display: none;" webkitdirectory directory multiple (change)="onFolderSelected($event)">
+              </div>
+              <div class="mb-3">
+                <label for="setupRootFolderContentType" class="form-label">Primary Content Type</label>
+                <select class="form-select" id="setupRootFolderContentType" [(ngModel)]="contentType" [ngModelOptions]="{standalone: true}" name="contentType">
+                  @for (type of contentTypes; track type) {
+                    <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+              </div>
+            </form>
+            <button type="button" class="btn btn-secondary" (click)="onPrevStep2()">Previous</button>
+            <button type="button" class="btn btn-primary" (click)="onNextStep2()">Next</button>
+          </div>
+        }
+
+        <!-- Step 3: Finish Setup -->
+        @if (currentStep === 3) {
+          <div class="setup-step">
+            <h5>Step 3: Finish Setup</h5>
+            <div class="alert alert-success">
+              <p><strong>Great job!</strong> You've completed the initial setup.</p>
+              <p>Your collection and root folder will be created when you click Finish.</p>
+              <p>You can add more collections and root folders later from the Collections page.</p>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="onPrevStep3()">Previous</button>
+            <button type="button" class="btn btn-success" (click)="onFinishSetup()" [disabled]="isLoading">
+              {{ isLoading ? 'Setting up...' : 'Finish Setup' }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

@@ -1,0 +1,15 @@
+<div class="notification-container">
+  @for (notification of notifications; track notification) {
+    <mat-card class="notification-card" [ngClass]="notification.type">
+      <mat-card-content class="notification-content">
+        <div class="notification-message">
+          <mat-icon class="notification-icon">{{ getNotificationIcon(notification.type) }}</mat-icon>
+          <span class="notification-text">{{ notification.message }}</span>
+        </div>
+        <button mat-icon-button class="notification-close" (click)="removeNotification(notification.id)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

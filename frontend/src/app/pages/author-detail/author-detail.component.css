@@ -1,0 +1,175 @@
+.author-detail-container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.author-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.author-photo {
+  flex-shrink: 0;
+}
+
+.photo-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.placeholder-photo {
+  width: 200px;
+  height: 200px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #ccc;
+}
+
+.author-info {
+  flex: 1;
+}
+
+.author-info h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.author-nationality,
+.author-birth-date {
+  font-size: 1rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.author-nationality i,
+.author-birth-date i {
+  margin-right: 0.5rem;
+}
+
+.author-bio {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #495057;
+}
+
+.author-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.metadata-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.metadata-item:last-child {
+  border-bottom: none;
+}
+
+.metadata-label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.metadata-value {
+  display: block;
+  color: #495057;
+}
+
+.metadata-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.65rem;
+}
+
+.notable-works-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notable-works-list li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: #495057;
+}
+
+.notable-works-list li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+}
+
+@media (max-width: 768px) {
+  .author-detail-container {
+    padding: 1rem;
+  }
+
+  .author-header {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .photo-image,
+  .placeholder-photo {
+    width: 150px;
+    height: 150px;
+  }
+
+  .author-info h1 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cover Display Test (CORS Fixed)</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .cover-test { margin: 10px; border: 1px solid #ccc; padding: 10px; display: inline-block; }
+        .cover-img { width: 150px; height: 200px; object-fit: cover; border: 1px solid #ddd; }
+        .error { color: red; }
+        .success { color: green; }
+        .status { margin-top: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Cover Display Test</h1>
+    <p>Testing cover images with CORS workaround...</p>
+    
+    <div id="covers-container"></div>
+    
+    <script>
+        // Test specific cover URLs directly
+        const testUrls = [
+            { id: 143, volume: 1, url: 'http://localhost:7227/api/cover-art/volume/143' },
+            { id: 144, volume: 2, url: 'http://localhost:7227/api/cover-art/volume/144' },
+            { id: 145, volume: 3, url: 'http://localhost:7227/api/cover-art/volume/145' },
+            { id: 146, volume: 4, url: 'http://localhost:7227/api/cover-art/volume/146' },
+            { id: 147, volume: 5, url: 'http://localhost:7227/api/cover-art/volume/147' }
+        ];
+        
+        const container = document.getElementById('covers-container');
+        
+        testUrls.forEach(test => {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'cover-test';
+            
+            testDiv.innerHTML = `
+                <h3>Volume ${test.volume}</h3>
+                <p><strong>URL:</strong> ${test.url}</p>
+                <div class="image-container">
+                    <img src="${test.url}" class="cover-img" 
+                         onerror="this.style.display='none'; this.nextElementSibling.innerHTML='❌ Failed to load (CORS or server error)'" 
+                         onload="this.nextElementSibling.innerHTML='✅ Loaded successfully'">
+                    <div class="status">Loading...</div>
+                </div>
+            `;
+            
+            container.appendChild(testDiv);
+        });
+        
+        // Also test via proxy (if needed)
+        setTimeout(() => {
+            const proxyDiv = document.createElement('div');
+            proxyDiv.innerHTML = '<h2>🔄 Testing via Proxy (if CORS fails)</h2>';
+            container.appendChild(proxyDiv);
+            
+            testUrls.forEach(test => {
+                const proxyTestDiv = document.createElement('div');
+                proxyTestDiv.className = 'cover-test';
+                
+                // Try via a simple proxy approach
+                const proxyUrl = `https://cors-anywhere.herokuapp.com/${test.url}`;
+                
+                proxyTestDiv.innerHTML = `
+                    <h3>Volume ${test.volume} (Proxy)</h3>
+                    <p><strong>Proxy URL:</strong> ${proxyUrl}</p>
+                    <div class="image-container">
+                        <img src="${proxyUrl}" class="cover-img" 
+                             onerror="this.style.display='none'; this.nextElementSibling.innerHTML='❌ Proxy failed'" 
+                             onload="this.nextElementSibling.innerHTML='✅ Loaded via proxy'">
+                        <div class="status">Loading...</div>
+                    </div>
+                `;
+                
+                container.appendChild(proxyTestDiv);
+            });
+        }, 1000);
+    </script>
+</body>
+</html>

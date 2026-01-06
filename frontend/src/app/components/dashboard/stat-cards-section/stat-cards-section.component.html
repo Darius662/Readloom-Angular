@@ -1,0 +1,15 @@
+<div class="stat-cards-grid">
+  @for (card of statCards; track card) {
+    <mat-card [class]="'stat-card stat-card-' + card.color">
+      <mat-card-content>
+        <div class="stat-icon">
+          <mat-icon>{{ card.icon }}</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ card.value }}</div>
+          <div class="stat-label">{{ card.label }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

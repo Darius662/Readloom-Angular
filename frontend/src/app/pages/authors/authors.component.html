@@ -1,0 +1,98 @@
+<div class="authors-container">
+  <div class="authors-header">
+    <h1>{{ title }}</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="success" (click)="enrichAllAuthors()">
+        <mat-icon>auto_awesome</mat-icon>
+        Enrich Authors
+      </button>
+      <button mat-stroked-button color="primary" (click)="checkIncompleteAuthors()">
+        <mat-icon>check_circle</mat-icon>
+        Check Status
+      </button>
+      <button mat-stroked-button color="accent" (click)="updateAllReadmeFiles()">
+        <mat-icon>description</mat-icon>
+        Update READMEs
+      </button>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search authors...</mat-label>
+        <input matInput #searchInput (keyup)="onSearch(searchInput.value)">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <app-loading-spinner [isLoading]="isLoading" message="Loading authors..."></app-loading-spinner>
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  @if (!isLoading) {
+    <div class="authors-section">
+      <div class="section-header">
+        <h2>Authors of my Books</h2>
+      </div>
+      @if (filteredAuthors.length > 0) {
+        <div class="authors-grid">
+          @for (author of filteredAuthors; track author) {
+            <mat-card class="author-card">
+              <div class="author-name">{{ author.name }}</div>
+              <div class="author-stats">
+                <div class="stat">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Followed</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Owned</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Released</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Owned</div>
+                </div>
+              </div>
+              <mat-card-actions class="author-actions">
+                <button mat-raised-button color="primary" size="small" (click)="openAuthorDetails(author)">
+                  <mat-icon>visibility</mat-icon>
+                  View Details
+                </button>
+                <button mat-stroked-button color="primary" size="small">
+                  <mat-icon>menu_book</mat-icon>
+                  View Books
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      }
+      @if (filteredAuthors.length > 0) {
+        <mat-card class="popular-authors">
+          <mat-card-header>
+            <mat-card-title>Popular Authors</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="empty-placeholder">
+              <mat-icon class="placeholder-icon">star</mat-icon>
+              <p>Popular authors data coming soon</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+      @if (filteredAuthors.length === 0) {
+        <mat-card class="empty-state-card">
+          <mat-card-content>
+            <div class="empty-state">
+              <mat-icon class="empty-icon">person_search</mat-icon>
+              <h5>No authors found</h5>
+              <p>Try adjusting your search or add authors to your library</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

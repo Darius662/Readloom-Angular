@@ -1,0 +1,24 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <h3 class="sidebar-title">Readloom</h3>
+  </div>
+
+  <!-- Navigation Menu -->
+  <mat-nav-list class="sidebar-nav">
+    @for (item of menuItems; track item; let last = $last) {
+      <a mat-list-item 
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }"
+         class="sidebar-item">
+        <mat-icon matListItemIcon class="sidebar-icon">{{ item.icon }}</mat-icon>
+        <span matListItemTitle class="sidebar-text">{{ item.label }}</span>
+      </a>
+      
+      @if (!last && item.label === 'Notifications') {
+        <div class="sidebar-divider"></div>
+      }
+    }
+  </mat-nav-list>
+</div>

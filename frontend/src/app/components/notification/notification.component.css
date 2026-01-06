@@ -1,0 +1,109 @@
+.notification-container {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 9000;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Angular Material Card Overrides */
+.notification-card {
+  margin-bottom: 10px;
+  border-radius: 6px;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.notification-card .mat-mdc-card-content {
+  padding: 1rem !important;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.notification-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.notification-text {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.notification-close {
+  flex-shrink: 0;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* Notification Type Variants */
+.notification-card.success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.notification-card.success .notification-icon {
+  color: #155724;
+}
+
+.notification-card.error {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.notification-card.error .notification-icon {
+  color: #721c24;
+}
+
+.notification-card.warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.notification-card.warning .notification-icon {
+  color: #856404;
+}
+
+.notification-card.info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+}
+
+.notification-card.info .notification-icon {
+  color: #0c5460;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .notification-container {
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}

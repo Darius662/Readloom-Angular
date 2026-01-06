@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block title %}Authors - Readloom{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Authors Library</h5>
+                    <div>
+                        <button id="enrichAuthorsBtn" class="btn btn-success me-2" onclick="enrichAllAuthors()">
+                            <i class="fas fa-magic me-1"></i> Enrich Authors
+                        </button>
+                        <input type="text" id="searchInput" class="form-control d-inline-block" placeholder="Search authors..." style="width: 300px;">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Recent Authors Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Authors of my Books</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-xxl-6 g-4" id="authorsContainer">
+                                        <div class="col-12 text-center py-4">
+                                            <div class="spinner-border" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading authors...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popular Authors Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Popular Authors</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-xxl-6 g-4" id="popularAuthorsGrid">
+                                        <div class="col-12 text-center py-4">
+                                            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                                            <p>Popular authors data coming soon</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center" id="paginationContainer">
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Author Detail Modal -->
+<div class="modal fade" id="authorModal" tabindex="-1" aria-labelledby="authorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <h5 class="modal-title" id="authorModalLabel">Author Details</h5>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" id="btnEditAuthorModal" title="Edit Author">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-circle" id="btnDeleteAuthorModal" title="Delete Author">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-body" id="authorModalBody">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Author Modal -->
+<div class="modal fade" id="editAuthorModal" tabindex="-1" aria-labelledby="editAuthorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAuthorModalLabel">Edit Author</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAuthorForm">
+                    <input type="hidden" id="editAuthorId">
+                    <div class="mb-3">
+                        <label for="editAuthorName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editAuthorName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAuthorBiography" class="form-label">Biography</label>
+                        <textarea class="form-control" id="editAuthorBiography" rows="4"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAuthorDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editAuthorDescription" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editAuthorBirthDate" class="form-label">Birth Date</label>
+                                <input type="text" class="form-control" id="editAuthorBirthDate" placeholder="YYYY-MM-DD">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editAuthorDeathDate" class="form-label">Death Date</label>
+                                <input type="text" class="form-control" id="editAuthorDeathDate" placeholder="YYYY-MM-DD">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAuthorPhotoUrl" class="form-label">Photo URL</label>
+                        <input type="url" class="form-control" id="editAuthorPhotoUrl">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEditAuthorBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let currentSearch = '';
+const perPage = 12;
+
+$(document).ready(function() {
+    loadAuthors();
+    
+    // Search functionality
+    $('#searchInput').on('keyup', function() {
+        currentSearch = $(this).val();
+        currentPage = 1;
+        loadAuthors();
+    });
+});
+
+function loadAuthors() {
+    const url = `/api/authors/?page=${currentPage}&per_page=${perPage}` + 
+                (currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : '');
+    
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(data) {
+            if (data.success === false) {
+                console.error('API returned error:', data);
+                $('#authorsContainer').html(
+                    '<div class="col-12"><div class="alert alert-danger">Failed to load authors: ' + (data.message || data.error) + '</div></div>'
+                );
+                return;
+            }
+            displayAuthors(data.authors || []);
+            displayPagination(data.pagination || {page: 1, pages: 0, per_page: perPage, total: 0});
+        },
+        error: function(error) {
+            console.error('Error loading authors:', error);
+            let errorMsg = 'Failed to load authors';
+            if (error.responseJSON && error.responseJSON.message) {
+                errorMsg = error.responseJSON.message;
+            }
+            $('#authorsContainer').html(
+                '<div class="col-12"><div class="alert alert-danger">' + errorMsg + '</div></div>'
+            );
+        }
+    });
+}
+
+function displayAuthors(authors) {
+    const container = $('#authorsContainer');
+    container.empty();
+    
+    if (authors.length === 0) {
+        container.html('<div class="col-12 text-center py-4"><i class="fas fa-user-slash fa-3x text-muted mb-3"></i><p>No authors found</p></div>');
+        return;
+    }
+    
+    authors.forEach(author => {
+        // Use photo_url if available, otherwise use a placeholder
+        const coverUrl = author.photo_url ? author.photo_url : 'https://via.placeholder.com/200x280?text=' + encodeURIComponent(author.name);
+        
+        const html = `
+            <div class="col">
+                <div class="card h-100 author-card" style="cursor: pointer; overflow: hidden;" data-author-id="${author.id}">
+                    <!-- Author Photo/Cover - Hidden -->
+                    <div style="height: 220px; overflow: hidden; background-color: #f0f0f0; display: none;">
+                        <img src="${coverUrl}" class="w-100 h-100" alt="${author.name}" style="object-fit: cover;">
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column p-3">
+                        <!-- Author Name -->
+                        <h6 class="card-title text-center mb-2" style="font-size: 0.95rem; line-height: 1.3; min-height: 2.6em; display: flex; align-items: center; justify-content: center;">${author.name}</h6>
+                        
+                        <!-- Statistics -->
+                        <div class="text-center small mt-auto pt-2 border-top">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="text-primary fw-bold released-count" style="font-size: 0.9rem;" data-author-id="${author.id}">-</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Released</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-success fw-bold" style="font-size: 0.9rem;">${author.book_count || 0}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">Owned</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer p-2">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showAuthorDetail(${author.id})" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                <i class="fas fa-eye me-1"></i> View Details
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); window.location.href='/authors/${author.id}/books'" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                                <i class="fas fa-book me-1"></i> View Books
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.append(html);
+        
+        // Fetch released books count asynchronously
+        fetchAuthorReleasedCount(author.id, author.name);
+    });
+    
+    // Add hover effect
+    // $('.author-card').hover(
+    //     function() {
+    //         $(this).css('transform', 'translateY(-8px)').css('box-shadow', '0 8px 20px rgba(0,0,0,0.15)');
+    //     },
+    //     function() {
+    //         $(this).css('transform', 'translateY(0)').css('box-shadow', '');
+    //     }
+    // );
+}
+
+function displayPagination(pagination) {
+    const container = $('#paginationContainer');
+    container.empty();
+    
+    // Previous button
+    if (pagination.page > 1) {
+        container.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${pagination.page - 1}); return false;">
+                    Previous
+                </a>
+            </li>
+        `);
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        const active = i === pagination.page ? 'active' : '';
+        container.append(`
+            <li class="page-item ${active}">
+                <a class="page-link" href="#" onclick="goToPage(${i}); return false;">
+                    ${i}
+                </a>
+            </li>
+        `);
+    }
+    
+    // Next button
+    if (pagination.page < pagination.pages) {
+        container.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${pagination.page + 1}); return false;">
+                    Next
+                </a>
+            </li>
+        `);
+    }
+}
+
+function goToPage(page) {
+    currentPage = page;
+    loadAuthors();
+    window.scrollTo(0, 0);
+}
+
+function showAuthorDetail(authorId) {
+    $.ajax({
+        url: `/api/authors/${authorId}`,
+        method: 'GET',
+        success: function(data) {
+            if (data.success === false) {
+                console.error('API returned error:', data);
+                notificationManager.error('Failed to load author details: ' + (data.error || 'Unknown error'));
+                return;
+            }
+            
+            const author = data.author;
+            const books = data.books || [];
+            const releasedBooksCount = data.released_books_count || 0;
+            const metadataProvider = data.metadata_provider || null;
+            const providerBooks = data.provider_books || [];
+            
+            console.log('Author data:', {author, books, releasedBooksCount, metadataProvider, providerBooks});
+            
+            let booksHtml = '';
+            if (books.length > 0) {
+                booksHtml = '<h6 class="mt-4 mb-3">Books in your library:</h6><div class="list-group">';
+                books.forEach(book => {
+                    const coverUrl = book.cover_url ? processImageUrl(book.cover_url) : 'https://via.placeholder.com/80x120?text=' + encodeURIComponent(book.title);
+                    booksHtml += `
+                        <div class="list-group-item d-flex align-items-center gap-3 p-2" style="border: 1px solid #dee2e6;">
+                            <img src="${coverUrl}" alt="${book.title}" style="width: 60px; height: 90px; object-fit: cover; border-radius: 4px;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1" style="font-size: 0.95rem;">${book.title}</h6>
+                                <p class="mb-0 small text-muted">${book.content_type} • Vol: ${book.volumes || 0} | Ch: ${book.chapters || 0}</p>
+                            </div>
+                            <a href="/books/${book.id}" class="btn btn-sm btn-outline-primary" title="View Book Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    `;
+                });
+                booksHtml += '</div>';
+            } else {
+                booksHtml = '<div class="alert alert-info mt-4 mb-0">No books by this author in your library</div>';
+            }
+            
+            // Add provider books section if available
+            let providerBooksHtml = '';
+            console.log('Provider books check:', {providerBooks, metadataProvider, length: providerBooks.length});
+            if (providerBooks.length > 0 && metadataProvider) {
+                console.log('Rendering provider books section');
+                const providerName = metadataProvider.charAt(0).toUpperCase() + metadataProvider.slice(1);
+                providerBooksHtml = `<h6 class="mt-4 mb-3">Books on ${providerName}:</h6><div class="row">`;
+                providerBooks.forEach(book => {
+                    const coverUrl = book.cover_url || 'https://via.placeholder.com/150x200?text=' + encodeURIComponent(book.title);
+                    const year = book.first_publish_year ? ` (${book.first_publish_year})` : '';
+                    providerBooksHtml += `
+                        <div class="col-md-4 col-lg-3 mb-3">
+                            <div class="card h-100" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); opacity: 0.85;">
+                                <img src="${coverUrl}" class="card-img-top" alt="${book.title}" style="height: 180px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title small mb-2" style="font-size: 0.85rem; line-height: 1.3;">${book.title}</h6>
+                                    <p class="card-text small text-muted mb-0" style="font-size: 0.75rem;">
+                                        ${year}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                providerBooksHtml += '</div>';
+            } else {
+                console.log('Provider books section not rendered - missing data');
+            }
+            
+            const modalBody = `
+                <div>
+                    <h4>${author.name}</h4>
+                    
+                    <h6>Biography</h6>
+                    <p>${author.biography || 'No biography available'}</p>
+                    
+                    <div class="row text-center mb-4">
+                        <div class="col-6">
+                            <div class="h5 text-primary fw-bold">${releasedBooksCount}</div>
+                            <div class="text-muted small">Released</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5 text-success fw-bold">${books.length}</div>
+                            <div class="text-muted small">Owned</div>
+                        </div>
+                    </div>
+                </div>
+                ${booksHtml}
+                ${providerBooksHtml}
+            `;
+            
+            $('#authorModalBody').html(modalBody);
+            
+            // Store author ID for edit/delete buttons
+            $('#btnEditAuthorModal').data('author-id', author.id).data('author-name', author.name);
+            $('#btnDeleteAuthorModal').data('author-id', author.id).data('author-name', author.name);
+            
+            const modal = new bootstrap.Modal(document.getElementById('authorModal'));
+            modal.show();
+        },
+        error: function(error) {
+            console.error('Error loading author details:', error);
+            showError('Failed to load author details');
+        }
+    });
+}
+
+function fetchAuthorReleasedCount(authorId, authorName) {
+    $.ajax({
+        url: `/api/authors/${authorId}`,
+        method: 'GET',
+        timeout: 5000,
+        success: function(data) {
+            if (data.released_books_count !== undefined) {
+                $(`.released-count[data-author-id="${authorId}"]`).text(data.released_books_count);
+            }
+        },
+        error: function() {
+            // Silently fail - keep the "-" placeholder
+        }
+    });
+}
+
+// Edit author button click
+$('#btnEditAuthorModal').on('click', function() {
+    const authorId = $(this).data('author-id');
+    const authorName = $(this).data('author-name');
+    
+    // Fetch author data
+    $.ajax({
+        url: `/api/authors/${authorId}`,
+        method: 'GET',
+        success: function(data) {
+            const author = data.author || data;
+            
+            // Populate the edit form
+            $('#editAuthorId').val(authorId);
+            $('#editAuthorName').val(author.name || '');
+            $('#editAuthorBiography').val(author.biography || '');
+            $('#editAuthorDescription').val(author.description || '');
+            $('#editAuthorBirthDate').val(author.birth_date || '');
+            $('#editAuthorDeathDate').val(author.death_date || '');
+            $('#editAuthorPhotoUrl').val(author.photo_url || '');
+            
+            // Close the details modal and open the edit modal
+            bootstrap.Modal.getInstance(document.getElementById('authorModal')).hide();
+            const editModal = new bootstrap.Modal(document.getElementById('editAuthorModal'));
+            editModal.show();
+        },
+        error: function(xhr) {
+            showError('Failed to load author data');
+        }
+    });
+});
+
+// Delete author button click
+$('#btnDeleteAuthorModal').on('click', function() {
+    const authorId = $(this).data('author-id');
+    const authorName = $(this).data('author-name');
+    
+    // Show confirmation
+    if (confirm(`Are you sure you want to delete the author "${authorName}"? This will also delete all their books. README files will be preserved.`)) {
+        // Disable button and show loading state
+        const $btn = $(this);
+        const originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>');
+        
+        // Delete author
+        $.ajax({
+            url: `/api/authors/${authorId}`,
+            method: 'DELETE',
+            success: function(response) {
+                // Reset button
+                $btn.prop('disabled', false).html(originalText);
+                
+                if (response.success) {
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('authorModal')).hide();
+                    
+                    // Show success message
+                    showSuccess('Author deleted successfully');
+                    
+                    // Reload the page after a short delay
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showError(response.error || 'Failed to delete author');
+                }
+            },
+            error: function(xhr) {
+                // Reset button
+                $btn.prop('disabled', false).html(originalText);
+                
+                showError(xhr.responseJSON?.error || 'Failed to delete author');
+            }
+        });
+    }
+});
+
+// Save edited author
+$('#saveEditAuthorBtn').on('click', function() {
+    const authorId = $('#editAuthorId').val();
+    const $btn = $(this);
+    const originalText = $btn.html();
+    
+    const authorData = {
+        name: $('#editAuthorName').val(),
+        biography: $('#editAuthorBiography').val(),
+        description: $('#editAuthorDescription').val(),
+        birth_date: $('#editAuthorBirthDate').val() || null,
+        death_date: $('#editAuthorDeathDate').val() || null,
+        photo_url: $('#editAuthorPhotoUrl').val() || null
+    };
+    
+    // Validate required fields
+    if (!authorData.name.trim()) {
+        showError('Author name is required');
+        return;
+    }
+    
+    // Disable button and show loading state
+    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Saving...');
+    
+    $.ajax({
+        url: `/api/authors/${authorId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(authorData),
+        success: function(response) {
+            // Reset button
+            $btn.prop('disabled', false).html(originalText);
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('editAuthorModal')).hide();
+            
+            // Show success message
+            showSuccess('Author updated successfully');
+            
+            // Reload authors list
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        },
+        error: function(xhr) {
+            // Reset button
+            $btn.prop('disabled', false).html(originalText);
+            
+            showError(xhr.responseJSON?.error || 'Failed to update author');
+        }
+    });
+});
+
+function enrichAllAuthors() {
+    // Disable button and show loading state
+    const btn = $('#enrichAuthorsBtn');
+    const originalText = btn.html();
+    btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Enriching...');
+    
+    $.ajax({
+        url: '/api/authors/enrich-all',
+        method: 'POST',
+        success: function(data) {
+            if (data.success) {
+                const stats = data.stats || {};
+                const message = `✓ Enrichment complete!\n` +
+                    `OpenLibrary updated: ${stats.openlibrary_updated || 0}\n` +
+                    `Biographies added: ${stats.biographies_added || 0}\n` +
+                    `Photos added: ${stats.photos_added || 0}\n` +
+                    `Errors: ${stats.errors || 0}`;
+                
+                showSuccess(message);
+                
+                // Reload authors after a short delay
+                setTimeout(() => {
+                    loadAuthors();
+                }, 1000);
+            } else {
+                showError(data.message || 'Enrichment failed');
+            }
+        },
+        error: function(error) {
+            console.error('Error enriching authors:', error);
+            let errorMsg = 'Failed to enrich authors';
+            if (error.responseJSON && error.responseJSON.error) {
+                errorMsg = error.responseJSON.error;
+            }
+            showError(errorMsg);
+        },
+        complete: function() {
+            // Re-enable button
+            btn.prop('disabled', false).html(originalText);
+        }
+    });
+}
+</script>
+
+<style>
+.author-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-height: 350px;
+}
+
+.author-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.card {
+    min-height: 350px;
+}
+</style>
+{% endblock %}

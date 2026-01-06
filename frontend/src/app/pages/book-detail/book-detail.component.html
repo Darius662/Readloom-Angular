@@ -1,0 +1,249 @@
+<div class="book-detail-page">
+  @if (book && !isLoading && !error) {
+    <!-- Book Info Card -->
+    <mat-card class="book-info-card">
+      <mat-card-header class="book-header">
+        <div class="book-header-content">
+          <div class="book-title-section">
+            <mat-card-title class="book-title">{{ book.title || book.name }}</mat-card-title>
+          </div>
+          <div class="book-actions">
+            <button 
+              mat-icon-button
+              [color]="isInWantToRead ? 'warn' : 'primary'"
+              [title]="isInWantToRead ? 'Remove from Want to Read' : 'Add to Want to Read'"
+              (click)="toggleWantToRead()"
+              [disabled]="isWantToReadLoading">
+              <mat-icon>{{ isInWantToRead ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openEditModal()" title="Edit Book">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openMoveModal()" title="Move Book">
+              <mat-icon>swap_horiz</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openDeleteModal()" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-header>
+      <mat-card-content class="book-content">
+        <div class="book-detail-layout">
+          <div class="book-cover-section">
+            <img [src]="getCoverUrl(book.cover_url)" 
+                 [alt]="book.title || book.name"
+                 class="book-cover-image">
+          </div>
+          <div class="book-info-section">
+            <!-- Author -->
+            @if (book.author) {
+              <div class="info-row">
+                <span class="info-label">Author:</span>
+                <span class="info-value">{{ book.author }}</span>
+              </div>
+            }
+
+            <!-- Publisher -->
+            @if (book.publisher) {
+              <div class="info-row">
+                <span class="info-label">Publisher:</span>
+                <span class="info-value">{{ book.publisher }}</span>
+              </div>
+            }
+
+            <!-- Published Date -->
+            @if (book.published_date) {
+              <div class="info-row">
+                <span class="info-label">Published:</span>
+                <span class="info-value">{{ book.published_date }}</span>
+              </div>
+            }
+
+            <!-- ISBN -->
+            @if (book.isbn) {
+              <div class="info-row">
+                <span class="info-label">ISBN:</span>
+                <span class="info-value">{{ book.isbn }}</span>
+              </div>
+            }
+
+            <!-- Genres -->
+            @if (getGenres().length > 0) {
+              <div class="info-row">
+                <span class="info-label">Genres:</span>
+                <div class="genres-container">
+                  @for (genre of getGenres(); track $index) {
+                    <mat-chip class="genre-chip">{{ genre }}</mat-chip>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Description -->
+            @if (book.description) {
+              <div class="info-row description-row">
+                <span class="info-label">Description:</span>
+                <p class="description-text">{{ book.description }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Reading Status Card -->
+    <mat-card class="reading-status-card">
+      <mat-card-header>
+        <mat-card-title class="card-title">Reading Status</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-content">
+          <!-- Left Column -->
+          <div class="status-left-column">
+            <!-- Star Rating -->
+            <div class="rating-section">
+              <div class="rating-label">Your Rating</div>
+              <div class="rating-controls">
+                <div class="star-rating">
+                  @for (i of [1, 2, 3, 4, 5]; track i) {
+                    <mat-icon 
+                      class="star-icon"
+                      [class]="i <= starRating ? 'star-active' : 'star-inactive'"
+                      (click)="setRating(i)"
+                      [matTooltip]="'Rate ' + i + ' stars'">
+                      {{ i <= starRating ? 'star' : 'star_border' }}
+                    </mat-icon>
+                  }
+                </div>
+                <mat-chip class="rating-chip">{{ starRating }}/5</mat-chip>
+              </div>
+            </div>
+
+            <!-- Reading Progress -->
+            <div class="progress-section">
+              @if (book) {
+              <div class="progress-label">Reading Progress</div>
+              <mat-button-toggle-group 
+                class="progress-toggle-group"
+                [value]="readingProgress" 
+                (change)="setReadingProgress($event.value)">
+                <mat-button-toggle value="0">Not Started</mat-button-toggle>
+                <mat-button-toggle value="25">25%</mat-button-toggle>
+                <mat-button-toggle value="50">50%</mat-button-toggle>
+                <mat-button-toggle value="75">75%</mat-button-toggle>
+                <mat-button-toggle value="100">Completed</mat-button-toggle>
+              </mat-button-toggle-group>
+            } @else {
+              <div class="progress-label">Reading Progress</div>
+              <div class="text-muted">Loading...</div>
+            }
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="status-right-column">
+            <!-- User Notes -->
+            <div class="notes-section">
+              <div class="notes-label">Your Notes</div>
+              <mat-form-field appearance="outline" class="notes-field">
+                <mat-label>Add your personal notes about this book...</mat-label>
+                <textarea matInput
+                  [(ngModel)]="userNotes"
+                  (blur)="saveNotes()"
+                  rows="4"
+                  placeholder="Share your thoughts, favorite quotes, or reading notes..."></textarea>
+              </mat-form-field>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button mat-stroked-button (click)="resetStatus()">
+                <mat-icon>refresh</mat-icon>
+                Reset Status
+              </button>
+              <button mat-raised-button color="primary" (click)="saveBookData()">
+                <mat-icon>save</mat-icon>
+                Save Status
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recommendations Card -->
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <mat-card-title>Recommended for You</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="text-muted">Recommendations coming soon...</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- E-book Management Card -->
+    <mat-card class="mb-4">
+      <mat-card-header class="d-flex justify-content-between align-items-center">
+        <mat-card-title>E-book Management</mat-card-title>
+        <button mat-icon-button (click)="toggleEbookSection()">
+          <mat-icon>{{ showEbookSection ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+      </mat-card-header>
+      @if (showEbookSection) {
+        <mat-card-content>
+          <div class="mb-3">
+            <strong>Folder Location</strong>
+            <p class="mb-1">Place your e-book files in this folder: <code>/ebooks/Books/{{ book.title }}</code></p>
+          </div>
+          <div class="mb-3">
+            <strong>Supported file formats:</strong> PDF, EPUB, CBZ, CBR, MOBI, AZW
+          </div>
+          <div class="mb-3">
+            <strong>Naming convention:</strong> "Volume 1.pdf", "Vol 2.epub", "v3.cbz"
+          </div>
+          <div class="mb-3">
+            <strong>To set a custom path for this book, use the Edit Book button above.</strong>
+          </div>
+          <div class="mb-3">
+            <strong>Scan your data directory for e-books and automatically add them to the database</strong>
+            <div class="mt-2">
+              <button mat-raised-button color="primary" id="scan-for-ebooks">
+                <mat-icon>search</mat-icon> Scan for E-books
+              </button>
+            </div>
+          </div>
+          <hr>
+          <div class="mb-3">
+            <strong>E-book Files:</strong>
+            <p class="text-muted mt-2">No e-book files uploaded</p>
+          </div>
+          <div class="mb-3">
+            <button mat-raised-button color="primary" (click)="openUploadModal()">
+              <mat-icon>upload</mat-icon> Upload E-book File
+            </button>
+          </div>
+        </mat-card-content>
+      }
+    </mat-card>
+  }
+  
+  <!-- Loading and Error States -->
+  @if (isLoading) {
+    <app-loading-spinner [isLoading]="true" message="Loading book details..."></app-loading-spinner>
+  }
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+  @if (!book && !isLoading && !error) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">book</mat-icon>
+          <h5>Book not found</h5>
+          <p>The requested book could not be found.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

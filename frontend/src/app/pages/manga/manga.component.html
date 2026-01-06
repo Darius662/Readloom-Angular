@@ -1,0 +1,121 @@
+<div class="manga-container">
+  <div class="manga-header">
+    <h1>{{ title }}</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="primary">
+        <mat-icon>search</mat-icon> Search Manga
+      </button>
+      <button mat-raised-button color="success" (click)="scanForManga()" [disabled]="isScanning">
+        <mat-icon>{{ isScanning ? 'hourglass_empty' : 'qr_code' }}</mat-icon>
+        {{ isScanning ? 'Scanning...' : 'Scan for Manga' }}
+      </button>
+    </div>
+  </div>
+
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  @if (!error) {
+    <div class="manga-section">
+      <div class="section-header">
+        <h2>Manga Library</h2>
+        <div class="controls">
+          <mat-form-field appearance="outline" class="filter-input">
+            <mat-label>Filter by name...</mat-label>
+            <input matInput [value]="filterBy" (input)="onFilterInput($event)" name="filterBy">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="sort-select">
+            <mat-label>Sort by</mat-label>
+            <mat-select [value]="sortBy" (selectionChange)="onSortChange($event.value)" name="sortBy">
+              <mat-option value="name">Sort by Name</mat-option>
+              <mat-option value="rating">Sort by Rating</mat-option>
+              <mat-option value="date">Sort by Date</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      @if (filteredManga.length > 0) {
+        <div class="manga-grid">
+          @for (manga of filteredManga; track manga.id) {
+            <app-series-card [series]="manga" (click)="onViewSeries(manga)"></app-series-card>
+          }
+        </div>
+      }
+      @if (filteredManga.length === 0) {
+        <mat-card class="empty-state-card">
+          <mat-card-content>
+            <div class="empty-state">
+              <mat-icon class="empty-icon">auto_stories</mat-icon>
+              <h5>No manga found</h5>
+              <p>Try adjusting your filters or add manga to your collection</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Trending Manga Section -->
+    <div class="trending-section">
+      <div class="section-header">
+        <h2>Trending Now</h2>
+        <div class="trending-info">
+          <small class="text-muted">Popular manga from AniList</small>
+        </div>
+      </div>
+      
+      @if (isLoadingTrending) {
+        <div class="loading-state">
+          <mat-spinner></mat-spinner>
+          <p>Loading trending manga...</p>
+        </div>
+      }
+      
+      @if (!isLoadingTrending && trendingManga.length > 0) {
+        <div class="trending-grid">
+          @for (manga of trendingManga; track manga.metadata_id) {
+            <mat-card class="trending-card" (click)="onViewSeries(manga)">
+              <mat-card-content>
+                <div class="cover-container">
+                  <img [src]="manga.cover_url || '/assets/img/no-cover.png'" 
+                       [alt]="manga.name || manga.title"
+                       class="manga-cover"
+                       onerror="this.src='/assets/img/no-cover.png'">
+                  <div class="trending-score">
+                    <mat-icon class="trending-icon">local_fire_department</mat-icon>
+                    <span>Trending: {{ manga.trending_score || 0 }}</span>
+                  </div>
+                </div>
+                <div class="manga-info">
+                  <h5 class="manga-title">{{ manga.name || manga.title }}</h5>
+                  <p class="manga-meta">
+                    <small class="text-muted">
+                      @if (manga.popularity) {
+                        <span>Popularity: {{ manga.popularity }}</span>
+                      }
+                    </small>
+                  </p>
+                </div>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-raised-button color="primary" class="view-series-btn" (click)="onViewSeries(manga)">
+                  <mat-icon>visibility</mat-icon>
+                  View Series
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      }
+      
+      @if (!isLoadingTrending && trendingManga.length === 0) {
+        <div class="empty-trending">
+          <mat-icon class="empty-icon">local_fire_department</mat-icon>
+          <h3>Unable to load trending manga</h3>
+          <p>Check back later for popular manga recommendations!</p>
+        </div>
+      }
+    </div>
+  }
+</div>

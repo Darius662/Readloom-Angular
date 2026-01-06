@@ -1,0 +1,632 @@
+<div class="settings-page">
+  <mat-card class="settings-card">
+    <!-- Page Header -->
+    <mat-card-header class="page-header">
+      <mat-card-title class="mat-headline-4">{{ title }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Error Message -->
+      @if (error) {
+        <app-error-message [message]="error"></app-error-message>
+      }
+
+      <!-- Settings Tabs -->
+      <mat-tab-group [(selectedIndex)]="getTabIndex()" (selectedIndexChange)="setActiveTab($event)" class="settings-tabs">
+        <mat-tab label="General">
+          <mat-icon matTabIcon>settings</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- General settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Collections">
+          <mat-icon matTabIcon>folder</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- Collections settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Calendar">
+          <mat-icon matTabIcon>calendar_today</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- Calendar settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Logging">
+          <mat-icon matTabIcon>description</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- Logging settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Integrations">
+          <mat-icon matTabIcon>extension</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- Integrations settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Data Sync">
+          <mat-icon matTabIcon>sync</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- Data Sync settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Notifications">
+          <mat-icon matTabIcon>notifications</mat-icon>
+          <ng-template matTabContent>
+            <div class="tab-content">
+              <!-- Notifications settings content will go here -->
+            </div>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+    <!-- General Tab -->
+    @if (activeTab === 'general') {
+      <!-- <div class="tab-pane"> -->
+      <div>
+        <h3 class="h4 mb-3">General Settings</h3>
+        <form>
+          <!-- Host Setting -->
+          <div class="form-group row mb-3">
+            <label for="host" class="col-sm-3 col-form-label">Host</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" [(ngModel)]="generalSettings.host" [ngModelOptions]="{standalone: true}" id="host" placeholder="0.0.0.0">
+              <small class="form-text text-muted">The host to bind the server to (e.g., 0.0.0.0)</small>
+            </div>
+          </div>
+
+          <!-- Port Setting -->
+          <div class="form-group row mb-3">
+            <label for="port" class="col-sm-3 col-form-label">Port</label>
+            <div class="col-sm-9">
+              <input type="number" class="form-control" [(ngModel)]="generalSettings.port" [ngModelOptions]="{standalone: true}" id="port" placeholder="7227">
+              <small class="form-text text-muted">The port to bind the server to (e.g., 7227)</small>
+            </div>
+          </div>
+
+          <!-- URL Base Setting -->
+          <div class="form-group row mb-3">
+            <label for="urlBase" class="col-sm-3 col-form-label">URL Base</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" [(ngModel)]="generalSettings.urlBase" [ngModelOptions]="{standalone: true}" id="urlBase" placeholder="/readloom">
+              <small class="form-text text-muted">The base URL for the application (e.g., /readloom)</small>
+            </div>
+          </div>
+
+          <!-- Task Interval Setting -->
+          <div class="form-group row mb-3">
+            <label for="taskInterval" class="col-sm-3 col-form-label">Task Interval</label>
+            <div class="col-sm-9">
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="generalSettings.taskInterval" [ngModelOptions]="{standalone: true}" id="taskInterval" placeholder="30">
+                <span class="input-group-text">minutes</span>
+              </div>
+              <small class="form-text text-muted">How often background tasks should run</small>
+            </div>
+          </div>
+
+          <!-- Metadata Cache Setting -->
+          <div class="form-group row mb-3">
+            <label for="metadataCache" class="col-sm-3 col-form-label">Metadata Cache</label>
+            <div class="col-sm-9">
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="generalSettings.metadataCache" [ngModelOptions]="{standalone: true}" id="metadataCache" placeholder="7">
+                <span class="input-group-text">days</span>
+              </div>
+              <small class="form-text text-muted">How long to cache metadata before refreshing</small>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-9 offset-sm-3">
+              <button class="btn btn-primary" (click)="onSaveSettings()">
+                <i class="fas fa-save me-1"></i> Save Settings
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Collections Tab -->
+    @if (activeTab === 'collections') {
+      <div class="tab-content">
+        <div class="collections-header">
+          <h2>Collections Manager</h2>
+          <button mat-raised-button color="primary" (click)="onAddCollection()">
+            <mat-icon>add</mat-icon>
+            Add Collection
+          </button>
+        </div>
+        <div class="collections-root-folders-container">
+          <div class="collections-section">
+            <div class="section-header">
+              <h3>Collections</h3>
+              <button mat-raised-button color="primary" (click)="onAddCollection()">
+                <mat-icon>add</mat-icon>
+                Add Collection
+              </button>
+            </div>
+            <table class="collections-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (collection of collections; track collection.id) {
+                  <tr>
+                    <td>{{ collection.name }}</td>
+                    <td>{{ collection.description }}</td>
+                    <td>{{ collection.type || collection.content_type }}</td>
+                    <td>
+                      @if (collection.is_default) {
+                        <mat-icon class="icon-success">check_circle</mat-icon>
+                      }
+                    </td>
+                    <td>
+                      <button mat-icon-button color="accent" (click)="onViewCollection(collection)" matTooltip="View collection details">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                      <button mat-icon-button color="primary" (click)="onEditCollection(collection)" matTooltip="Edit collection">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="warn" (click)="onDeleteCollection(collection)" matTooltip="Delete collection">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="root-folders-section">
+            <div class="section-header">
+              <h3>Root Folders</h3>
+              <button mat-raised-button color="primary" (click)="onAddRootFolder()">
+                <mat-icon>add</mat-icon>
+                Add Root Folder
+              </button>
+            </div>
+            <table class="root-folders-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Path</th>
+                  <th>Content Type</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (folder of rootFolders; track folder.id) {
+                  <tr>
+                    <td>{{ folder.name }}</td>
+                    <td>{{ folder.path }}</td>
+                    <td>{{ folder.content_type }}</td>
+                    <td>
+                      <mat-icon class="icon-success">check_circle</mat-icon>
+                    </td>
+                    <td>
+                      <button mat-icon-button color="primary" (click)="onEditRootFolder(folder)" matTooltip="Edit root folder">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="warn" (click)="onDeleteRootFolder(folder)" matTooltip="Delete root folder">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Collection Details Section -->
+        @if (selectedCollection) {
+          <div class="collection-details-section">
+            <div class="section-header">
+              <h3>Collection: {{ selectedCollection.name }}</h3>
+              <button mat-icon-button (click)="onCloseCollectionDetails()" matTooltip="Close">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            <div class="collection-details-content">
+              <div class="root-folders-assigned">
+                <div class="subsection-header">
+                  <h4>Root Folders</h4>
+                  <button mat-raised-button color="primary" (click)="onLinkRootFolder()" size="small">
+                    <mat-icon>link</mat-icon>
+                    Link Root Folder
+                  </button>
+                </div>
+                @if (selectedCollectionRootFolders.length > 0) {
+                  <table class="details-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Path</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (folder of selectedCollectionRootFolders; track folder.id) {
+                        <tr>
+                          <td>{{ folder.name }}</td>
+                          <td>{{ folder.path }}</td>
+                          <td>
+                            <button mat-icon-button color="warn" (click)="onUnlinkRootFolder(folder)" matTooltip="Unlink root folder">
+                              <mat-icon>link_off</mat-icon>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                } @else {
+                  <p class="text-muted">No root folders linked to this collection</p>
+                }
+              </div>
+
+              <div class="series-in-collection">
+                <h4>Series</h4>
+                @if (selectedCollectionSeries.length > 0) {
+                  <table class="details-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (series of selectedCollectionSeries; track series.id) {
+                        <tr>
+                          <td>{{ series.title }}</td>
+                          <td>{{ series.content_type }}</td>
+                          <td>
+                            <button mat-icon-button color="primary" matTooltip="View series">
+                              <mat-icon>open_in_new</mat-icon>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                } @else {
+                  <p class="text-muted">No series in this collection</p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Calendar Tab -->
+    @if (activeTab === 'calendar') {
+      <div class="tab-content">
+        <h2>Calendar Settings</h2>
+        <div class="settings-group">
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Show Upcoming Releases</label>
+              <p class="setting-hint">Display upcoming releases on the calendar</p>
+            </div>
+            <div class="setting-value">
+              <input type="checkbox" [(ngModel)]="calendarSettings.showUpcoming" [ngModelOptions]="{standalone: true}" class="form-check-input">
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Highlight Owned Series</label>
+              <p class="setting-hint">Highlight releases for series you own</p>
+            </div>
+            <div class="setting-value">
+              <input type="checkbox" [(ngModel)]="calendarSettings.highlightOwned" [ngModelOptions]="{standalone: true}" class="form-check-input">
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Default View</label>
+              <p class="setting-hint">Default calendar view when loading</p>
+            </div>
+            <div class="setting-value">
+              <select [(ngModel)]="calendarSettings.defaultView" [ngModelOptions]="{standalone: true}" class="form-select">
+                <option value="month">Month</option>
+                <option value="week">Week</option>
+                <option value="day">Day</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button class="btn btn-primary" (click)="onSaveSettings()">
+            Save Calendar Settings
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Logging Tab -->
+    @if (activeTab === 'logging') {
+      <div class="tab-content">
+        <h2>Logging Settings</h2>
+        <div class="settings-group">
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Log Level</label>
+              <p class="setting-hint">Set the logging level for the application</p>
+            </div>
+            <div class="setting-value">
+              <select [(ngModel)]="loggingSettings.logLevel" [ngModelOptions]="{standalone: true}" class="form-select">
+                <option value="DEBUG">Debug</option>
+                <option value="INFO">Info</option>
+                <option value="WARNING">Warning</option>
+                <option value="ERROR">Error</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Enable File Logging</label>
+              <p class="setting-hint">Save logs to file</p>
+            </div>
+            <div class="setting-value">
+              <input type="checkbox" [(ngModel)]="loggingSettings.enableFileLogging" [ngModelOptions]="{standalone: true}" class="form-check-input">
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Log Retention Days</label>
+              <p class="setting-hint">Number of days to keep log files</p>
+            </div>
+            <div class="setting-value">
+              <input type="number" [(ngModel)]="loggingSettings.retentionDays" [ngModelOptions]="{standalone: true}" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button class="btn btn-primary" (click)="onSaveSettings()">
+            Save Logging Settings
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Integrations Tab -->
+    @if (activeTab === 'integrations') {
+      <div class="tab-content">
+        <h2>Available Integrations</h2>
+        <p class="section-description">Readloom can integrate with other services to provide additional functionality.</p>
+        <div class="integrations-grid">
+          <!-- Home Assistant Integration -->
+          <div class="integration-card">
+            <div class="integration-header">
+              <h3>Home Assistant</h3>
+              <span class="badge bg-success">Available</span>
+            </div>
+            <p class="integration-description">Integrate Readloom with your Home Assistant instance</p>
+            <p>Home Assistant is an open source home automation platform that puts local control and privacy first.</p>
+            <p><strong>With this integration, you can:</strong></p>
+            <ul class="integration-list">
+              <li>View upcoming e-book releases in your Home Assistant dashboard</li>
+              <li>Receive notifications for new releases</li>
+              <li>Monitor Readloom status</li>
+            </ul>
+            <button class="btn btn-primary btn-sm" (click)="configureIntegration('homeAssistant')">
+              <i class="fas fa-cog"></i> Configure
+            </button>
+          </div>
+          <!-- Homarr Integration -->
+          <div class="integration-card">
+            <div class="integration-header">
+              <h3>Homarr</h3>
+              <span class="badge bg-success">Available</span>
+            </div>
+            <p class="integration-description">Integrate Readloom with your Homarr dashboard</p>
+            <p>Homarr is a sleek, modern dashboard that puts all your apps and services in one place.</p>
+            <p><strong>With this integration, you can:</strong></p>
+            <ul class="integration-list">
+              <li>View Readloom status in your Homarr dashboard</li>
+              <li>See today's releases at a glance</li>
+              <li>Quick access to Readloom interface</li>
+            </ul>
+            <button class="btn btn-primary btn-sm" (click)="configureIntegration('homarr')">
+              <i class="fas fa-cog"></i> Configure
+            </button>
+          </div>
+          <!-- Metadata Providers Integration -->
+          <div class="integration-card">
+            <div class="integration-header">
+              <h3>Metadata Providers</h3>
+              <span class="badge bg-success">Available</span>
+            </div>
+            <p class="integration-description">Configure metadata providers for e-book search and import</p>
+            <p>Readloom can search and import e-books from various external sources.</p>
+            <p><strong>Available providers include:</strong></p>
+            <ul class="integration-list">
+              <li>MangaFire - Popular e-book aggregator</li>
+              <li>MyAnimeList (MAL) - Comprehensive anime/e-book database</li>
+              <li>Manga-API - General-purpose e-book API</li>
+              <li>Google Books - Millions of books</li>
+              <li>Open Library - Free, open database of books</li>
+              <li>ISBNdb - Comprehensive book database</li>
+            </ul>
+            <button class="btn btn-primary btn-sm" (click)="configureIntegration('metadataProviders')">
+              <i class="fas fa-cog"></i> Configure
+            </button>
+          </div>
+          <!-- AI Providers Integration -->
+          <div class="integration-card">
+            <div class="integration-header">
+              <h3>AI Providers</h3>
+              <span class="badge bg-info">New</span>
+            </div>
+            <p class="integration-description">Use AI to extract accurate manga metadata</p>
+            <p>Readloom now supports multiple AI providers for accurate manga metadata extraction including volumes, chapters, and release dates.</p>
+            <p><strong>Available providers:</strong></p>
+            <ul class="integration-list">
+              <li><strong>Groq</strong> - Fastest, free, 1 minute setup</li>
+              <li><strong>Google Gemini</strong> - Powerful, free tier, 2 minutes setup</li>
+              <li><strong>DeepSeek</strong> - Good reasoning, free tier, 2 minutes setup</li>
+              <li><strong>Ollama</strong> - Self-hosted, private, free, 5 minutes setup</li>
+            </ul>
+            <p class="text-muted small">All providers are completely free with no credit card required.</p>
+            <button class="btn btn-primary btn-sm" (click)="configureIntegration('aiProviders')">
+              <i class="fas fa-cog"></i> Configure
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Data Sync Tab -->
+    @if (activeTab === 'data-sync') {
+      <div class="tab-content">
+        <h2>Data Sync Settings</h2>
+        <div class="settings-group">
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Auto Sync Interval</label>
+              <p class="setting-hint">How often to automatically sync data (in minutes)</p>
+            </div>
+            <div class="setting-value">
+              <input type="number" [(ngModel)]="dataSyncSettings.autoSyncInterval" [ngModelOptions]="{standalone: true}" class="form-control">
+              <span class="setting-unit">minutes</span>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Enable Auto Sync</label>
+              <p class="setting-hint">Automatically sync data at regular intervals</p>
+            </div>
+            <div class="setting-value">
+              <input type="checkbox" [(ngModel)]="dataSyncSettings.enableAutoSync" [ngModelOptions]="{standalone: true}" class="form-check-input">
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label>Sync on Startup</label>
+              <p class="setting-hint">Sync data when the application starts</p>
+            </div>
+            <div class="setting-value">
+              <input type="checkbox" [(ngModel)]="dataSyncSettings.syncOnStartup" [ngModelOptions]="{standalone: true}" class="form-check-input">
+            </div>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button class="btn btn-primary" (click)="onSyncNow()">
+            <i class="fas fa-sync"></i> Sync Now
+          </button>
+          <button class="btn btn-primary" (click)="onSaveSettings()">
+            Save Sync Settings
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Notifications Demo Tab -->
+    @if (activeTab === 'notifications') {
+      <div class="tab-content">
+        <h1>Notification System Demo</h1>
+        <p class="section-description">Click buttons below to test different notification layouts</p>
+        <!-- NotificationManager (Custom In-App) Section -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">NotificationManager (Custom In-App)</h5>
+          </div>
+          <div class="card-body">
+            <div class="notifications-demo-grid">
+              <div class="demo-button-col">
+                <button class="btn btn-success w-100" (click)="showNotification('success', 'Operation completed successfully!')">
+                  <i class="fas fa-check-circle me-2"></i>Success
+                </button>
+              </div>
+              <div class="demo-button-col">
+                <button class="btn btn-danger w-100" (click)="showNotification('error', 'An error occurred. Please try again.')">
+                  <i class="fas fa-exclamation-circle me-2"></i>Error
+                </button>
+              </div>
+              <div class="demo-button-col">
+                <button class="btn btn-warning w-100" (click)="showNotification('warning', 'This action cannot be undone.')">
+                  <i class="fas fa-exclamation-triangle me-2"></i>Warning
+                </button>
+              </div>
+              <div class="demo-button-col">
+                <button class="btn btn-info w-100" (click)="showNotification('info', 'Here is some helpful information.')">
+                  <i class="fas fa-info-circle me-2"></i>Info
+                </button>
+              </div>
+              <div class="demo-button-col">
+                <button class="btn btn-secondary w-100" (click)="testConfirmDialog()">
+                  <i class="fas fa-question-circle me-2"></i>Confirm Dialog
+                </button>
+              </div>
+              <div class="demo-button-col">
+                <button class="btn btn-outline-secondary w-100" (click)="clearAllNotifications()">
+                  <i class="fas fa-trash me-2"></i>Clear All
+                </button>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3 mb-0">
+              <small><strong>Location:</strong> Top-right corner with slide-in animation</small>
+            </div>
+          </div>
+        </div>
+        <!-- Multiple Notifications Section -->
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Multiple Notifications</h5>
+          </div>
+          <div class="card-body">
+            <div class="notifications-demo-grid">
+              <div class="demo-button-col">
+                <button class="btn btn-primary w-100" (click)="testMultipleNotifications()">
+                  <i class="fas fa-layer-group me-2"></i>Show 3 Notifications
+                </button>
+              </div>
+              <div class="demo-button-col">
+                <button class="btn btn-primary w-100" (click)="testLongMessage()">
+                  <i class="fas fa-align-left me-2"></i>Long Message
+                </button>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3 mb-0">
+              <small><strong>Test:</strong> Stack multiple notifications and test with longer messages</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    </div>
+  </div>
+</div>

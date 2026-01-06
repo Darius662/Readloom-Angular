@@ -1,0 +1,19 @@
+<mat-toolbar color="primary" class="app-header">
+  <button mat-icon-button (click)="onToggleSidebar()" title="Toggle Sidebar">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="header-brand">{{ title }}</span>
+  <span class="spacer"></span>
+  <button mat-icon-button (click)="onToggleTheme()" title="Toggle Theme">
+    <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+  <button mat-icon-button title="Profile">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <button mat-icon-button title="Settings">
+    <mat-icon>settings</mat-icon>
+  </button>
+  <button mat-icon-button title="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>

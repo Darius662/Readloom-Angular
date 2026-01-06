@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Readloom - Manga, Manwa, and Comics Collection Manager">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Readloom">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>{% block title %}Readloom{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    {% block styles %}{% endblock %}
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --header-height: 60px;
+            --transition-speed: 0.3s;
+            --primary-color: #0d6efd;
+            --primary-color-hover: #0b5ed7;
+            --sidebar-bg: #212529;
+            --sidebar-active: #0d6efd;
+        }
+        
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 999;
+            background: var(--sidebar-bg);
+            transition: all var(--transition-speed);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar.active {
+            margin-left: calc(-1 * var(--sidebar-width) + var(--sidebar-collapsed-width));
+        }
+        
+        .sidebar .sidebar-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.1);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .sidebar ul.components {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar ul li a {
+            padding: 12px 20px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar ul li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar ul li a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar ul li.active > a {
+            color: #fff;
+            background: rgba(13, 110, 253, 0.2);
+            border-left-color: var(--sidebar-active);
+        }
+        
+        .sidebar.active ul li a span {
+            display: none;
+        }
+        
+        .sidebar.active ul li a i {
+            margin-right: 0;
+            font-size: 1.4rem;
+        }
+        
+        #content {
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            transition: all var(--transition-speed);
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+        
+        #content.active {
+            width: calc(100% - var(--sidebar-collapsed-width));
+        }
+        
+        #content .navbar {
+            height: var(--header-height);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-toggle {
+            cursor: pointer;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 20px;
+        }
+        
+        /* .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        } */
+        
+        .card-header {
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+            font-weight: 600;
+        }
+        
+        .btn {
+            border-radius: 6px;
+        }
+        
+        /* Fix modal backdrop issues */
+        .modal.fade {
+            transition: opacity 0.15s linear !important;
+        }
+        
+        .modal-backdrop {
+            z-index: 1040 !important;
+            opacity: 0.5 !important;
+            animation: none !important;
+        }
+        
+        .modal {
+            z-index: 1050 !important;
+        }
+        
+        /* Prevent multiple backdrops from stacking */
+        body.modal-open {
+            overflow: hidden !important;
+        }
+        
+        /* Disable Popper.js for modals */
+        .modal [data-bs-popper] {
+            position: static !important;
+        }
+        
+        /* Fix form-select in modals */
+        .modal .form-select {
+            position: relative !important;
+            z-index: 1051 !important;
+            pointer-events: auto !important;
+            transition: none !important;
+        }
+        
+        /* Ensure dropdown works properly in modals */
+        .modal .dropdown-menu {
+            position: fixed !important;
+            z-index: 1060 !important;
+        }
+        
+        /* Prevent modal from having animation issues */
+        .modal.show {
+            animation: none !important;
+        }
+        
+        /* Fix select element appearance */
+        select.form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            
+            .sidebar.active {
+                margin-left: 0;
+            }
+            
+            #content {
+                width: 100%;
+            }
+            
+            #content.active {
+                width: 100%;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+                opacity: 0;
+                transition: all 0.5s ease-in-out;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+        }
+        
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Readloom</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li {% if request.path == '/' %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.home') }}">
+                        <i class="fas fa-home"></i> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li {% if request.path.startswith('/calendar') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.calendar') }}">
+                        <i class="fas fa-calendar-alt"></i> <span>Calendar</span>
+                    </a>
+                </li>
+                <li {% if request.path.startswith('/series') and not request.path.startswith('/series/') %}class="active"{% endif %} style="display: none;">
+                    <a href="{{ url_for('ui.series_list') }}">
+                        <i class="fas fa-book"></i> <span>Series</span>
+                    </a>
+                </li>
+                <li {% if request.path.startswith('/books') and not request.path.startswith('/books/') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.books_home') }}">
+                        <i class="fas fa-book"></i> <span>Books</span>
+                    </a>
+                </li>
+                <li {% if request.path.startswith('/manga') and not request.path.startswith('/manga/') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.manga_home') }}">
+                        <i class="fas fa-book-open"></i> <span>Manga</span>
+                    </a>
+                </li>
+                <li {% if request.path.startswith('/authors') and not request.path.startswith('/authors/') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.authors_home') }}">
+                        <i class="fas fa-user-edit"></i> <span>Authors</span>
+                    </a>
+                </li>
+                <li {% if request.path == '/want-to-read' %}class="active"{% endif %}>
+                    <a href="/want-to-read">
+                        <i class="fas fa-bookmark"></i> <span>Want to Read</span>
+                    </a>
+                </li>
+                <li {% if request.path == '/library' %}class="active"{% endif %}>
+                    <a href="/library">
+                        <i class="fas fa-layer-group"></i> <span>Library Items</span>
+                    </a>
+                </li>
+                <!-- Collections Manager moved to Settings tab -->
+                <!-- <li {% if request.path == '/collections' %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.collections_manager') }}">
+                        <i class="fas fa-layer-group"></i> <span>Collections Manager</span>
+                    </a>
+                </li> -->
+                <li {% if request.path.startswith('/search') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.search') }}">
+                        <i class="fas fa-search"></i> <span>Search</span>
+                    </a>
+                </li>
+                <li {% if request.path.startswith('/notifications') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.notifications') }}">
+                        <i class="fas fa-bell"></i> <span>Notifications</span>
+                    </a>
+                </li>
+                <li class="sidebar-divider"></li>
+                <li {% if request.path.startswith('/settings') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.settings') }}">
+                        <i class="fas fa-cog"></i> <span>Settings</span>
+                    </a>
+                </li>
+                <!-- Root Folders tab hidden but route still functional -->
+                <!-- <li {% if request.path.startswith('/root-folders') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.root_folders') }}">
+                        <i class="fas fa-folder"></i> <span>Root Folders</span>
+                    </a>
+                </li> -->
+                <!-- Integrations tab hidden and moved to Settings page -->
+                <!-- <li {% if request.path.startswith('/integrations') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.integrations') }}">
+                        <i class="fas fa-plug"></i> <span>Integrations</span>
+                    </a>
+                </li> -->
+                <li {% if request.path.startswith('/about') %}class="active"{% endif %}>
+                    <a href="{{ url_for('ui.about') }}">
+                        <i class="fas fa-info-circle"></i> <span>About</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <div class="version-info">
+                    <small>v0.3.0</small>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay"></div>
+        
+        <!-- Page Content -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-dark">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <span class="navbar-brand ms-3">{% block page_title %}Readloom{% endblock %}</span>
+                    <div class="d-flex align-items-center">
+                        <div id="notifications-dropdown" class="dropdown me-3">
+                            <button class="btn btn-dark position-relative" type="button" id="notificationsButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell"></i>
+                                <span id="notification-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                    <span id="notification-count">0</span>
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsButton" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                                <h6 class="dropdown-header">Notifications</h6>
+                                <div id="notification-items">
+                                    <!-- Notifications will be loaded here -->
+                                    <div class="dropdown-item text-center text-muted">
+                                        <small>No new notifications</small>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-center" href="{{ url_for('ui.notifications') }}">
+                                    <small>View all notifications</small>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="theme-toggle">
+                            <button class="btn btn-dark" id="theme-toggle">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                {% block content %}{% endblock %}
+            </div>
+            
+            <footer class="footer mt-auto py-3 bg-dark">
+                <div class="container-fluid text-center">
+                    <span class="text-muted">© {{ current_year }} Readloom | <a href="{{ url_for('ui.about') }}" class="text-muted text-decoration-none">About</a></span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Notification System -->
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <!-- Image Utilities -->
+    <script>
+    /**
+     * Process an image URL to use the proxy for external images
+     * @param {string} url - The original image URL
+     * @returns {string} - The processed URL, using proxy if needed
+     */
+    function processImageUrl(url) {
+        // If no URL provided, use the fallback
+        if (!url) {
+            return '{{ url_for("static", filename="img/no-cover.png") }}';
+        }
+        
+        // If URL is already relative, just return it
+        if (!url.startsWith('http')) {
+            return url;
+        }
+        
+        // Use the proxy for external URLs
+        return `/api/proxy/image?url=${encodeURIComponent(url)}`;
+    }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Toggle sidebar
+            $('#sidebarCollapse').on('click', function() {
+                $('#sidebar').toggleClass('active');
+                $('#content').toggleClass('active');
+                $('.sidebar-overlay').toggleClass('active');
+            });
+            
+            // Close sidebar when clicking on overlay (mobile)
+            $('.sidebar-overlay').on('click', function() {
+                $('#sidebar').removeClass('active');
+                $('#content').removeClass('active');
+                $('.sidebar-overlay').removeClass('active');
+            });
+
+            // Theme toggle
+            $('#theme-toggle').on('click', function() {
+                const currentTheme = $('body').attr('data-bs-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                $('body').attr('data-bs-theme', newTheme);
+                
+                // Update icon
+                const icon = newTheme === 'dark' ? 'fa-moon' : 'fa-sun';
+                $('#theme-toggle i').removeClass('fa-moon fa-sun').addClass(icon);
+                
+                // Save preference
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // Load saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                $('body').attr('data-bs-theme', savedTheme);
+                const icon = savedTheme === 'dark' ? 'fa-moon' : 'fa-sun';
+                $('#theme-toggle i').removeClass('fa-moon fa-sun').addClass(icon);
+            }
+            
+            // Load notifications
+            function loadNotifications() {
+                fetch('/api/notifications?unread_only=true&limit=5')
+                    .then(response => response.json())
+                    .then(data => {
+                        const notificationItems = $('#notification-items');
+                        const notificationBadge = $('#notification-badge');
+                        const notificationCount = $('#notification-count');
+                        
+                        // Clear existing notifications
+                        notificationItems.empty();
+                        
+                        if (data.notifications && data.notifications.length > 0) {
+                            // Show badge with count
+                            notificationBadge.removeClass('d-none');
+                            notificationCount.text(data.notifications.length);
+                            
+                            // Add notifications to dropdown
+                            data.notifications.forEach(notification => {
+                                const item = $('<a class="dropdown-item"></a>')
+                                    .attr('href', '{{ url_for("ui.notifications") }}')
+                                    .data('id', notification.id);
+                                
+                                const title = $('<div class="fw-bold"></div>')
+                                    .text(notification.title);
+                                
+                                const message = $('<div class="small text-muted"></div>')
+                                    .text(notification.message.length > 50 ? 
+                                          notification.message.substring(0, 50) + '...' : 
+                                          notification.message);
+                                
+                                const time = $('<div class="small text-muted mt-1"></div>')
+                                    .text(new Date(notification.created_at).toLocaleString());
+                                
+                                item.append(title).append(message).append(time);
+                                notificationItems.append(item);
+                            });
+                        } else {
+                            // Hide badge
+                            notificationBadge.addClass('d-none');
+                            
+                            // Show no notifications message
+                            notificationItems.html(
+                                '<div class="dropdown-item text-center text-muted"><small>No new notifications</small></div>'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading notifications:', error);
+                    });
+            }
+            
+            // Load notifications on page load (with timeout to prevent blocking)
+            setTimeout(() => {
+                loadNotifications();
+            }, 500);
+            
+            // Reload notifications every 60 seconds
+            setInterval(loadNotifications, 60000);
+            
+            // Mark notification as read when clicked
+            $(document).on('click', '#notification-items a', function(e) {
+                const notificationId = $(this).data('id');
+                if (notificationId) {
+                    fetch(`/api/notifications/${notificationId}/read`, {
+                        method: 'PUT'
+                    }).catch(error => {
+                        console.error('Error marking notification as read:', error);
+                    });
+                }
+            });
+            
+            // Add animation classes to cards
+            $('.card').addClass('fade-in');
+        });
+    </script>
+    <!-- PWA Initialization -->
+    <script src="{{ url_for('static', filename='js/pwa-init.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

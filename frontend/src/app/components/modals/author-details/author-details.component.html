@@ -1,0 +1,133 @@
+<div class="author-details-dialog">
+  <mat-dialog-content class="author-details-content">
+    <!-- Author Header Section -->
+    <div class="author-header">
+      <div class="author-photo-section">
+        <img *ngIf="author.photo_url" [src]="author.photo_url" [alt]="author.name" class="author-photo" 
+             (error)="onImageError($event)">
+        <div *ngIf="!author.photo_url" class="author-photo-placeholder">
+          <mat-icon>person</mat-icon>
+        </div>
+      </div>
+      
+      <div class="author-info">
+        <h2 class="author-name">{{ author.name }}</h2>
+        <p *ngIf="author.birth_date" class="author-dates">
+          <span class="birth-date">Born: {{ formatDate(author.birth_date) }}</span>
+          <span *ngIf="author.death_date" class="death-date">• Died: {{ formatDate(author.death_date) }}</span>
+        </p>
+        <p *ngIf="author.folder_path" class="author-folder">
+          <mat-icon>folder</mat-icon>
+          <span>{{ author.folder_path }}</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Biography Section -->
+    <div *ngIf="author.biography" class="biography-section">
+      <h3>
+        <mat-icon>description</mat-icon>
+        Biography
+      </h3>
+      <div class="biography-content">
+        <p>{{ author.biography }}</p>
+      </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="statistics-section">
+      <h3>
+        <mat-icon>bar_chart</mat-icon>
+        Statistics
+      </h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">{{ releasedBooksCount }}</div>
+          <div class="stat-label">Released Books</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ libraryBooksCount }}</div>
+          <div class="stat-label">In Library</div>
+        </div>
+        <div *ngIf="author.last_updated" class="stat-card">
+          <div class="stat-value">{{ formatDate(author.last_updated) }}</div>
+          <div class="stat-label">Last Updated</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Books in Library Section -->
+    <div *ngIf="libraryBooks.length > 0" class="books-section">
+      <h3>
+        <mat-icon>library_books</mat-icon>
+        Books in Library ({{ libraryBooks.length }})
+      </h3>
+      <div class="books-list">
+        <div *ngFor="let book of libraryBooks; trackBy: trackByBookId" class="book-list-item">
+          <div class="book-cover-small">
+            <img *ngIf="book.cover_url" [src]="book.cover_url" [alt]="book.title" 
+                 (error)="onBookImageError($event, book)">
+            <div *ngIf="!book.cover_url" class="cover-placeholder-small">
+              <mat-icon>auto_stories</mat-icon>
+            </div>
+          </div>
+          <div class="book-info-list">
+            <h4 class="book-title-list">{{ book.title }}</h4>
+          </div>
+          <div class="book-actions-list">
+            <button mat-stroked-button color="primary" size="small" (click)="openBookDetails(book)">
+              <mat-icon>info</mat-icon>
+              Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popular Books Section -->
+    <div class="popular-books-section">
+      <h3>
+        <mat-icon>trending_up</mat-icon>
+        Popular Books
+      </h3>
+      
+      <!-- Loading State -->
+      <div *ngIf="isLoadingPopularBooks" class="loading-state">
+        <mat-icon class="loading-icon">hourglass_empty</mat-icon>
+        <span>Loading popular books...</span>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingPopularBooks && popularBooks.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">trending_down</mat-icon>
+        <span>No popular books found for this author</span>
+      </div>
+      
+      <!-- Books List -->
+      <div *ngIf="!isLoadingPopularBooks && popularBooks.length > 0" class="books-list">
+        <div *ngFor="let book of popularBooks; trackBy: trackByBookId" class="book-list-item">
+          <div class="book-cover-small">
+            <img *ngIf="book.cover_url" [src]="book.cover_url" [alt]="book.title" 
+                 (error)="onBookImageError($event, book)">
+            <div *ngIf="!book.cover_url" class="cover-placeholder-small">
+              <mat-icon>auto_stories</mat-icon>
+            </div>
+          </div>
+          <div class="book-info-list">
+            <h4 class="book-title-list">{{ book.title }}</h4>
+          </div>
+          <div class="book-actions-list">
+            <button mat-stroked-button color="accent" size="small" (click)="showBookModal(book)">
+              <mat-icon>visibility</mat-icon>
+              Show Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="onClose()">Close</button>
+  </mat-dialog-actions>
+</div>

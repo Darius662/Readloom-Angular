@@ -1,0 +1,42 @@
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ message }}</p>
+        
+        <!-- E-book files removal checkbox -->
+        @if (showEbookCheckbox) {
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="removeEbookFiles" [(ngModel)]="removeEbookFiles">
+            <label class="form-check-label" for="removeEbookFiles">
+              <strong>Also remove e-book files from disk</strong>
+              <div class="text-muted small">
+                This will delete the manga folder and all e-book files (PDF, EPUB, CBZ, etc.) from your storage.
+              </div>
+            </label>
+          </div>
+        }
+        
+        @if (showWarning) {
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> Warning: This action cannot be undone.
+          </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="onConfirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

@@ -1,0 +1,168 @@
+/* Sidebar Container - Exact Bootstrap Style */
+.sidebar {
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 100vh;
+  background: #343a40;
+  color: #fff;
+  transition: all 0.3s;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  overflow-x: hidden;
+}
+
+.sidebar.collapsed {
+  margin-left: -250px;
+}
+
+/* Sidebar Header - Exact Bootstrap Style */
+.sidebar-header {
+  padding: 20px;
+  background: #212529;
+  height: auto;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #4b545c;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #fff;
+}
+
+/* Sidebar Navigation - Exact Bootstrap Style */
+.sidebar-nav {
+  padding: 20px 0;
+  border-bottom: 1px solid #4b545c;
+}
+
+/* Override Material List Item Styles - Exact Bootstrap */
+.sidebar .mat-mdc-list-item {
+  padding: 12px 20px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
+  transition: all 0.3s ease !important;
+  border-left: 3px solid transparent;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+.sidebar .mat-mdc-list-item:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-left-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.sidebar .mat-mdc-list-item.active {
+  color: #fff !important;
+  background: rgba(13, 110, 253, 0.2) !important;
+  border-left-color: #0d6efd !important;
+}
+
+.sidebar .mat-mdc-list-item:focus {
+  background: transparent !important;
+}
+
+/* Sidebar Icon - FontAwesome 6.4.0 Visual Size Match */
+.sidebar-icon {
+  margin-right: 15px !important;
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 22px !important;
+  text-align: center !important;
+  color: inherit !important;
+  transition: all 0.3s ease !important;
+  display: inline-block !important;
+  font-family: 'Material Icons' !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  line-height: 20px !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  -webkit-font-smoothing: antialiased !important;
+  text-rendering: optimizeLegibility !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-feature-settings: 'liga' !important;
+  vertical-align: middle !important;
+  box-sizing: border-box !important;
+}
+
+.sidebar.collapsed .sidebar-icon {
+  margin-right: 0 !important;
+  font-size: 26px !important;
+  line-height: 20px !important;
+}
+
+/* Sidebar Text - Exact Bootstrap Style */
+.sidebar-text {
+  transition: all 0.3s ease !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  color: inherit !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  display: inline !important;
+}
+
+.sidebar.collapsed .sidebar-text {
+  display: none !important;
+}
+
+/* Remove Material List Item Underline */
+.sidebar .mat-mdc-list-item::before {
+  display: none !important;
+}
+
+.sidebar .mat-mdc-list-item::after {
+  display: none !important;
+}
+
+/* Remove Material ripple effect for cleaner Bootstrap look */
+.sidebar .mat-mdc-list-item .mat-ripple {
+  display: none !important;
+}
+
+/* Remove Material list item styling */
+.sidebar .mat-mdc-list-item .mdc-list-item__primary-text {
+  color: inherit !important;
+}
+
+.sidebar .mat-mdc-list-item.mdc-list-item--selected {
+  background: #0d6efd !important;
+  color: #fff !important;
+}
+
+/* Sidebar Divider - Bootstrap Style */
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+  border: none;
+}
+
+/* Mobile Responsive - Exact Bootstrap */
+@media (max-width: 768px) {
+  .sidebar {
+    margin-left: -250px;
+  }
+  
+  .sidebar.collapsed {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,42 @@
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Search</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search by series name..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Type</label>
+          <select
+            class="form-select"
+            [(ngModel)]="selectedType"
+            (change)="onTypeChange()">
+            <option value="">All Types</option>
+            @for (type of types; track type) {
+              <option [value]="type">
+                {{ type | titlecase }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Sort By</label>
+          <select
+            class="form-select"
+            [(ngModel)]="sortBy"
+            (change)="onSortChange()">
+            @for (option of sortOptions; track option) {
+              <option [value]="option.value">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>

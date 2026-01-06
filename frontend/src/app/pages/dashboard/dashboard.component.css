@@ -1,0 +1,64 @@
+/* Dashboard Layout - Material Design */
+.dashboard-container {
+  padding: 2.5rem;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.dashboard-container .mat-headline-4 {
+  color: var(--text-primary);
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: 2.5rem;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.mb-4 {
+  margin-bottom: 24px;
+}
+
+.stats-row {
+  margin-bottom: 2rem;
+}
+
+.content-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.left-column,
+.right-column {
+  flex: 1;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1200px) {
+  .content-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-container h1 {
+    font-size: 1.75rem;
+  }
+}

@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Authors - Readloom{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">Authors</h2>
+                    <p class="text-muted mb-0">Discover authors and their works</p>
+                </div>
+                <div>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search authors..." style="width: 300px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authors Grid -->
+    <div class="row" id="authorsContainer">
+        <div class="col-12 text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading authors...</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center" id="paginationContainer">
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Author Detail Modal -->
+<div class="modal fade" id="authorModal" tabindex="-1" aria-labelledby="authorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authorModalLabel">Author Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="authorModalBody">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let currentSearch = '';
+const perPage = 12;
+
+$(document).ready(function() {
+    loadAuthors();
+    
+    // Search functionality
+    $('#searchInput').on('keyup', function() {
+        currentSearch = $(this).val();
+        currentPage = 1;
+        loadAuthors();
+    });
+});
+
+function loadAuthors() {
+    const url = `/api/authors/?page=${currentPage}&per_page=${perPage}` + 
+                (currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : '');
+    
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(data) {
+            displayAuthors(data.authors);
+            displayPagination(data.pagination);
+        },
+        error: function(error) {
+            console.error('Error loading authors:', error);
+            $('#authorsContainer').html(
+                '<div class="col-12"><div class="alert alert-danger">Failed to load authors</div></div>'
+            );
+        }
+    });
+}
+
+function displayAuthors(authors) {
+    const container = $('#authorsContainer');
+    container.empty();
+    
+    if (authors.length === 0) {
+        container.html('<div class="col-12"><div class="alert alert-info">No authors found</div></div>');
+        return;
+    }
+    
+    authors.forEach(author => {
+        const birthYear = author.birth_date ? new Date(author.birth_date).getFullYear() : 'Unknown';
+        const bio = author.biography ? author.biography.substring(0, 150) + '...' : 'No biography available';
+        const photoUrl = author.photo_url || 'https://via.placeholder.com/300x400?text=' + encodeURIComponent(author.name);
+        
+        const html = `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 author-card" style="cursor: pointer; transition: all 0.3s;" onclick="showAuthorDetail(${author.id})">
+                    <!-- Author Photo -->
+                    <div style="height: 250px; overflow: hidden; background: #f8f9fa;">
+                        <img src="${photoUrl}" alt="${author.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Author Name -->
+                        <h5 class="card-title">${author.name}</h5>
+                        
+                        <!-- Birth Year -->
+                        <p class="card-text text-muted small mb-2">
+                            <i class="fas fa-birthday-cake"></i> Born: ${birthYear}
+                        </p>
+                        
+                        <!-- Biography -->
+                        <p class="card-text small">${bio}</p>
+                        
+                        <!-- Statistics -->
+                        <div class="row text-center small mb-3">
+                            <div class="col-6">
+                                <div class="text-primary fw-bold">${author.book_count || 0}</div>
+                                <div class="text-muted">Books</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-success fw-bold">${author.total_volumes || 0}</div>
+                                <div class="text-muted">Volumes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-sm btn-primary w-100" onclick="event.stopPropagation(); showAuthorDetail(${author.id})">
+                            <i class="fas fa-eye me-1"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.append(html);
+    });
+    
+    // Add hover effect
+    // $('.author-card').hover(
+    //     function() {
+    //         $(this).css('transform', 'translateY(-10px)').css('box-shadow', '0 10px 25px rgba(0,0,0,0.2)');
+    //     },
+    //     function() {
+    //         $(this).css('transform', 'translateY(0)').css('box-shadow', '');
+    //     }
+    // );
+}
+
+function displayPagination(pagination) {
+    const container = $('#paginationContainer');
+    container.empty();
+    
+    // Previous button
+    if (pagination.page > 1) {
+        container.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${pagination.page - 1}); return false;">
+                    Previous
+                </a>
+            </li>
+        `);
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        const active = i === pagination.page ? 'active' : '';
+        container.append(`
+            <li class="page-item ${active}">
+                <a class="page-link" href="#" onclick="goToPage(${i}); return false;">
+                    ${i}
+                </a>
+            </li>
+        `);
+    }
+    
+    // Next button
+    if (pagination.page < pagination.pages) {
+        container.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="goToPage(${pagination.page + 1}); return false;">
+                    Next
+                </a>
+            </li>
+        `);
+    }
+}
+
+function goToPage(page) {
+    currentPage = page;
+    loadAuthors();
+    window.scrollTo(0, 0);
+}
+
+function showAuthorDetail(authorId) {
+    $.ajax({
+        url: `/api/authors/${authorId}`,
+        method: 'GET',
+        success: function(data) {
+            const author = data.author;
+            const books = data.books || [];
+            
+            const photoUrl = author.photo_url || 'https://via.placeholder.com/300x400?text=' + encodeURIComponent(author.name);
+            const birthDate = author.birth_date ? new Date(author.birth_date).toLocaleDateString() : 'Unknown';
+            
+            let booksHtml = '';
+            if (books.length > 0) {
+                booksHtml = '<h6 class="mt-4 mb-3">Books by this author:</h6><div class="row">';
+                books.forEach(book => {
+                    const coverUrl = book.cover_url || 'https://via.placeholder.com/150x200?text=' + encodeURIComponent(book.title);
+                    booksHtml += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <img src="${coverUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h6 class="card-title">${book.title}</h6>
+                                    <p class="card-text small text-muted">
+                                        Type: ${book.content_type}<br>
+                                        Volumes: ${book.volumes}<br>
+                                        Chapters: ${book.chapters}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                booksHtml += '</div>';
+            }
+            
+            const modalBody = `
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <img src="${photoUrl}" alt="${author.name}" class="img-fluid rounded mb-3" style="max-height: 400px; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <h4>${author.name}</h4>
+                        <p class="text-muted"><i class="fas fa-birthday-cake"></i> Born: ${birthDate}</p>
+                        
+                        <h6>Biography</h6>
+                        <p>${author.biography || 'No biography available'}</p>
+                        
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="h4 text-primary">${books.length}</div>
+                                <div class="text-muted">Total Books</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-success">${books.reduce((sum, b) => sum + (b.volumes || 0), 0)}</div>
+                                <div class="text-muted">Total Volumes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${booksHtml}
+            `;
+            
+            $('#authorModalBody').html(modalBody);
+            const modal = new bootstrap.Modal(document.getElementById('authorModal'));
+            modal.show();
+        },
+        error: function(error) {
+            console.error('Error loading author details:', error);
+            alert('Failed to load author details');
+        }
+    });
+}
+</script>
+
+<style>
+.author-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.author-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,21 @@
+<div class="library-container">
+  <h1 class="mb-4">{{ title }}</h1>
+
+  <!-- Loading Spinner -->
+  <app-loading-spinner [isLoading]="isLoading" message="Loading library..."></app-loading-spinner>
+
+  <!-- Error Message -->
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  <!-- Search & Filter Section -->
+  @if (!isLoading) {
+    <app-search-filter-section (filtersChanged)="onFiltersChanged($event)"></app-search-filter-section>
+  }
+
+  <!-- Series Grid Section -->
+  @if (!isLoading) {
+    <app-series-grid-section [series]="filteredSeries" [resultCount]="resultCount"></app-series-grid-section>
+  }
+</div>

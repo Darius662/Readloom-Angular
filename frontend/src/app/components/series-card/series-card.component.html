@@ -1,0 +1,28 @@
+<mat-card class="library-item-card manga-card">
+  <div class="card-img-top-wrapper">
+    @if (series.cover_url) {
+      <div class="cover-link" (click)="navigateToSeries()">
+        <img [src]="series.cover_url" [alt]="series.name" class="card-img-top manga-cover">
+      </div>
+    }
+    @if (!series.cover_url) {
+      <div class="cover-link" (click)="navigateToSeries()">
+        <div class="placeholder-image">
+          <mat-icon>auto_stories</mat-icon>
+        </div>
+      </div>
+    }
+  </div>
+  
+  <mat-card-content class="card-body">
+    <h5 class="card-title">{{ series.name }}</h5>
+    <p class="card-text text-muted">{{ series.author || 'Unknown' }}</p>
+  </mat-card-content>
+  
+  <mat-card-actions class="card-footer">
+    <button mat-raised-button color="primary" class="view-series-btn" (click)="navigateToSeries()">
+      <mat-icon>auto_stories</mat-icon>
+      View Series
+    </button>
+  </mat-card-actions>
+</mat-card>

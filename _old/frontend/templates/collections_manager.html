@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block title %}Collections Manager - Readloom{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                Collections Manager
+                <i class="fas fa-info-circle ms-2" style="cursor: help; color: #0d6efd;" data-bs-toggle="tooltip" data-bs-placement="right" title="Collections allow you to organize your manga/comics into groups and connect them to specific root folders. Each collection can have multiple root folders, and each root folder can be used by multiple collections. You must have at least one collection and one root folder before you can add manga/comics to your library."></i>
+            </h1>
+
+<!-- Link Root Folder To Collection Modal -->
+<div class="modal fade" id="linkRootFolderModal" tabindex="-1" aria-labelledby="linkRootFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="linkRootFolderModalLabel">Link Root Folder to Collection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="linkRootFolderForm">
+                    <div class="mb-3">
+                        <label for="selectRootFolder" class="form-label">Root Folder</label>
+                        <select class="form-select" id="selectRootFolder" style="pointer-events: auto;">
+                        </select>
+                    </div>
+                </form>
+                <div id="linkRootFolderHelp" class="form-text">Only root folders not already in this collection are listed.</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmLinkRootFolderBtn">Link</button>
+            </div>
+        </div>
+    </div>
+</div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Collections</h5>
+                            <button class="btn btn-sm btn-primary" id="addCollectionBtn">
+                                <i class="fas fa-plus"></i> Add Collection
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="collectionsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Type</th>
+                                            <th>Root Folders</th>
+                                            <th>Series</th>
+                                            <th>Default</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="collectionsTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center">Loading collections...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Root Folders</h5>
+                            <button class="btn btn-sm btn-primary" id="addRootFolderBtn">
+                                <i class="fas fa-plus"></i> Add Root Folder
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="rootFoldersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Path</th>
+                                            <th>Content Type</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rootFoldersTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center">Loading root folders...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4 d-none" id="collectionDetailsCard">
+                <div class="card-header">
+                    <h5 class="mb-0">Collection: <span id="selectedCollectionName">Selected Collection</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h6 class="mb-0">Root Folders</h6>
+                                <button class="btn btn-sm btn-primary" id="linkRootFolderBtn" data-bs-toggle="modal" data-bs-target="#linkRootFolderModal">
+                                    <i class="fas fa-link"></i> Link Root Folder
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped" id="collectionRootFoldersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Path</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="collectionRootFoldersTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Series</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped" id="collectionSeriesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Type</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="collectionSeriesTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Collection Modal -->
+<div class="modal fade" id="addCollectionModal" tabindex="-1" aria-labelledby="addCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCollectionModalLabel">Add Collection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCollectionForm">
+                    <div class="mb-3">
+                        <label for="collectionName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="collectionName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="collectionDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="collectionDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="collectionContentType" class="form-label">Content Type</label>
+                        <select class="form-select" id="collectionContentType">
+                            <option value="MANGA">Manga</option>
+                            <option value="COMIC">Comic</option>
+                            <option value="BOOK">Book</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="collectionIsDefault">
+                        <label class="form-check-label" for="collectionIsDefault">Set as default collection</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCollectionBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Collection Modal -->
+<div class="modal fade" id="editCollectionModal" tabindex="-1" aria-labelledby="editCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCollectionModalLabel">Edit Collection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCollectionForm">
+                    <input type="hidden" id="editCollectionId">
+                    <div class="mb-3">
+                        <label for="editCollectionName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editCollectionName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCollectionDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editCollectionDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCollectionContentType" class="form-label">Content Type</label>
+                        <select class="form-select" id="editCollectionContentType">
+                            <option value="MANGA">Manga</option>
+                            <option value="COMIC">Comic</option>
+                            <option value="BOOK">Book</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editCollectionIsDefault">
+                        <label class="form-check-label" for="editCollectionIsDefault">Set as default collection</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateCollectionBtn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Root Folder Modal -->
+<div class="modal fade" id="addRootFolderModal" tabindex="-1" aria-labelledby="addRootFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRootFolderModalLabel">Add Root Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addRootFolderForm">
+                    <div class="mb-3">
+                        <label for="rootFolderPath" class="form-label">Path</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="rootFolderPath" required>
+                            <button class="btn btn-outline-secondary" type="button" id="browseFolderBtn">
+                                <i class="fas fa-folder-open"></i> Browse
+                            </button>
+                            <button class="btn btn-outline-secondary" type="button" id="validateFolderBtn" style="display: none;">Validate</button>
+                        </div>
+                        <small class="form-text text-muted">Enter the full path to the folder containing your manga/comics</small>
+                        <input type="file" id="folder-picker" style="display: none;" webkitdirectory directory multiple>
+                        <div id="folderValidationStatus" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-outline-primary" id="createFolderBtn" style="display: none;" disabled>
+                            <i class="fas fa-folder-plus"></i> Create Folder
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rootFolderName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="rootFolderName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rootFolderContentType" class="form-label">Content Type</label>
+                        <select class="form-select" id="rootFolderContentType">
+                            <option value="MANGA">Manga</option>
+                            <option value="COMIC">Comic</option>
+                            <option value="BOOK">Book</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveRootFolderBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Root Folder Modal -->
+<div class="modal fade" id="editRootFolderModal" tabindex="-1" aria-labelledby="editRootFolderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRootFolderModalLabel">Edit Root Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRootFolderForm">
+                    <input type="hidden" id="editRootFolderId">
+                    <div class="mb-3">
+                        <label for="editRootFolderPath" class="form-label">Path</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="editRootFolderPath" required>
+                            <button class="btn btn-outline-secondary" type="button" id="editBrowseFolderBtn">
+                                <i class="fas fa-folder-open"></i> Browse
+                            </button>
+                            <button class="btn btn-outline-secondary" type="button" id="editValidateFolderBtn" style="display: none;">Validate</button>
+                        </div>
+                        <small class="form-text text-muted">Enter the full path to the folder containing your manga/comics</small>
+                        <input type="file" id="edit-folder-picker" style="display: none;" webkitdirectory directory multiple>
+                        <div id="editFolderValidationStatus" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-outline-primary" id="editCreateFolderBtn" style="display: none;" disabled>
+                            <i class="fas fa-folder-plus"></i> Create Folder
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRootFolderName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editRootFolderName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRootFolderContentType" class="form-label">Content Type</label>
+                        <select class="form-select" id="editRootFolderContentType">
+                            <option value="MANGA">Manga</option>
+                            <option value="COMIC">Comic</option>
+                            <option value="BOOK">Book</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateRootFolderBtn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/folder-validation.js') }}"></script>
+<script src="{{ url_for('static', filename='js/collections_manager.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        // Set up folder validation for the Add Root Folder modal
+        setupFolderValidation('rootFolderPath', 'folderValidationStatus', 'validateFolderBtn', 'createFolderBtn');
+        
+        // Set up folder validation for the Edit Root Folder modal
+        setupFolderValidation('editRootFolderPath', 'editFolderValidationStatus', 'editValidateFolderBtn', 'editCreateFolderBtn');
+        
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Folder browser functionality
+        let currentBrowsePath = null;
+        let targetInputId = null;
+        
+        function openFolderBrowser(inputId) {
+            targetInputId = inputId;
+            currentBrowsePath = null;
+            const currentValue = $(`#${inputId}`).val();
+            
+            if (currentValue) {
+                currentBrowsePath = currentValue;
+            }
+            
+            loadFolderBrowserPath(currentBrowsePath);
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('folderBrowserModal')).show();
+        }
+        
+        function loadFolderBrowserPath(path) {
+            $.ajax({
+                url: '/api/folders/browse',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ path: path }),
+                success: function(response) {
+                    if (response.success) {
+                        currentBrowsePath = response.current_path;
+                        $('#folderBrowserCurrentPath').val(currentBrowsePath);
+                        $('#folderBrowserSelectedPath').val(currentBrowsePath);
+                        
+                        if (response.drives && response.drives.length > 0) {
+                            $('#folderBrowserDrivesContainer').show();
+                            const drivesHtml = response.drives.map(drive => 
+                                `<button type="button" class="btn btn-outline-secondary folder-drive-btn" data-path="${drive}">${drive}</button>`
+                            ).join('');
+                            $('#folderBrowserDrives').html(drivesHtml);
+                        } else {
+                            $('#folderBrowserDrivesContainer').hide();
+                        }
+                        
+                        if (response.folders && response.folders.length > 0) {
+                            const foldersHtml = response.folders.map(folder => 
+                                `<div class="list-group-item list-group-item-action cursor-pointer folder-item" data-path="${folder.path}">
+                                    <i class="fas fa-folder me-2"></i>${folder.name}
+                                </div>`
+                            ).join('');
+                            $('#folderBrowserList').html(foldersHtml);
+                        } else {
+                            $('#folderBrowserList').html('<div class="text-center text-muted">No folders found</div>');
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Failed to browse folders');
+                }
+            });
+        }
+        
+        $('#browseFolderBtn').on('click', function() {
+            openFolderBrowser('rootFolderPath');
+        });
+        
+        $('#editBrowseFolderBtn').on('click', function() {
+            openFolderBrowser('editRootFolderPath');
+        });
+        
+        $(document).on('click', '.folder-item', function() {
+            const path = $(this).data('path');
+            loadFolderBrowserPath(path);
+        });
+        
+        $(document).on('click', '.folder-drive-btn', function() {
+            const path = $(this).data('path');
+            loadFolderBrowserPath(path);
+        });
+        
+        $(document).on('click', '#folderBrowserUpBtn', function() {
+            if (currentBrowsePath) {
+                const lastBackslash = currentBrowsePath.lastIndexOf('\\');
+                const lastForwardSlash = currentBrowsePath.lastIndexOf('/');
+                const lastSeparator = Math.max(lastBackslash, lastForwardSlash);
+                if (lastSeparator > 0) {
+                    const parentPath = currentBrowsePath.substring(0, lastSeparator);
+                    if (parentPath !== currentBrowsePath) {
+                        loadFolderBrowserPath(parentPath);
+                    }
+                }
+            }
+        });
+        
+        $(document).on('click', '#folderBrowserHomeBtn', function() {
+            loadFolderBrowserPath(null);
+        });
+        
+        $(document).on('click', '#folderBrowserSelectBtn', function() {
+            if (targetInputId && currentBrowsePath) {
+                $(`#${targetInputId}`).val(currentBrowsePath);
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('folderBrowserModal')).hide();
+            }
+        });
+    });
+</script>
+
+<!-- Folder Browser Modal -->
+<div class="modal fade" id="folderBrowserModal" tabindex="-1" aria-labelledby="folderBrowserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="folderBrowserModalLabel">Select Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Current Path:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="folderBrowserCurrentPath" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="folderBrowserUpBtn">
+                            <i class="fas fa-arrow-up"></i> Up
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" id="folderBrowserHomeBtn">
+                            <i class="fas fa-home"></i> Home
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="folderBrowserDrivesContainer" class="mb-3" style="display: none;">
+                    <label class="form-label">Drives:</label>
+                    <div id="folderBrowserDrives" class="btn-group w-100 flex-wrap" role="group"></div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Folders:</label>
+                    <div id="folderBrowserList" class="list-group" style="height: 300px; overflow-y: auto;">
+                        <div class="text-center text-muted">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Selected Path:</label>
+                    <input type="text" class="form-control" id="folderBrowserSelectedPath" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="folderBrowserSelectBtn">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

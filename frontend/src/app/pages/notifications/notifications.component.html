@@ -1,0 +1,280 @@
+<div class="notifications-page">
+  <!-- Main Content Row -->
+  <div class="notifications-layout">
+    <!-- Left Column: Notifications List and Upcoming Releases -->
+    <div class="notifications-main">
+      <!-- Notifications List -->
+      <mat-card class="notifications-card">
+        <mat-card-header class="card-header-with-actions">
+          <mat-card-title>Notifications</mat-card-title>
+          <div class="header-actions">
+            <button mat-stroked-button color="primary" class="me-2" (click)="markAllRead()">
+              <mat-icon class="me-1">check_circle</mat-icon>
+              Mark All Read
+            </button>
+            <button mat-stroked-button color="warn" (click)="clearAll()">
+              <mat-icon class="me-1">delete</mat-icon>
+              Clear All
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Loading State -->
+          @if (isLoadingNotifications) {
+            <div class="loading-state text-center py-5">
+              <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+              <p class="mt-2">Loading notifications...</p>
+            </div>
+          }
+          
+          <!-- Empty State -->
+          @if (!isLoadingNotifications && notifications.length === 0) {
+            <div class="empty-state text-center py-5">
+              <mat-icon class="empty-icon">notifications_off</mat-icon>
+              <h5>No notifications</h5>
+              <p class="text-muted">You don't have any notifications yet</p>
+            </div>
+          }
+          
+          <!-- Notifications List -->
+          @if (!isLoadingNotifications && notifications.length > 0) {
+            <div class="notifications-list">
+              @for (notification of notifications; track notification.id) {
+                <mat-card class="notification-card" [class.unread]="!notification.read" [class.notification-info]="notification.type === 'INFO'" [class.notification-success]="notification.type === 'SUCCESS'" [class.notification-warning]="notification.type === 'WARNING'" [class.notification-error]="notification.type === 'ERROR'">
+                  <mat-card-content>
+                    <div class="notification-header">
+                      <h6 class="notification-title">{{ notification.title }}</h6>
+                      <span class="notification-time">{{ formatDate(notification.created_at) }}</span>
+                    </div>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <div class="notification-actions">
+                      @if (!notification.read) {
+                        <button mat-icon-button color="primary" (click)="markAsRead(notification.id)" matTooltip="Mark as read">
+                          <mat-icon>check</mat-icon>
+                        </button>
+                      }
+                      <button mat-icon-button color="warn" (click)="deleteNotification(notification.id)" matTooltip="Delete">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- Upcoming Releases -->
+      <mat-card class="upcoming-releases-card">
+        <mat-card-header class="card-header-with-actions">
+          <mat-card-title>Upcoming Releases</mat-card-title>
+          <button mat-raised-button color="primary" (click)="checkReleases()">
+            <mat-icon class="me-1">refresh</mat-icon>
+            Check Now
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Loading State -->
+          @if (isLoadingReleases) {
+            <div class="loading-state text-center py-5">
+              <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+              <p class="mt-2">Loading upcoming releases...</p>
+            </div>
+          }
+          
+          <!-- Empty State -->
+          @if (!isLoadingReleases && upcomingReleases.length === 0) {
+            <div class="empty-state text-center py-5">
+              <mat-icon class="empty-icon">event_busy</mat-icon>
+              <h5>No upcoming releases</h5>
+              <p class="text-muted">There are no upcoming releases for your subscribed series</p>
+            </div>
+          }
+          
+          <!-- Releases List -->
+          @if (!isLoadingReleases && upcomingReleases.length > 0) {
+            <div class="releases-list">
+              @for (releaseGroup of groupedReleases; track releaseGroup.date) {
+                <div class="release-group">
+                  <h6 class="release-date">{{ formatDate(releaseGroup.date) }}</h6>
+                  @for (release of releaseGroup.releases; track release.id) {
+                    <mat-card class="release-card">
+                      <mat-card-content class="py-2">
+                        <div class="release-content">
+                          <img [src]="processImageUrl(release.series.cover_url)" alt="Cover" class="release-cover" />
+                          <div class="release-info">
+                            <h6 class="release-title">{{ release.title }}</h6>
+                            <p class="release-description">{{ release.description }}</p>
+                          </div>
+                          <mat-chip [color]="release.type === 'VOLUME_RELEASE' ? 'primary' : 'accent'">
+                            {{ release.type === 'VOLUME_RELEASE' ? 'Volume' : 'Chapter' }}
+                          </mat-chip>
+                        </div>
+                      </mat-card-content>
+                    </mat-card>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <!-- Right Column: Subscriptions and Settings -->
+    <div class="notifications-sidebar">
+      <!-- Subscriptions -->
+      <mat-card class="subscriptions-card">
+        <mat-card-header class="card-header-with-actions">
+          <mat-card-title>Subscriptions</mat-card-title>
+          <button mat-raised-button color="success" (click)="openAddSubscriptionDialog()">
+            <mat-icon class="me-1">add</mat-icon>
+            Add
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Loading State -->
+          @if (isLoadingSubscriptions) {
+            <div class="loading-state text-center py-5">
+              <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+              <p class="mt-2">Loading subscriptions...</p>
+            </div>
+          }
+          
+          <!-- Empty State -->
+          @if (!isLoadingSubscriptions && subscriptions.length === 0) {
+            <div class="empty-state text-center py-5">
+              <mat-icon class="empty-icon">rss_feed</mat-icon>
+              <h5>No subscriptions</h5>
+              <p class="text-muted">You haven't subscribed to any series yet</p>
+              <button mat-stroked-button color="primary" (click)="openAddSubscriptionDialog()">
+                <mat-icon class="me-1">add</mat-icon>
+                Add Subscription
+              </button>
+            </div>
+          }
+          
+          <!-- Subscriptions List -->
+          @if (!isLoadingSubscriptions && subscriptions.length > 0) {
+            <div class="subscriptions-list">
+              @for (subscription of subscriptions; track subscription.id) {
+                <mat-card class="subscription-card">
+                  <img [src]="processImageUrl(subscription.series_cover_url)" alt="Cover" class="subscription-cover" />
+                  <mat-card-content>
+                    <h6 class="subscription-title">{{ subscription.series_title }}</h6>
+                    <p class="subscription-author">{{ subscription.series_author || 'Unknown author' }}</p>
+                    <div class="subscription-badges">
+                      @if (subscription.notify_new_volumes) {
+                        <mat-chip color="primary">Volumes</mat-chip>
+                      }
+                      @if (subscription.notify_new_chapters) {
+                        <mat-chip color="accent">Chapters</mat-chip>
+                      }
+                    </div>
+                    <button mat-stroked-button color="warn" class="w-100" (click)="unsubscribe(subscription.series_id)">
+                      <mat-icon class="me-1">close</mat-icon>
+                      Unsubscribe
+                    </button>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- Notification Settings -->
+      <mat-card class="settings-card">
+        <mat-card-header>
+          <mat-card-title>Notification Settings</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form class="settings-form">
+            <!-- General Settings -->
+            <div class="settings-section">
+              <h6 class="section-title">General Settings</h6>
+              <div class="setting-item">
+                <mat-slide-toggle [(ngModel)]="notificationSettings.notifyNewVolumes" [ngModelOptions]="{standalone: true}">
+                  Notify for new volumes
+                </mat-slide-toggle>
+              </div>
+              <div class="setting-item">
+                <mat-slide-toggle [(ngModel)]="notificationSettings.notifyNewChapters" [ngModelOptions]="{standalone: true}">
+                  Notify for new chapters
+                </mat-slide-toggle>
+              </div>
+              <div class="setting-item">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-select [(ngModel)]="notificationSettings.notifyDaysBefore" [ngModelOptions]="{standalone: true}" placeholder="Notify days before release">
+                    <mat-option value="0">On release day</mat-option>
+                    <mat-option value="1">1 day before</mat-option>
+                    <mat-option value="2">2 days before</mat-option>
+                    <mat-option value="3">3 days before</mat-option>
+                    <mat-option value="7">1 week before</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            
+            <!-- Notification Channels -->
+            <div class="settings-section">
+              <h6 class="section-title">Notification Channels</h6>
+              <div class="setting-item">
+                <mat-slide-toggle [(ngModel)]="notificationSettings.browserEnabled" [ngModelOptions]="{standalone: true}">
+                  Browser notifications
+                </mat-slide-toggle>
+              </div>
+              <div class="setting-item">
+                <mat-slide-toggle [(ngModel)]="notificationSettings.emailEnabled" [ngModelOptions]="{standalone: true}">
+                  Email notifications
+                </mat-slide-toggle>
+                @if (notificationSettings.emailEnabled) {
+                  <div class="channel-settings">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <input matInput type="email" [(ngModel)]="notificationSettings.emailAddress" [ngModelOptions]="{standalone: true}" placeholder="Email address">
+                    </mat-form-field>
+                  </div>
+                }
+              </div>
+              <div class="setting-item">
+                <mat-slide-toggle [(ngModel)]="notificationSettings.discordEnabled" [ngModelOptions]="{standalone: true}">
+                  Discord webhook
+                </mat-slide-toggle>
+                @if (notificationSettings.discordEnabled) {
+                  <div class="channel-settings">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <input matInput [(ngModel)]="notificationSettings.discordWebhook" [ngModelOptions]="{standalone: true}" placeholder="Discord webhook URL">
+                    </mat-form-field>
+                  </div>
+                }
+              </div>
+              <div class="setting-item">
+                <mat-slide-toggle [(ngModel)]="notificationSettings.telegramEnabled" [ngModelOptions]="{standalone: true}">
+                  Telegram notifications
+                </mat-slide-toggle>
+                @if (notificationSettings.telegramEnabled) {
+                  <div class="channel-settings">
+                    <mat-form-field appearance="outline" class="w-100 mb-2">
+                      <input matInput [(ngModel)]="notificationSettings.telegramBotToken" [ngModelOptions]="{standalone: true}" placeholder="Telegram bot token">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-100">
+                      <input matInput [(ngModel)]="notificationSettings.telegramChatId" [ngModelOptions]="{standalone: true}" placeholder="Telegram chat ID">
+                    </mat-form-field>
+                  </div>
+                }
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button mat-raised-button color="primary" class="w-100" (click)="saveNotificationSettings()">
+                <mat-icon class="me-1">save</mat-icon>
+                Save Settings
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

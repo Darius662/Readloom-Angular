@@ -1,0 +1,67 @@
+<!-- Chapter Form Modal -->
+<div class="modal fade" id="chapterModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="chapterModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="chapterModalLabel">{{ isEditMode ? 'Edit Chapter' : 'Add Chapter' }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="chapter-number" class="form-label">Chapter Number *</label>
+            <input type="text" class="form-control" id="chapter-number" [(ngModel)]="number" name="number" required>
+          </div>
+          <div class="mb-3">
+            <label for="chapter-title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="chapter-title" [(ngModel)]="title" name="title">
+          </div>
+          <div class="mb-3">
+            <label for="chapter-volume" class="form-label">Volume</label>
+            <select class="form-select" id="chapter-volume" [(ngModel)]="volumeId" name="volumeId">
+              <option [value]="null">None</option>
+              @for (vol of volumes; track vol) {
+                <option [value]="vol.id">{{ vol.number }} {{ vol.title ? '- ' + vol.title : '' }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="chapter-description" class="form-label">Description</label>
+            <textarea class="form-control" id="chapter-description" [(ngModel)]="description" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="chapter-release-date" class="form-label">Release Date</label>
+            <input type="date" class="form-control" id="chapter-release-date" [(ngModel)]="releaseDate" name="releaseDate">
+          </div>
+          <div class="mb-3">
+            <label for="chapter-status" class="form-label">Status</label>
+            <select class="form-select" id="chapter-status" [(ngModel)]="status" name="status">
+              @for (opt of statusOptions; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="chapter-read-status" class="form-label">Read Status</label>
+            <select class="form-select" id="chapter-read-status" [(ngModel)]="readStatus" name="readStatus">
+              @for (opt of readStatusOptions; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="isLoading">
+          {{ isLoading ? 'Saving...' : 'Save Chapter' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

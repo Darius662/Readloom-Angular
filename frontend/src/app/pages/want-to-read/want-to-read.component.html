@@ -1,0 +1,141 @@
+<div class="want-to-read-container">
+  <!-- Header with Refresh Button -->
+  <div class="header-section">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">
+        <mat-icon class="me-2">bookmark</mat-icon>
+        Want to Read
+      </h1>
+      <div>
+        <button mat-stroked-button color="primary" (click)="refreshItems()">
+          <mat-icon class="me-2">refresh</mat-icon>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading and Error States -->
+  <app-loading-spinner [isLoading]="isLoading" message="Loading want-to-read items..."></app-loading-spinner>
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  <!-- Statistics Cards -->
+  @if (!isLoading) {
+    <mat-card class="stats-card">
+      <mat-card-content>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value text-primary">{{ totalCount }}</div>
+            <div class="stat-label">Total Items</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value text-info">{{ mangaCount }}</div>
+            <div class="stat-label">Manga/Comics</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value text-success">{{ bookCount }}</div>
+            <div class="stat-label">Books</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Filter and Sort Controls -->
+  @if (!isLoading) {
+    <mat-card class="filters-card">
+      <mat-card-content>
+        <div class="filters-grid">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Filter by Type</mat-label>
+            <mat-select [(ngModel)]="filterType" (selectionChange)="applyFiltersAndSort()">
+              <mat-option value="">All Types</mat-option>
+              <mat-option value="MANGA">Manga</mat-option>
+              <mat-option value="MANHWA">Manhwa</mat-option>
+              <mat-option value="MANHUA">Manhua</mat-option>
+              <mat-option value="COMIC">Comics</mat-option>
+              <mat-option value="BOOK">Books</mat-option>
+              <mat-option value="NOVEL">Novels</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Sort By</mat-label>
+            <mat-select [(ngModel)]="sortBy" (selectionChange)="applyFiltersAndSort()">
+              <mat-option value="title">Title (A-Z)</mat-option>
+              <mat-option value="title-desc">Title (Z-A)</mat-option>
+              <mat-option value="added">Recently Added</mat-option>
+              <mat-option value="author">Author</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="searchTerm" (keyup)="applyFiltersAndSort()" 
+                   placeholder="Search by title or author...">
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Items Grid -->
+  @if (!isLoading && filteredSeries.length > 0) {
+    <div class="items-grid">
+      @for (item of filteredSeries; track item.id) {
+        <mat-card class="want-to-read-card" (click)="viewDetails(item)">
+          <div class="card-image-container">
+            @if (item.cover_url) {
+              <img [src]="item.cover_url" [alt]="item.name || item.title" 
+                   class="card-image" onerror="this.src='/assets/no-cover.png'">
+            } @else {
+              <div class="no-cover-image">
+                <mat-icon>book</mat-icon>
+              </div>
+            }
+          </div>
+          
+          <mat-card-content class="card-content">
+            <h5 class="card-title">{{ item.name || item.title || 'Unknown Title' }}</h5>
+            <p class="card-author">{{ item.author || 'Unknown Author' }}</p>
+            <div class="card-badges">
+              <mat-chip class="type-chip">{{ item.content_type || 'Unknown' }}</mat-chip>
+              @if (item.in_library === 1 && item.want_to_read === 1) {
+                <mat-chip class="collection-chip">{{ item.collection_names || 'In Library' }}</mat-chip>
+              } @else if (item.in_library === 1 && item.want_to_read === 0) {
+                <mat-chip class="collection-chip">{{ item.collection_names || 'In Library' }}</mat-chip>
+              } @else if (item.in_library === 0 && item.want_to_read === 1) {
+                <mat-chip class="want-to-read-only-chip">Want to Read Only</mat-chip>
+              } @else {
+                <mat-chip class="unknown-chip">Unknown</mat-chip>
+              }
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions class="card-actions">
+            <button mat-raised-button color="primary" size="small" 
+                    (click)="viewDetails(item)" (click)="$event.stopPropagation()">
+              <mat-icon class="me-1">visibility</mat-icon>
+              View Details
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && filteredSeries.length === 0) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">bookmark</mat-icon>
+          <h5>No items in your Want to Read list</h5>
+          <p>Search for manga or books and click "Want to Read" to add them here</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

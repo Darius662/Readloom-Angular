@@ -1,0 +1,166 @@
+<div class="search-details-modal">
+  <div class="modal-header">
+    <h5 class="modal-title">{{ contentType === 'book' ? 'Book' : 'Manga' }} Details</h5>
+    <button type="button" class="btn-close" (click)="close()" aria-label="Close"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <!-- Cover Image and Controls -->
+      <div class="col-md-3">
+        <img [src]="getCoverUrl(result.cover_url)" 
+             [alt]="result.title || result.name"
+             class="img-fluid rounded"
+             onerror="this.src='/assets/no-cover.png'">
+        
+        <div class="mt-3">
+          <!-- Collection Label -->
+          <div class="mb-2">
+            <label class="form-label small mb-1">Collection</label>
+          </div>
+
+          <!-- Collection Selection Dropdown -->
+          <div class="mb-3">
+            <select class="form-select form-select-sm" 
+                    [(ngModel)]="selectedCollection"
+                    (change)="onCollectionChange()"
+                    name="collection">
+              <option value="">-- Select Collection --</option>
+              @for (collection of collections; track collection.id) {
+                <option [value]="collection.id">
+                  {{ collection.name }}{{ collection.is_default === 1 ? ' (default)' : '' }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Root Folder Label -->
+          <div class="mb-2">
+            <label class="form-label small mb-1">Root Folder</label>
+          </div>
+
+          <!-- Root Folder Selection Dropdown -->
+          <div class="mb-3">
+            <select class="form-select form-select-sm" 
+                    [(ngModel)]="selectedRootFolder"
+                    name="rootFolder">
+              <option value="">-- Auto --</option>
+              @for (folder of rootFolders; track folder.id) {
+                <option [value]="folder.id">{{ folder.name }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Add to Collection Button -->
+          <button class="btn btn-success w-100 mb-2" 
+                  (click)="handlePrimaryAction()"
+                  [disabled]="isLoading">
+            @if (isLoading) {
+              <i class="fas fa-spinner fa-spin me-2"></i> {{ isInLibrary ? 'Loading...' : 'Adding...' }}
+            } @else {
+              <i class="fas fa-{{ isInLibrary ? 'arrow-right' : 'plus-circle' }} me-2"></i> {{ primaryButtonText }}
+            }
+          </button>
+
+          <!-- Remove from Want to Read Button -->
+          <button class="btn btn-outline-warning w-100" 
+                  (click)="handleSecondaryAction()"
+                  [disabled]="isLoading">
+            @if (isLoading) {
+              <i class="fas fa-spinner fa-spin me-2"></i> Removing...
+            } @else {
+              <i class="fas fa-{{ isInWantToRead ? 'trash' : 'bookmark' }} me-2"></i> {{ secondaryButtonText }}
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="col-md-9">
+        <h4 class="mb-3">{{ result.title || result.name }}</h4>
+        
+        @if (result.alternative_titles && result.alternative_titles.length > 0) {
+          <div id="modalAltTitles" class="text-muted small mb-3">
+            {{ result.alternative_titles.join(', ') }}
+          </div>
+        } @else {
+          <div id="modalAltTitles" class="text-muted small mb-3"></div>
+        }
+        
+        <!-- Author info -->
+        <div id="modalAuthor" class="mb-4">
+          @if (result.author) {
+            {{ result.author }}
+          }
+        </div>
+        
+        <!-- Book-specific fields -->
+        <div class="book-fields">
+          @if (result.publisher) {
+            <div class="mb-3">
+              <strong>Publisher:</strong> <span id="modalPublisher">{{ result.publisher }}</span>
+            </div>
+          } @else {
+            <div class="mb-3">
+              <strong>Publisher:</strong> <span id="modalPublisher" class="text-muted">Unknown</span>
+            </div>
+          }
+          
+          @if (result.published_date) {
+            <div class="mb-3">
+              <strong>Published:</strong> <span id="modalPublishedDate">{{ result.published_date }}</span>
+            </div>
+          } @else {
+            <div class="mb-3">
+              <strong>Published:</strong> <span id="modalPublishedDate" class="text-muted">Unknown</span>
+            </div>
+          }
+          
+          @if (result.isbn) {
+            <div class="mb-3">
+              <strong>ISBN:</strong> <span id="modalISBN">{{ result.isbn }}</span>
+            </div>
+          } @else {
+            <div class="mb-3">
+              <strong>ISBN:</strong> <span id="modalISBN" class="text-muted">Unknown</span>
+            </div>
+          }
+        </div>
+        
+        <!-- Genres/Subjects -->
+        <div class="mb-4">
+          <strong>{{ contentType === 'book' ? 'Subjects' : 'Genres' }}:</strong>
+          <div id="modalGenres" class="mt-2">
+            @if (result.subjects && result.subjects.length > 0) {
+              @for (subject of result.subjects; track $index) {
+                <span class="badge bg-secondary me-1 mb-1">{{ subject }}</span>
+              }
+            } @else if (result.genres && result.genres.length > 0) {
+              @for (genre of result.genres; track $index) {
+                <span class="badge bg-secondary me-1 mb-1">{{ genre }}</span>
+              }
+            } @else {
+              <span class="text-muted">No genres available</span>
+            }
+          </div>
+        </div>
+        
+        <!-- Description -->
+        <div class="mb-3">
+          <strong>Description:</strong>
+          <div id="modalDescription" class="mt-2 description-scroll">
+            @if (result.description) {
+              {{ result.description }}
+            } @else {
+              <span class="text-muted">No description available</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+  </div>
+</div>

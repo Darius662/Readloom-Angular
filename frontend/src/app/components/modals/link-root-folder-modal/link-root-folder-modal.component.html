@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Link Root Folder to Collection</h2>
+
+<mat-dialog-content>
+  <form>
+    <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Root Folder</mat-label>
+        <mat-select [(ngModel)]="selectedRootFolderId" [ngModelOptions]="{standalone: true}" name="rootFolder">
+          @for (folder of availableFolders; track folder.id) {
+            <mat-option [value]="folder.id">{{ folder.name }} ({{ folder.path }})</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <p class="text-muted">Only root folders not already linked to this collection are listed.</p>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onLink()" [disabled]="selectedRootFolderId === null">Link</button>
+</mat-dialog-actions>

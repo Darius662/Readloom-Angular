@@ -1,0 +1,37 @@
+<mat-card class="releases-card">
+  <mat-card-header>
+    <mat-card-title>Upcoming Releases (Next 7 Days)</mat-card-title>
+  </mat-card-header>
+  <mat-divider />
+  <mat-card-content>
+    @if (releases.length > 0) {
+      <div class="releases-list">
+        @for (release of releases; track release) {
+          <div class="release-item">
+            <div class="release-info">
+              <h4 class="release-series">{{ release.seriesTitle }}</h4>
+              <div class="release-details">
+                <mat-chip-set aria-label="Release details">
+                  <mat-chip [highlighted]="release.type === 'chapter'">
+                    {{ release.type }}
+                  </mat-chip>
+                  <mat-chip>#{{ release.number }}</mat-chip>
+                  <mat-chip>{{ release.releaseDate | date: 'MMM d, yyyy' }}</mat-chip>
+                  <mat-chip [highlighted]="release.is_confirmed">
+                    {{ release.is_confirmed ? 'Confirmed' : 'Predicted' }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+    @if (releases.length === 0) {
+      <p class="empty-message">
+        <mat-icon>info</mat-icon>
+        No upcoming releases in the next 7 days.
+      </p>
+    }
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Library{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="mb-4">
+            <i class="fas fa-book"></i> Library
+        </h1>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card bg-primary bg-opacity-10">
+            <div class="stat-value" id="total-series">{{ stats.total_series }}</div>
+            <div class="stat-label">Total Series</div>
+            <i class="fas fa-book stat-icon text-primary"></i>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card bg-info bg-opacity-10">
+            <div class="stat-value" id="total-volumes">{{ stats.total_volumes }}</div>
+            <div class="stat-label">Total Volumes</div>
+            <i class="fas fa-layer-group stat-icon text-info"></i>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card bg-success bg-opacity-10">
+            <div class="stat-value" id="owned-volumes">{{ stats.owned_volumes }}</div>
+            <div class="stat-label">Owned Volumes</div>
+            <i class="fas fa-check-circle stat-icon text-success"></i>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card bg-warning bg-opacity-10">
+            <div class="stat-value" id="total-value">${{ "%.2f"|format(stats.total_value) }}</div>
+            <div class="stat-label">Library Value</div>
+            <i class="fas fa-dollar-sign stat-icon text-warning"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="filter-content-type" class="form-label">Content Type</label>
+                        <select class="form-select" id="filter-content-type">
+                            <option value="">All Types</option>
+                            <option value="BOOK">Books</option>
+                            <option value="MANGA">Manga</option>
+                            <option value="MANHWA">Manhwa</option>
+                            <option value="MANHUA">Manhua</option>
+                            <option value="COMIC">Comics</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label for="filter-ownership" class="form-label">Ownership Status</label>
+                        <select class="form-select" id="filter-ownership">
+                            <option value="">All Items</option>
+                            <option value="OWNED">Owned</option>
+                            <option value="WANTED">Wanted</option>
+                            <option value="ORDERED">Ordered</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label for="filter-format" class="form-label">Format</label>
+                        <select class="form-select" id="filter-format">
+                            <option value="">All Formats</option>
+                            <option value="PHYSICAL">Physical</option>
+                            <option value="DIGITAL">Digital</option>
+                            <option value="BOTH">Both</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-primary w-100" id="apply-filters">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Library Items List -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Library Items</h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="library-items-container">
+                    {% if library_items %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 library-items-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Description</th>
+                                        <th>Tags</th>
+                                        <th class="text-center">Volumes</th>
+                                        <th class="text-center">Value</th>
+                                        <th class="text-center">Owned</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in library_items %}
+                                    <tr class="library-item-row">
+                                        <!-- Title -->
+                                        <td class="library-item-title-cell">
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if item.cover_url %}
+                                                    <img src="{{ item.cover_url }}" alt="{{ item.series_title }}" class="library-item-thumbnail" onerror="this.src='/static/images/placeholder.png'">
+                                                {% else %}
+                                                    <div class="library-item-thumbnail placeholder-thumbnail">
+                                                        <i class="fas fa-book"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="library-item-title">{{ item.series_title }}</div>
+                                            </div>
+                                        </td>
+                                        
+                                        <!-- Author -->
+                                        <td class="library-item-author-cell">
+                                            {{ item.author or '-' }}
+                                        </td>
+                                        
+                                        <!-- Description -->
+                                        <td class="library-item-description-cell">
+                                            {{ item.description[:50] }}{% if item.description and item.description|length > 50 %}...{% endif %}
+                                        </td>
+                                        
+                                        <!-- Tags/Badges -->
+                                        <td class="library-item-tags-cell">
+                                            <span class="badge bg-info">{{ item.content_type }}</span>
+                                            <span class="badge bg-secondary">{{ item.status or 'Unknown' }}</span>
+                                        </td>
+                                        
+                                        <!-- Volumes -->
+                                        <td class="library-item-stat-cell text-center">
+                                            {{ item.volume_count }}
+                                        </td>
+                                        
+                                        <!-- Value -->
+                                        <td class="library-item-stat-cell text-center">
+                                            ${{ "%.2f"|format(item.total_value or 0) }}
+                                        </td>
+                                        
+                                        <!-- Owned -->
+                                        <td class="library-item-stat-cell text-center">
+                                            {{ item.owned_volumes or 0 }}
+                                        </td>
+                                        
+                                        <!-- Action -->
+                                        <td class="library-item-action-cell text-center">
+                                            <a href="/series/{{ item.series_id }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i> No library items found. Add some books or manga to get started!
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Apply filters
+        $('#apply-filters').click(function() {
+            const contentType = $('#filter-content-type').val();
+            const ownershipStatus = $('#filter-ownership').val();
+            const format = $('#filter-format').val();
+            
+            let url = '/library/api/items?';
+            if (contentType) url += `content_type=${contentType}&`;
+            if (ownershipStatus) url += `ownership_status=${ownershipStatus}&`;
+            if (format) url += `format=${format}&`;
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        renderLibraryItems(response.items);
+                    } else {
+                        showError('Failed to load library items');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error loading library items:', error);
+                    showError('Failed to load library items');
+                }
+            });
+        });
+        
+        // Render library items
+        function renderLibraryItems(items) {
+            const container = $('#library-items-container');
+            container.empty();
+            
+            if (items.length === 0) {
+                container.html(`
+                    <div class="p-4">
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> No library items match your filters.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+            
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 library-items-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Description</th>
+                                <th>Tags</th>
+                                <th class="text-center">Volumes</th>
+                                <th class="text-center">Value</th>
+                                <th class="text-center">Owned</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            items.forEach(item => {
+                const coverUrl = item.cover_url || '/static/images/placeholder.png';
+                const totalValue = (item.total_value || 0).toFixed(2);
+                const description = item.description ? item.description.substring(0, 50) : '';
+                const hasMoreDescription = item.description && item.description.length > 50;
+                
+                html += `
+                    <tr class="library-item-row">
+                        <td class="library-item-title-cell">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="${coverUrl}" alt="${item.series_title}" class="library-item-thumbnail" onerror="this.src='/static/images/placeholder.png'">
+                                <div class="library-item-title">${item.series_title}</div>
+                            </div>
+                        </td>
+                        <td class="library-item-author-cell">
+                            ${item.author || '-'}
+                        </td>
+                        <td class="library-item-description-cell">
+                            ${description}${hasMoreDescription ? '...' : ''}
+                        </td>
+                        <td class="library-item-tags-cell">
+                            <span class="badge bg-info">${item.content_type}</span>
+                            <span class="badge bg-secondary">${item.status || 'Unknown'}</span>
+                        </td>
+                        <td class="library-item-stat-cell text-center">
+                            ${item.volume_count}
+                        </td>
+                        <td class="library-item-stat-cell text-center">
+                            $${totalValue}
+                        </td>
+                        <td class="library-item-stat-cell text-center">
+                            ${item.owned_volumes || 0}
+                        </td>
+                        <td class="library-item-action-cell text-center">
+                            <a href="/series/${item.series_id}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.html(html);
+        }
+    });
+</script>
+{% endblock %}

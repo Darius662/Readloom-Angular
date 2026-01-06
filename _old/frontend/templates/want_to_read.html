@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+
+{% block title %}Want to Read{% endblock %}
+
+{% block page_title %}Want to Read{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="mb-0">
+                <i class="fas fa-bookmark"></i> Want to Read
+            </h1>
+            <div>
+                <button id="btnRefresh" class="btn btn-outline-primary">
+                    <i class="fas fa-sync-alt me-2"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h3 id="totalCount" class="text-primary">0</h3>
+                            <p class="text-muted">Total Items</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h3 id="mangaCount" class="text-info">0</h3>
+                            <p class="text-muted">Manga/Comics</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h3 id="bookCount" class="text-success">0</h3>
+                            <p class="text-muted">Books</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter and Sort -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Filter by Type</label>
+                        <select id="filterType" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="MANGA">Manga</option>
+                            <option value="MANHWA">Manhwa</option>
+                            <option value="MANHUA">Manhua</option>
+                            <option value="COMIC">Comics</option>
+                            <option value="BOOK">Books</option>
+                            <option value="NOVEL">Novels</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Sort By</label>
+                        <select id="sortBy" class="form-select">
+                            <option value="title">Title (A-Z)</option>
+                            <option value="title-desc">Title (Z-A)</option>
+                            <option value="added">Recently Added</option>
+                            <option value="author">Author</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Search</label>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by title or author...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Items Grid -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div id="loadingIndicator" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading want-to-read items...</p>
+        </div>
+        
+        <div id="noItems" class="text-center my-5 d-none">
+            <i class="fas fa-bookmark fa-3x text-muted mb-3"></i>
+            <h5>No items in your Want to Read list</h5>
+            <p class="text-muted">Search for manga or books and click "Want to Read" to add them here</p>
+        </div>
+        
+        <div id="itemsGrid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+            <!-- Items will be populated here -->
+        </div>
+    </div>
+</div>
+
+<!-- E-book Details Modal -->
+<div class="modal fade" id="ebookDetailsModal" tabindex="-1" aria-labelledby="ebookDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ebookDetailsModalLabel">Item Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <img id="modalCover" src="" alt="Cover" class="img-fluid rounded">
+                        <div class="mt-3">
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Content Type</label>
+                                <select id="modalContentType" class="form-select form-select-sm">
+                                    <option value="MANGA">Manga</option>
+                                    <option value="MANHWA">Manhwa</option>
+                                    <option value="MANHUA">Manhua</option>
+                                    <option value="COMICS">Comics</option>
+                                    <option value="NOVEL">Novel</option>
+                                    <option value="BOOK">Book</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <button id="btnAddToCollection" class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-plus-circle me-2"></i> Add to Collection
+                            </button>
+                            <button id="btnWantToRead" class="btn btn-outline-warning w-100 mb-2">
+                                <i class="fas fa-bookmark me-2"></i> Remove from Want to Read
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="modalTitle"></h4>
+                        <div id="modalAltTitles" class="text-muted small mb-2"></div>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary me-1" id="modalStatus"></span>
+                            <span class="badge bg-warning" id="modalRating"><i class="fas fa-star me-1"></i> <span id="modalRatingValue"></span></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Author:</strong> <span id="modalAuthor"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Genres:</strong>
+                            <div id="modalGenres" class="mt-1"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Description:</strong>
+                            <p id="modalDescription" class="mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        let allItems = [];
+        
+        // Load want-to-read items
+        function loadWantToReadItems() {
+            $('#loadingIndicator').removeClass('d-none');
+            $('#itemsGrid').empty();
+            $('#noItems').addClass('d-none');
+            
+            $.ajax({
+                url: '/api/collection/want-to-read',
+                method: 'GET',
+                success: function(data) {
+                    $('#loadingIndicator').addClass('d-none');
+                    
+                    if (data.success && data.items && data.items.length > 0) {
+                        allItems = data.items;
+                        updateStatistics();
+                        displayItems(allItems);
+                    } else {
+                        $('#noItems').removeClass('d-none');
+                        $('#totalCount').text(0);
+                        $('#mangaCount').text(0);
+                        $('#bookCount').text(0);
+                    }
+                },
+                error: function(xhr) {
+                    $('#loadingIndicator').addClass('d-none');
+                    $('#noItems').removeClass('d-none');
+                    console.error('Error loading want-to-read items:', xhr);
+                    if (notificationManager) {
+                        notificationManager.error('Failed to load want-to-read items');
+                    }
+                }
+            });
+        }
+        
+        // Update statistics
+        function updateStatistics() {
+            const total = allItems.length;
+            const manga = allItems.filter(item => 
+                ['MANGA', 'MANHWA', 'MANHUA', 'COMIC'].includes((item.content_type || '').toUpperCase())
+            ).length;
+            const books = allItems.filter(item => 
+                ['BOOK', 'NOVEL'].includes((item.content_type || '').toUpperCase())
+            ).length;
+            
+            $('#totalCount').text(total);
+            $('#mangaCount').text(manga);
+            $('#bookCount').text(books);
+        }
+        
+        // Display items
+        function displayItems(items) {
+            const grid = $('#itemsGrid');
+            grid.empty();
+            
+            if (items.length === 0) {
+                $('#noItems').removeClass('d-none');
+                return;
+            }
+            
+            items.forEach(item => {
+                const coverUrl = item.cover_url || '/static/img/no-cover.png';
+                const title = item.title || 'Unknown Title';
+                const author = item.author || 'Unknown Author';
+                const contentType = item.content_type || 'Unknown';
+                const seriesId = item.id;
+                
+                // Determine link based on content type
+                let link = '#';
+                if (['MANGA', 'MANHWA', 'MANHUA', 'COMIC'].includes(contentType.toUpperCase())) {
+                    link = `/manga/series/${seriesId}`;
+                } else {
+                    link = `/books/${seriesId}`;
+                }
+                
+                // Show collection info based on in_library flag
+                let collectionBadge = '';
+                if (item.in_library === 1 && item.want_to_read === 1) {
+                    collectionBadge = `<span class="badge bg-success">${item.collection_names || 'In Library'}</span>`;
+                } else if (item.in_library === 1 && item.want_to_read === 0) {
+                    collectionBadge = `<span class="badge bg-success">${item.collection_names || 'In Library'}</span>`;
+                } else if (item.in_library === 0 && item.want_to_read === 1) {
+                    collectionBadge = '<span class="badge bg-warning">Want to Read Only</span>';
+                } else {
+                    collectionBadge = '<span class="badge bg-secondary">Unknown</span>';
+                }
+                
+                const html = `
+                    <div class="col">
+                        <div class="card h-100 want-to-read-card" style="cursor: pointer;" data-cache-id="${item.id}">
+                            <img src="${coverUrl}" class="card-img-top" alt="${title}" style="height: 250px; object-fit: cover;" onerror="this.src='/static/img/no-cover.png'">
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">
+                                    ${title}
+                                </h5>
+                                <p class="card-text text-muted text-truncate">${author}</p>
+                                <div class="mb-2">
+                                    <span class="badge bg-info">${contentType}</span>
+                                    ${collectionBadge}
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary btn-sm w-100 view-details-btn">
+                                    <i class="fas fa-eye me-1"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                grid.append(html);
+            });
+        }
+        
+        // Filter and sort
+        function applyFiltersAndSort() {
+            let filtered = allItems;
+            
+            // Apply type filter
+            const filterType = $('#filterType').val();
+            if (filterType) {
+                filtered = filtered.filter(item => 
+                    (item.content_type || '').toUpperCase() === filterType.toUpperCase()
+                );
+            }
+            
+            // Apply search
+            const searchTerm = $('#searchInput').val().toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(item => 
+                    (item.title || '').toLowerCase().includes(searchTerm) ||
+                    (item.author || '').toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Apply sort
+            const sortBy = $('#sortBy').val();
+            switch(sortBy) {
+                case 'title':
+                    filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+                    break;
+                case 'title-desc':
+                    filtered.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+                    break;
+                case 'author':
+                    filtered.sort((a, b) => (a.author || '').localeCompare(b.author || ''));
+                    break;
+                case 'added':
+                default:
+                    // Keep original order
+                    break;
+            }
+            
+            displayItems(filtered);
+        }
+        
+        // Handle card click to show details modal
+        $(document).on('click', '.want-to-read-card, .view-details-btn', function(e) {
+            e.preventDefault();
+            const card = $(this).closest('.want-to-read-card');
+            const cacheId = card.data('cache-id');
+            
+            // Fetch item details
+            $.ajax({
+                url: `/api/want-to-read/${cacheId}/details`,
+                method: 'GET',
+                success: function(data) {
+                    if (data.success && data.item) {
+                        showItemModal(data.item, data.in_library, data.series_id);
+                    } else {
+                        notificationManager.error('Failed to load item details');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching item details:', xhr);
+                    notificationManager.error('Failed to load item details');
+                }
+            });
+        });
+        
+        // Show item details modal
+        function showItemModal(item, inLibrary, seriesId) {
+            // Update modal with item details
+            $('#modalTitle').text(item.title || 'Unknown Title');
+            
+            // Use image proxy for external images in modal
+            let modalCoverUrl = item.cover_url || '/static/img/no-cover.png';
+            if (modalCoverUrl && modalCoverUrl.startsWith('http')) {
+                modalCoverUrl = `/api/proxy/image?url=${encodeURIComponent(modalCoverUrl)}`;
+            }
+            $('#modalCover').attr('src', modalCoverUrl);
+            
+            // Alternative titles
+            if (item.alternative_titles && item.alternative_titles.length > 0) {
+                $('#modalAltTitles').text('Also known as: ' + item.alternative_titles.join(', '));
+            } else {
+                $('#modalAltTitles').empty();
+            }
+            
+            // Status
+            $('#modalStatus').text(item.status || 'Unknown');
+            
+            // Rating
+            if (item.rating) {
+                $('#modalRating').removeClass('d-none');
+                $('#modalRatingValue').text(item.rating);
+            } else {
+                $('#modalRating').addClass('d-none');
+            }
+            
+            // Author
+            $('#modalAuthor').text(item.author || 'Unknown');
+            
+            // Genres
+            if (item.genres && item.genres.length > 0) {
+                const genresHtml = item.genres.map(genre => 
+                    `<span class="badge bg-secondary me-1 mb-1">${genre}</span>`
+                ).join('');
+                $('#modalGenres').html(genresHtml);
+            } else {
+                $('#modalGenres').html('<span class="text-muted">No genres available</span>');
+            }
+            
+            // Description
+            $('#modalDescription').text(item.description || 'No description available');
+            
+            // Update button based on library status
+            const $addBtn = $('#btnAddToCollection');
+            const $wantToReadBtn = $('#btnWantToRead');
+            
+            if (inLibrary && seriesId) {
+                // Item is already in library - show "Go to Book/Manga" button
+                const contentType = item.content_type || 'MANGA';
+                const isBook = ['BOOK', 'NOVEL'].includes(contentType.toUpperCase());
+                const goToUrl = isBook ? `/books/${seriesId}` : `/manga/series/${seriesId}`;
+                const buttonText = isBook ? 'Go to Book' : 'Go to Series';
+                
+                $addBtn.html(`<i class="fas fa-arrow-right me-2"></i> ${buttonText}`);
+                $addBtn.removeClass('btn-success').addClass('btn-info');
+                $addBtn.off('click').on('click', function() {
+                    window.location.href = goToUrl;
+                });
+            } else {
+                // Item not in library - show "Add to Collection" button
+                $addBtn.html('<i class="fas fa-plus-circle me-2"></i> Add to Collection');
+                $addBtn.removeClass('btn-info').addClass('btn-success');
+                $addBtn.data('ebook-id', item.metadata_id || item.id);
+                $addBtn.data('provider', item.metadata_source || 'unknown');
+            }
+            
+            // Update "Remove from Want to Read" button
+            $wantToReadBtn.html('<i class="fa-solid fa-bookmark me-2"></i> Remove from Want to Read');
+            $wantToReadBtn.removeClass('btn-outline-warning').addClass('btn-warning');
+            $wantToReadBtn.off('click').on('click', function() {
+                const $btn = $(this);
+                const originalHtml = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Removing...');
+                
+                // Remove from want-to-read cache using metadata source and ID
+                const provider = item.metadata_source || 'unknown';
+                const metadataId = item.metadata_id || item.id;
+                
+                $.ajax({
+                    url: `/api/metadata/want-to-read/${provider}/${metadataId}`,
+                    method: 'DELETE',
+                    success: function(data) {
+                        $btn.prop('disabled', false).html(originalHtml);
+                        
+                        if (data.success) {
+                            notificationManager.success('Removed from "Want to read"', data.message);
+                            // Close modal and reload items
+                            bootstrap.Modal.getInstance(document.getElementById('ebookDetailsModal')).hide();
+                            setTimeout(() => {
+                                loadWantToReadItems();
+                            }, 500);
+                        } else {
+                            notificationManager.error('Failed to remove', data.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        $btn.prop('disabled', false).html(originalHtml);
+                        console.error('Error removing from want to read:', xhr);
+                        notificationManager.error('Failed to remove from want to read');
+                    }
+                });
+            });
+            
+            $('#modalContentType').val(item.content_type || 'MANGA');
+            
+            // Show modal
+            const modalElement = document.getElementById('ebookDetailsModal');
+            const modal = new bootstrap.Modal(modalElement);
+            
+            // Clean up backdrop when modal is hidden
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                // Remove any lingering backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                    backdrop.remove();
+                });
+                // Ensure body scroll is restored
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            }, { once: true });
+            
+            modal.show();
+        }
+        
+        // Event listeners
+        $('#filterType').on('change', applyFiltersAndSort);
+        $('#sortBy').on('change', applyFiltersAndSort);
+        $('#searchInput').on('keyup', applyFiltersAndSort);
+        $('#btnRefresh').on('click', loadWantToReadItems);
+        
+        // Initial load
+        loadWantToReadItems();
+    });
+</script>
+{% endblock %}

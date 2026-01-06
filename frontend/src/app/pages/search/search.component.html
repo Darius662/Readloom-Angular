@@ -1,0 +1,116 @@
+<div class="search-page">
+  <!-- Content Type Selector - Bootstrap Style -->
+  <div class="content-type-selector">
+    <div class="btn-group w-100">
+      <button 
+        mat-stroked-button 
+        [color]="contentType === 'book' ? 'primary' : 'default'"
+        class="content-type-btn"
+        (click)="setContentType('book')">
+        <mat-icon class="me-1">book</mat-icon>
+        Books
+      </button>
+      <button 
+        mat-stroked-button 
+        [color]="contentType === 'manga' ? 'primary' : 'default'"
+        class="content-type-btn"
+        (click)="setContentType('manga')">
+        <mat-icon class="me-1">auto_stories</mat-icon>
+        Manga
+      </button>
+    </div>
+  </div>
+  
+  <!-- Search Section -->
+  <div class="search-section">
+    <h5 class="search-title">Search {{ contentType === 'book' ? 'Books' : 'Manga' }}</h5>
+    
+    <!-- Search Form - Single Row -->
+    <form (ngSubmit)="onSearch()" class="search-form">
+      <div class="search-form-row">
+        <mat-form-field appearance="outline" class="search-input">
+          <input matInput [(ngModel)]="searchQuery" name="searchQuery" 
+                 [placeholder]="getSearchPlaceholder()" required>
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="provider-select">
+          <mat-select [(ngModel)]="selectedProvider" name="selectedProvider">
+            <mat-option value="">All Providers</mat-option>
+            @for (provider of providers; track provider.name) {
+              <mat-option [value]="provider.name">{{ provider.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        
+        <button mat-raised-button color="primary" type="submit" class="search-button">
+          <mat-icon class="me-1">search</mat-icon>
+          Search
+        </button>
+      </div>
+    </form>
+    
+    <!-- Loading Indicator -->
+    @if (isLoading) {
+      <div class="loading-indicator">
+        <mat-progress-spinner mode="indeterminate" color="primary"></mat-progress-spinner>
+        <p class="loading-text">Searching across providers...</p>
+      </div>
+    }
+    
+    <!-- Search Results Grid -->
+    @if (!isLoading && hasSearched) {
+      @if (searchResults.length > 0) {
+        <div class="results-grid">
+          @for (result of searchResults; track result.id + result.provider) {
+            <mat-card class="result-card">
+              <mat-card-content class="result-card-content">
+                <div class="cover-wrapper">
+                  <img [src]="getCoverUrl(result.cover_url)" 
+                       class="cover-image" 
+                       [alt]="result.title || result.name"
+                       loading="lazy"
+                       (error)="$event.target.src='/assets/no-cover.png'">
+                </div>
+                <div class="result-info">
+                  <h6 class="result-title" [title]="result.title || result.name">
+                    {{ result.title || result.name }}
+                  </h6>
+                  <p class="result-author">
+                    {{ result.author || 'Unknown Author' }}
+                  </p>
+                  <div class="badges-container">
+                    <mat-chip color="primary">{{ result.provider }}</mat-chip>
+                    @if (result.rating) {
+                      <mat-chip color="accent">
+                        <mat-icon>star</mat-icon> {{ result.rating }}
+                      </mat-chip>
+                    }
+                  </div>
+                </div>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-stroked-button color="primary" class="w-100" (click)="viewDetails(result)">
+                  <mat-icon class="me-1">info</mat-icon>
+                  Details
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      } @else if (!noResults) {
+        <div class="no-results">
+          <mat-icon class="no-results-icon">search</mat-icon>
+          <h5>No results found</h5>
+          <p>Try a different search term or provider</p>
+        </div>
+      } @else {
+        <div class="no-results error">
+          <mat-icon class="no-results-icon">error</mat-icon>
+          <h5>Search failed</h5>
+          <p>Unable to search. Please try again.</p>
+        </div>
+      }
+    }
+  </div>
+</div>

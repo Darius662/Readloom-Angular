@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>Edit Root Folder</h2>
+
+<mat-dialog-content>
+  <form>
+    <div class="form-group">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Folder Name</mat-label>
+      <input matInput [(ngModel)]="form.name" [ngModelOptions]="{standalone: true}" name="name" placeholder="e.g., Library">
+    </mat-form-field>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Folder Path</mat-label>
+      <input matInput [(ngModel)]="form.path" [ngModelOptions]="{standalone: true}" name="path" placeholder="e.g., /home/user/books or C:\Users\user\books">
+      <button mat-icon-button matSuffix (click)="openFileBrowser()" matTooltip="Browse local folders">
+        <mat-icon>folder_open</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Content Type</mat-label>
+      <mat-select [(ngModel)]="form.content_type" [ngModelOptions]="{standalone: true}">
+        @for (type of contentTypes; track type.value) {
+          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Update Root Folder</button>
+</mat-dialog-actions>

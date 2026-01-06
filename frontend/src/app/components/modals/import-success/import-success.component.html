@@ -1,0 +1,30 @@
+<!-- Import Success Modal -->
+<div class="modal fade" id="importSuccessModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="importSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importSuccessModalLabel">Import Successful</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-3">
+          <i class="fas fa-check-circle text-success fa-4x"></i>
+        </div>
+        <p class="text-center">{{ message }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        @if (viewLink) {
+          <a (click)="navigateToView()" class="btn btn-primary" style="cursor: pointer;">
+            View Item
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

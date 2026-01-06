@@ -1,0 +1,82 @@
+<!-- Folder Browser Modal -->
+<div class="modal fade" id="folderBrowserModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="folderBrowserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="folderBrowserModalLabel">Select Folder</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Current Path:</label>
+          <div class="input-group">
+            <input type="text" class="form-control" [value]="currentPath" readonly>
+            <button class="btn btn-outline-secondary" type="button" (click)="onUpClick()" [disabled]="isLoading">
+              <i class="fas fa-arrow-up"></i> Up
+            </button>
+            <button class="btn btn-outline-secondary" type="button" (click)="onHomeClick()" [disabled]="isLoading">
+              <i class="fas fa-home"></i> Home
+            </button>
+          </div>
+        </div>
+
+        @if (showDrives) {
+          <div class="mb-3">
+            <label class="form-label">Drives:</label>
+            <div class="btn-group w-100 flex-wrap" role="group">
+              @for (drive of drives; track drive) {
+                <button type="button" class="btn btn-outline-secondary" (click)="onDriveClick(drive)" [disabled]="isLoading">
+                  {{ drive }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label">Folders:</label>
+          <div class="folder-list">
+            @if (isLoading) {
+              <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading folders...</p>
+              </div>
+            }
+            @if (!isLoading && folders.length > 0) {
+              <div class="list-group">
+                @for (folder of folders; track folder) {
+                  <button type="button" class="list-group-item list-group-item-action text-start" (click)="onFolderClick(folder.path)">
+                    <i class="fas fa-folder me-2"></i>{{ folder.name }}
+                  </button>
+                }
+              </div>
+            }
+            @if (!isLoading && folders.length === 0) {
+              <div class="text-center text-muted py-3">
+                No folders found
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Selected Path:</label>
+          <input type="text" class="form-control" [value]="selectedPath" readonly>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onSelectClick()" [disabled]="isLoading || !selectedPath">
+          Select
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

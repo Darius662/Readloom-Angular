@@ -1,0 +1,44 @@
+<div class="authors-header">
+  <p class="authors-count">
+    Found <strong>{{ resultCount }}</strong> authors
+  </p>
+</div>
+
+<div class="authors-grid">
+  @for (author of authors; track author) {
+    <mat-card class="author-card">
+      <mat-card-content>
+        <div class="author-avatar">
+          @if (author.photo_url) {
+            <img [src]="author.photo_url" [alt]="author.name" class="author-photo">
+          }
+          @if (!author.photo_url) {
+            <div class="placeholder-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+          }
+        </div>
+        <h3 class="author-name">{{ author.name }}</h3>
+        @if (author.nationality) {
+          <p class="author-nationality">
+            {{ author.nationality }}
+          </p>
+        }
+        @if (author.bio) {
+          <p class="author-bio">
+            {{ author.bio | slice:0:100 }}...
+          </p>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
+
+@if (authors.length === 0) {
+  <mat-card class="empty-state">
+    <mat-card-content>
+      <mat-icon class="empty-icon">info</mat-icon>
+      <p>No authors found. Try adjusting your search.</p>
+    </mat-card-content>
+  </mat-card>
+}

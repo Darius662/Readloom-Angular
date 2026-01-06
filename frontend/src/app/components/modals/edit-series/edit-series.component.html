@@ -1,0 +1,84 @@
+<!-- Edit Series Modal -->
+<div class="modal fade" id="seriesModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="seriesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="seriesModalLabel">Edit Series</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="series-title" class="form-label">Title *</label>
+            <input type="text" class="form-control" id="series-title" [(ngModel)]="title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="series-author" class="form-label">Author</label>
+            <input type="text" class="form-control" id="series-author" [(ngModel)]="author" name="author">
+          </div>
+          <div class="mb-3">
+            <label for="series-publisher" class="form-label">Publisher</label>
+            <input type="text" class="form-control" id="series-publisher" [(ngModel)]="publisher" name="publisher">
+          </div>
+          <div class="mb-3">
+            <label for="series-content-type" class="form-label">Content Type</label>
+            <select class="form-select" id="series-content-type" [(ngModel)]="contentType" name="contentType">
+              <option value="">Select content type</option>
+              @for (type of contentTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="series-status" class="form-label">Status</label>
+            <select class="form-select" id="series-status" [(ngModel)]="status" name="status">
+              @for (opt of statusOptions; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="series-description" class="form-label">Description</label>
+            <textarea class="form-control" id="series-description" [(ngModel)]="description" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="series-cover-url" class="form-label">Cover URL</label>
+            <input type="url" class="form-control" id="series-cover-url" [(ngModel)]="coverUrl" name="coverUrl">
+          </div>
+          <div class="mb-3">
+            <label for="series-custom-path" class="form-label">Custom Path</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="series-custom-path" [(ngModel)]="customPath" name="customPath" placeholder="/path/to/manga/folder or C:\Path\to\manga\folder">
+              <button class="btn btn-outline-secondary" type="button" (click)="onBrowseCustomPath()">
+                <i class="fas fa-folder-open"></i> Browse
+              </button>
+              <button class="btn btn-outline-secondary" type="button" (click)="onValidatePath()" [disabled]="isLoading">
+                Validate
+              </button>
+            </div>
+            <small class="form-text text-muted">If your e-books are in a different location than the default, specify the full path here.</small>
+            <input type="file" id="series-custom-path-picker" style="display: none;" webkitdirectory directory multiple (change)="onFolderSelected($event)">
+          </div>
+          <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="import-from-custom-path" [(ngModel)]="importFromCustomPath" name="importFromCustomPath">
+            <label class="form-check-label" for="import-from-custom-path">
+              Import files from custom folder
+            </label>
+            <div class="form-text">When saving, scan this folder for e-books and import them automatically.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="isLoading">
+          {{ isLoading ? 'Saving...' : 'Save Series' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

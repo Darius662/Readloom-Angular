@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+  <h1 class="mat-headline-4 mb-4">{{ title }}</h1>
+
+  <!-- Loading Spinner -->
+  <app-loading-spinner [isLoading]="isLoading" message="Loading dashboard..."></app-loading-spinner>
+
+  <!-- Error Message -->
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  <!-- Statistics Cards Section - 4 columns -->
+  @if (!isLoading) {
+    <div class="stats-row">
+      <app-stat-cards-section [stats]="stats"></app-stat-cards-section>
+    </div>
+  }
+
+  <!-- Upcoming Releases & Collection Stats Row -->
+  @if (!isLoading) {
+    <div class="content-row">
+      <div class="left-column">
+        <app-upcoming-releases-section [releases]="upcomingReleases"></app-upcoming-releases-section>
+      </div>
+      <div class="right-column">
+        <app-collection-stats-section [stats]="collectionStats"></app-collection-stats-section>
+      </div>
+    </div>
+  }
+
+  <!-- Recent Series Section -->
+  @if (!isLoading) {
+    <app-recent-series-section [series]="recentSeries"></app-recent-series-section>
+  }
+</div>

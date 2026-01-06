@@ -1,0 +1,85 @@
+/* Stat Cards Grid Layout */
+
+.stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  padding: 1.5rem !important;
+  border-radius: 8px !important;
+  color: white !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Card color variants using CSS variables */
+.stat-card-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1565c0 100%) !important;
+}
+
+.stat-card-success {
+  background: linear-gradient(135deg, var(--success-color) 0%, #2e7d32 100%) !important;
+}
+
+.stat-card-info {
+  background: linear-gradient(135deg, var(--info-color) 0%, #00838f 100%) !important;
+}
+
+.stat-card-warning {
+  background: linear-gradient(135deg, var(--warning-color) 0%, #ef6c00 100%) !important;
+  color: #212529 !important;
+}
+
+.stat-card-warning .stat-icon,
+.stat-card-warning .stat-label {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.stat-icon {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.5rem;
+  opacity: 0.3;
+  font-size: 2.5rem;
+}
+
+.stat-icon mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1200px) {
+  .stat-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .stat-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+}

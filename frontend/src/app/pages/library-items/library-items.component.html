@@ -1,0 +1,225 @@
+<div class="library-items-container">
+  <h1>{{ title }}</h1>
+
+  <app-loading-spinner [isLoading]="isLoading" message="Loading library items..."></app-loading-spinner>
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  <!-- Stats Cards -->
+  @if (!isLoading) {
+    <div class="stats-row">
+      <mat-card class="stat-card">
+        <div class="stat-value">{{ totalSeries }}</div>
+        <div class="stat-label">Total Series</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <div class="stat-value">{{ totalVolumes }}</div>
+        <div class="stat-label">Total Volumes</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <div class="stat-value">{{ ownedVolumes }}</div>
+        <div class="stat-label">Owned Volumes</div>
+      </mat-card>
+      <mat-card class="stat-card">
+        <div class="stat-value">${{ libraryValue | number:'1.2-2' }}</div>
+        <div class="stat-label">Library Value</div>
+      </mat-card>
+    </div>
+  }
+
+  <!-- Filters -->
+  @if (!isLoading) {
+    <mat-card class="filters-card">
+      <mat-card-header>
+        <mat-card-title>Filters</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="filters-grid">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Content Type</mat-label>
+            <mat-select [(ngModel)]="contentTypeFilter" (selectionChange)="onFilterChange()" name="contentTypeFilter">
+              <mat-option value="">All Types</mat-option>
+              <mat-option value="manga">Manga</mat-option>
+              <mat-option value="manwa">Manwa</mat-option>
+              <mat-option value="comic">Comic</mat-option>
+              <mat-option value="book">Book</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Ownership Status</mat-label>
+            <mat-select [(ngModel)]="ownershipStatusFilter" (selectionChange)="onFilterChange()" name="ownershipStatusFilter">
+              <mat-option value="">All Items</mat-option>
+              <mat-option value="owned">Owned</mat-option>
+              <mat-option value="unowned">Unowned</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Format</mat-label>
+            <mat-select [(ngModel)]="formatFilter" (selectionChange)="onFilterChange()" name="formatFilter">
+              <mat-option value="">All Formats</mat-option>
+              <mat-option value="digital">Digital</mat-option>
+              <mat-option value="physical">Physical</mat-option>
+            </mat-select>
+          </mat-form-field>
+          
+          <div class="filter-button-container">
+            <button mat-raised-button color="primary" class="apply-filters-btn" (click)="applyFiltersPublic()">
+              <mat-icon>filter_list</mat-icon>
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Library Items List -->
+  @if (!isLoading && filteredSeries.length > 0) {
+    <mat-card class="library-items-card">
+      <mat-card-header>
+        <mat-card-title>Library Items</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="filteredSeries" class="library-items-table">
+            <!-- Title Column with Cover -->
+            <ng-container matColumnDef="title">
+              <th mat-header-cell *matHeaderCellDef>Title</th>
+              <td mat-cell *matCellDef="let series" class="title-cell clickable-cell" (click)="openModal(series)">
+                <div class="d-flex align-items-center gap-2">
+                  @if (series.cover_url) {
+                    <img [src]="series.cover_url" [alt]="series.name || series.title" class="library-item-thumbnail" 
+                         onerror="this.src='/assets/no-cover.png'">
+                  } @else {
+                    <div class="library-item-thumbnail placeholder-thumbnail">
+                      <mat-icon>book</mat-icon>
+                    </div>
+                  }
+                  <div class="library-item-title">{{ series.name || series.title || 'Unknown Title' }}</div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Author Column -->
+            <ng-container matColumnDef="author">
+              <th mat-header-cell *matHeaderCellDef>Author</th>
+              <td mat-cell *matCellDef="let series" class="clickable-cell" (click)="openModal(series)">
+                {{ series.author || '-' }}
+              </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let series" class="description-cell clickable-cell" (click)="openModal(series)">
+                {{ (series.description || '').substring(0, 50) }}{{ (series.description && series.description.length > 50) ? '...' : '' }}
+              </td>
+            </ng-container>
+
+            <!-- Tags Column -->
+            <ng-container matColumnDef="tags">
+              <th mat-header-cell *matHeaderCellDef>Tags</th>
+              <td mat-cell *matCellDef="let series" class="tags-cell clickable-cell" (click)="openModal(series)">
+                <div class="tags-container">
+                  <mat-chip class="type-chip">{{ series.type || 'Unknown' }}</mat-chip>
+                  @if (series.status) {
+                    <mat-chip class="status-chip">{{ series.status }}</mat-chip>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Volumes Column -->
+            <ng-container matColumnDef="volumes">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Volumes</th>
+              <td mat-cell *matCellDef="let series" class="stat-cell text-center clickable-cell" (click)="openModal(series)">
+                {{ series.volume_count || 0 }}
+              </td>
+            </ng-container>
+
+            <!-- Value Column -->
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Value</th>
+              <td mat-cell *matCellDef="let series" class="stat-cell text-center clickable-cell" (click)="openModal(series)">
+                ${{ (series.total_value || 0).toFixed(2) }}
+              </td>
+            </ng-container>
+
+            <!-- Owned Column -->
+            <ng-container matColumnDef="owned">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Owned</th>
+              <td mat-cell *matCellDef="let series" class="stat-cell text-center clickable-cell" (click)="openModal(series)">
+                {{ series.owned_volumes || 0 }}
+              </td>
+            </ng-container>
+
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef class="text-center">Action</th>
+              <td mat-cell *matCellDef="let series" class="action-cell text-center">
+                <button mat-raised-button color="primary" size="small" 
+                        (click)="viewSeries(series)" (click)="$event.stopPropagation()">
+                  <mat-icon class="me-1">visibility</mat-icon>
+                  View
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['title', 'author', 'description', 'tags', 'volumes', 'value', 'owned', 'action']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['title', 'author', 'description', 'tags', 'volumes', 'value', 'owned', 'action'];" 
+                class="clickable-row" (click)="openModal(row)"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && filteredSeries.length === 0) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">library_books</mat-icon>
+          <h5>No library items found</h5>
+          <p>Try adjusting your filters or add some items to your library.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Modal -->
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <mat-card class="modal-content" (click)="$event.stopPropagation()">
+        <mat-card-header class="modal-header">
+          <mat-card-title>{{ selectedSeries?.name }}</mat-card-title>
+          <button mat-icon-button class="close-btn" (click)="closeModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-card-header>
+        @if (selectedSeries) {
+          <mat-card-content class="modal-body">
+            <div class="modal-grid">
+              <div class="modal-section">
+                <h6>Details</h6>
+                <p><strong>Type:</strong> {{ selectedSeries.type }}</p>
+                <p><strong>Status:</strong> {{ selectedSeries.status || '-' }}</p>
+                <p><strong>Rating:</strong> {{ selectedSeries.rating || '-' }}</p>
+              </div>
+              <div class="modal-section">
+                <h6>Description</h6>
+                <p>{{ selectedSeries.description || 'No description available' }}</p>
+              </div>
+            </div>
+          </mat-card-content>
+        }
+        <mat-card-actions class="modal-footer">
+          <button mat-stroked-button (click)="closeModal()">Close</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  }
+</div>

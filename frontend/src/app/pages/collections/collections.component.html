@@ -1,0 +1,113 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4">Collections</h1>
+
+      <app-loading-spinner [isLoading]="isLoading" message="Loading collections..."></app-loading-spinner>
+      @if (error) {
+        <app-error-message [message]="error"></app-error-message>
+      }
+
+      @if (!isLoading) {
+        <div class="row mb-4">
+          <!-- Collections Table -->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Collections</h5>
+                <button class="btn btn-sm btn-primary" (click)="onAddCollection()">
+                  <i class="fas fa-plus"></i> Add Collection
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Root Folders</th>
+                        <th>Series</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (collection of collections; track collection) {
+                        <tr>
+                          <td>{{ collection.name }}</td>
+                          <td>{{ collection.type }}</td>
+                          <td>0</td>
+                          <td>0</td>
+                          <td>
+                            <button class="btn btn-sm btn-primary me-2" (click)="onLinkRootFolder(collection)" title="Link Root Folder">
+                              <i class="fas fa-link"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" (click)="onDeleteCollection(collection)" title="Delete">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                      @if (collections.length === 0) {
+                        <tr>
+                          <td colspan="5" class="text-center">No collections found</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Root Folders Table -->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Root Folders</h5>
+                <button class="btn btn-sm btn-primary" (click)="onAddRootFolder()">
+                  <i class="fas fa-plus"></i> Add Root Folder
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Path</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (folder of rootFolders; track folder) {
+                        <tr>
+                          <td>{{ folder.name }}</td>
+                          <td>{{ folder.path }}</td>
+                          <td>{{ folder.content_type }}</td>
+                          <td>
+                            <button class="btn btn-sm btn-primary me-2" (click)="onEditRootFolder(folder)" title="Edit">
+                              <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" (click)="onDeleteRootFolder(folder)" title="Delete">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                      @if (rootFolders.length === 0) {
+                        <tr>
+                          <td colspan="4" class="text-center">No root folders found</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

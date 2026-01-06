@@ -1,0 +1,94 @@
+<div class="author-detail-container">
+  <app-loading-spinner [isLoading]="isLoading" message="Loading author..."></app-loading-spinner>
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  @if (!isLoading && author) {
+    <div class="author-content">
+      <div class="author-header">
+        <div class="author-photo">
+          @if (author.photo_url) {
+            <img [src]="author.photo_url" [alt]="author.name" class="photo-image">
+          }
+          @if (!author.photo_url) {
+            <div class="placeholder-photo">
+              <mat-icon>person</mat-icon>
+            </div>
+          }
+        </div>
+        <div class="author-info">
+          <h1>{{ author.name }}</h1>
+          @if (author.nationality) {
+            <p class="author-nationality">
+              <mat-icon>public</mat-icon> {{ author.nationality }}
+            </p>
+          }
+          @if (author.birth_date) {
+            <p class="author-birth-date">
+              <mat-icon>cake</mat-icon> {{ author.birth_date | date: 'MMM d, yyyy' }}
+            </p>
+          }
+          @if (author.bio) {
+            <p class="author-bio">{{ author.bio }}</p>
+          }
+          @if (author.website) {
+            <div class="author-links">
+              <a [href]="author.website" target="_blank" class="btn btn-sm btn-outline-primary">
+                <mat-icon>link</mat-icon> Website
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- Metadata Section -->
+      @if (metadata) {
+        <div class="metadata-section">
+          <div class="card mt-4">
+            <div class="card-header">
+              <h5 class="mb-0">Additional Information</h5>
+            </div>
+            <div class="card-body">
+              @if (metadata.goodreads_id) {
+                <div class="metadata-item">
+                  <span class="metadata-label">Goodreads ID:</span>
+                  <span class="metadata-value">{{ metadata.goodreads_id }}</span>
+                </div>
+              }
+              @if (metadata.wikipedia_url) {
+                <div class="metadata-item">
+                  <span class="metadata-label">Wikipedia:</span>
+                  <a [href]="metadata.wikipedia_url" target="_blank" class="metadata-value">
+                    View Profile
+                  </a>
+                </div>
+              }
+              @if (metadata.subjects && metadata.subjects.length > 0) {
+                <div class="metadata-item">
+                  <span class="metadata-label">Subjects:</span>
+                  <div class="metadata-tags">
+                    @for (subject of metadata.subjects; track subject) {
+                      <span class="badge bg-secondary">
+                        {{ subject }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+              @if (metadata.notable_works && metadata.notable_works.length > 0) {
+                <div class="metadata-item">
+                  <span class="metadata-label">Notable Works:</span>
+                  <ul class="notable-works-list">
+                    @for (work of metadata.notable_works; track work) {
+                      <li>{{ work }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

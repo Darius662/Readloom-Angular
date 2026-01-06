@@ -1,0 +1,31 @@
+/* App Layout */
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+.sidenav-container {
+  flex: 1;
+  overflow: hidden;
+  margin-top: 60px;
+}
+
+.sidenav {
+  width: 250px;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+}
+
+/* Mobile: full width overlay from top */
+.sidenav.mobile {
+  width: 100%;
+  max-width: 50vw;
+}
+
+.main-content {
+  background-color: var(--bg-color);
+  overflow-y: auto;
+}

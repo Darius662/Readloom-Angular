@@ -1,0 +1,24 @@
+services:
+  readloom:
+    build: .
+    container_name: readloom #Container name
+    restart: "unless-stopped" #Restart unless stopped
+    ports:
+      - "7227:7227" #Port
+    volumes:
+      - ./data:/config # Data folder contains the Logs and DB (mounted to /config for persistence)
+      # - ./ebooks:/ebooks #Path to your e-books
+      - ./ebooks:/ebooks #Path to your e-books
+    environment:
+      - TZ=UTC # Europe/Berlin
+      - PYTHONUNBUFFERED=1 #Unbuffered output
+    command:
+      - "-o" #Bind to all interfaces
+      - "0.0.0.0" #Bind to all interfaces
+      - "-p" #Port
+      - "7227" #Port
+    logging:
+      driver: "json-file" #JSON logging driver
+      options:
+        max-size: "10m" #Max log size
+        max-file: "3" #Max log files

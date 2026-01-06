@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Readloom - Integrations{% endblock %}
+
+{% block page_title %}Integrations{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Available Integrations</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Readloom can integrate with other services to provide additional functionality.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Home Assistant Integration -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Home Assistant</h5>
+                <span class="badge bg-success">Available</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex mb-3">
+                    <img src="https://brands.home-assistant.io/homeassistant/logo.png" alt="Home Assistant Logo" style="width: 50px; height: 50px; margin-right: 15px;">
+                    <div>
+                        <h6>Home Assistant Integration</h6>
+                        <p class="text-muted">Integrate Readloom with your Home Assistant instance</p>
+                    </div>
+                </div>
+                <p>Home Assistant is an open source home automation platform that puts local control and privacy first.</p>
+                <p>With this integration, you can:</p>
+                <ul>
+                    <li>View upcoming e-book releases in your Home Assistant dashboard</li>
+                    <li>Receive notifications for new releases</li>
+                    <li>Monitor Readloom status</li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ url_for('ui.home_assistant') }}" class="btn btn-primary">
+                        <i class="fas fa-cog me-1"></i> Configure
+                    </a>
+                </div>
+                <div>
+                    <span class="badge bg-info">Enhanced</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Homarr Integration -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Homarr</h5>
+                <span class="badge bg-success">Available</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex mb-3">
+                    <img src="https://avatars.githubusercontent.com/u/107269758" alt="Homarr Logo" style="width: 50px; height: 50px; margin-right: 15px;">
+                    <div>
+                        <h6>Homarr Integration</h6>
+                        <p class="text-muted">Integrate Readloom with your Homarr dashboard</p>
+                    </div>
+                </div>
+                <p>Homarr is a sleek, modern dashboard that puts all your apps and services in one place.</p>
+                <p>With this integration, you can:</p>
+                <ul>
+                    <li>View Readloom status in your Homarr dashboard</li>
+                    <li>See today's releases at a glance</li>
+                    <li>Quick access to Readloom interface</li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ url_for('ui.homarr') }}" class="btn btn-primary">
+                        <i class="fas fa-cog me-1"></i> Configure
+                    </a>
+                </div>
+                <div>
+                    <span class="badge bg-info">Enhanced</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Metadata Providers Integration -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Metadata Providers</h5>
+                <span class="badge bg-success">Available</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex mb-3">
+                    <i class="fas fa-search fa-2x text-primary" style="width: 50px; height: 50px; margin-right: 15px; display: flex; align-items: center; justify-content: center;"></i>
+                    <div>
+                        <h6>External E-book Sources</h6>
+                        <p class="text-muted">Configure metadata providers for e-book search and import</p>
+                    </div>
+                </div>
+                <p>Readloom can search and import e-books from various external sources.</p>
+                <p>Available providers include:</p>
+                <ul>
+                    <li>MangaFire - Popular e-book aggregator</li>
+                    <li>MyAnimeList (MAL) - Comprehensive anime/e-book database</li>
+                    <li>Manga-API - General-purpose e-book API</li>
+                    <li>Google Books - Millions of books</li>
+                    <li>Open Library - Free, open database of books</li>
+                    <li>ISBNdb - Comprehensive book database</li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ url_for('ui.provider_config') }}" class="btn btn-primary">
+                        <i class="fas fa-cog me-1"></i> Configure
+                    </a>
+                </div>
+                <div>
+                    <span class="badge bg-info">Enhanced</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Providers Integration -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">AI Providers</h5>
+                <span class="badge bg-info">New</span>
+            </div>
+            <div class="card-body">
+                <div class="d-flex mb-3">
+                    <i class="fas fa-brain fa-2x text-info" style="width: 50px; height: 50px; margin-right: 15px; display: flex; align-items: center; justify-content: center;"></i>
+                    <div>
+                        <h6>AI-Powered Metadata Extraction</h6>
+                        <p class="text-muted">Use AI to extract accurate manga metadata</p>
+                    </div>
+                </div>
+                <p>Readloom now supports multiple AI providers for accurate manga metadata extraction including volumes, chapters, and release dates.</p>
+                <p>Available providers:</p>
+                <ul>
+                    <li><strong>Groq</strong> - Fastest, free, 1 minute setup</li>
+                    <li><strong>Google Gemini</strong> - Powerful, free tier, 2 minutes setup</li>
+                    <li><strong>DeepSeek</strong> - Good reasoning, free tier, 2 minutes setup</li>
+                    <li><strong>Ollama</strong> - Self-hosted, private, free, 5 minutes setup</li>
+                </ul>
+                <p class="text-muted small">All providers are completely free with no credit card required.</p>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{{ url_for('ui.ai_providers_config') }}" class="btn btn-primary">
+                        <i class="fas fa-cog me-1"></i> Configure
+                    </a>
+                </div>
+                <div>
+                    <span class="badge bg-success">Free</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- API Documentation -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">API Documentation</h5>
+            </div>
+            <div class="card-body">
+                <p>Readloom provides a comprehensive REST API that can be used to integrate with other services.</p>
+                <p>Below are some of the key API endpoints:</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/api/series</code></td>
+                                <td>GET</td>
+                                <td>Get all series</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/series/{id}</code></td>
+                                <td>GET</td>
+                                <td>Get a specific series with volumes and chapters</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/calendar</code></td>
+                                <td>GET</td>
+                                <td>Get calendar events</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/calendar/refresh</code></td>
+                                <td>POST</td>
+                                <td>Refresh calendar data</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/integrations/home-assistant</code></td>
+                                <td>GET</td>
+                                <td>Get data for Home Assistant integration</td>
+                            </tr>
+                            <tr>
+                                <td><code>/api/integrations/homarr</code></td>
+                                <td>GET</td>
+                                <td>Get data for Homarr integration</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <p>For a complete API documentation, refer to the <a href="#" class="text-decoration-none">API Documentation</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

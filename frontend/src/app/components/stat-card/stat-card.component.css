@@ -1,0 +1,97 @@
+.stat-card-wrapper {
+  height: 100%;
+}
+
+/* Angular Material Card Overrides */
+.stat-card {
+  padding: 1.75rem !important;
+  border-radius: 12px !important;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  color: #fff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+}
+
+.stat-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+  transform: translateY(-4px);
+}
+
+.stat-card .mat-mdc-card-content {
+  padding: 0 !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Color Variants */
+.stat-card.primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+}
+
+.stat-card.success {
+  background: linear-gradient(135deg, #198754 0%, #157347 100%);
+}
+
+.stat-card.warning {
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+  color: #1a1a1a;
+}
+
+.stat-card.danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.stat-card.info {
+  background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+}
+
+.stat-icon {
+  position: absolute;
+  right: 1.5rem;
+  top: 1.5rem;
+  font-size: 3rem;
+  opacity: 0.2;
+}
+
+.stat-icon .mat-icon {
+  font-size: 3rem !important;
+  height: 3rem !important;
+  width: 3rem !important;
+}
+
+.stat-content {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-value {
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  opacity: 0.95;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+  .stat-card.warning {
+    background: linear-gradient(135deg, #e0a800 0%, #d39e00 100%);
+    color: #1a1a1a;
+  }
+}

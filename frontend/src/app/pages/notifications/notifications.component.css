@@ -1,0 +1,546 @@
+/* Notifications Page Layout - Tighter Bootstrap Design */
+.notifications-page {
+  padding: 2rem 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.notifications-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  max-width: 100%;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .notifications-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* Main Content Area */
+.notifications-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Sidebar */
+.notifications-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Card Styling - Wider Bootstrap Cards */
+.notifications-card,
+.upcoming-releases-card,
+.subscriptions-card,
+.settings-card {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 0;
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.notifications-card:hover,
+.upcoming-releases-card:hover,
+.subscriptions-card:hover,
+.settings-card:hover {
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.notifications-card .mat-mdc-card-header,
+.upcoming-releases-card .mat-mdc-card-header,
+.subscriptions-card .mat-mdc-card-header,
+.settings-card .mat-mdc-card-header {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 1rem 1.25rem;
+}
+
+.notifications-card .mat-mdc-card-title,
+.upcoming-releases-card .mat-mdc-card-title,
+.subscriptions-card .mat-mdc-card-title,
+.settings-card .mat-mdc-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+}
+
+.notifications-card .mat-mdc-card-content,
+.upcoming-releases-card .mat-mdc-card-content,
+.subscriptions-card .mat-mdc-card-content,
+.settings-card .mat-mdc-card-content {
+  padding: 1.25rem;
+}
+
+/* Card Header with Actions */
+.card-header-with-actions {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100%;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Notification Cards - Tighter Bootstrap Design */
+.notification-card {
+  margin-bottom: 1rem;
+  border-left: 4px solid #6c757d;
+  transition: transform 0.2s ease;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.notification-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.notification-card.unread {
+  border-left-color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.notification-card.notification-info {
+  border-left-color: #0dcaf0;
+}
+
+.notification-card.notification-success {
+  border-left-color: #198754;
+}
+
+.notification-card.notification-warning {
+  border-left-color: #ffc107;
+}
+
+.notification-card.notification-error {
+  border-left-color: #dc3545;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.notification-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.notification-time {
+  font-size: 0.8rem;
+  color: #6c757d;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.notification-message {
+  margin: 0.5rem 0;
+  color: #495057;
+  line-height: 1.4;
+  font-size: 0.95rem;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Release Cards - Tighter Bootstrap Design */
+.release-card {
+  margin-bottom: 0.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background-color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.release-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+}
+
+.release-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.release-cover {
+  width: 40px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+
+.release-info {
+  flex: 1;
+}
+
+.release-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.release-description {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin: 0.25rem 0 0 0;
+  line-height: 1.4;
+}
+
+.release-group {
+  margin-bottom: 1.5rem;
+}
+
+.release-date {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+}
+
+/* Subscription Cards - Tighter Bootstrap Design */
+.subscription-card {
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  background-color: #ffffff;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.subscription-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+}
+
+.subscription-cover {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.subscription-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem 0;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.subscription-author {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+.subscription-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Settings Form - Cleaner Design */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-section {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: #212529;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.setting-item {
+  margin-bottom: 1.25rem;
+}
+
+.channel-settings {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.375rem;
+  border-left: 3px solid #0d6efd;
+}
+
+/* Loading States */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.loading-state p {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  color: #dee2e6;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #6c757d;
+}
+
+.empty-state .text-muted {
+  color: #6c757d !important;
+  font-size: 0.9rem;
+}
+
+/* Better Button Styling - Bootstrap Look */
+.header-actions .mat-stroked-button,
+.header-actions .mat-raised-button {
+  font-weight: 500;
+  text-transform: none;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.header-actions .mat-stroked-button {
+  border-width: 1px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.header-actions .mat-raised-button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.header-actions .mat-stroked-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+}
+
+.header-actions .mat-raised-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+.notification-actions .mat-icon-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 0.25rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.notification-actions .mat-icon-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+}
+
+/* Utility Classes */
+.me-1 {
+  margin-right: 0.25rem;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.py-5 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+/* Form Actions */
+.form-actions {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+  .notifications-page {
+    background-color: #212529;
+  }
+  
+  .notifications-card,
+  .upcoming-releases-card,
+  .subscriptions-card,
+  .settings-card {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .notifications-card .mat-mdc-card-header,
+  .upcoming-releases-card .mat-mdc-card-header,
+  .subscriptions-card .mat-mdc-card-header,
+  .settings-card .mat-mdc-card-header {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: #4a5568;
+  }
+  
+  .notifications-card .mat-mdc-card-title,
+  .upcoming-releases-card .mat-mdc-card-title,
+  .subscriptions-card .mat-mdc-card-title,
+  .settings-card .mat-mdc-card-title {
+    color: #fff;
+  }
+  
+  .notification-card {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .notification-title {
+    color: #fff;
+  }
+  
+  .notification-message {
+    color: #e2e8f0;
+  }
+  
+  .release-card {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .release-title {
+    color: #fff;
+  }
+  
+  .release-description {
+    color: #cbd5e0;
+  }
+  
+  .release-date {
+    color: #e2e8f0;
+    border-bottom-color: #4a5568;
+  }
+  
+  .subscription-card {
+    background-color: #2d3748;
+  }
+  
+  .subscription-title {
+    color: #fff;
+  }
+  
+  .subscription-author {
+    color: #cbd5e0;
+  }
+  
+  .section-title {
+    color: #fff;
+    border-bottom-color: #4a5568;
+  }
+  
+  .channel-settings {
+    border-left-color: #3182ce;
+  }
+  
+  .empty-state {
+    color: #cbd5e0;
+  }
+  
+  .empty-state .empty-icon {
+    color: #718096;
+  }
+  
+  .empty-state h5 {
+    color: #e2e8f0;
+  }
+  
+  .empty-state p {
+    color: #cbd5e0;
+  }
+  
+  .form-actions {
+    border-top-color: #4a5568;
+  }
+}

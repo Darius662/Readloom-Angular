@@ -1,0 +1,19 @@
+<mat-card class="recent-series-card">
+  <mat-card-header>
+    <mat-card-title>Recent Series</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (series.length > 0) {
+      <div class="series-grid">
+        @for (s of series; track s) {
+          <app-series-card [series]="s"></app-series-card>
+        }
+      </div>
+    }
+    @if (series.length === 0) {
+      <p class="empty-message">
+        No series found. <a href="/library">Add some series to get started!</a>
+      </p>
+    }
+  </mat-card-content>
+</mat-card>

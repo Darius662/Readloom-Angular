@@ -1,0 +1,58 @@
+<!-- Move Series Modal -->
+<div class="modal fade" id="moveSeriesModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="moveSeriesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="moveSeriesModalLabel">Move Series</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="move-target-collection" class="form-label">Target Collection</label>
+            <select class="form-select" id="move-target-collection" [(ngModel)]="selectedCollection" [ngModelOptions]="{standalone: true}" name="collection" required>
+              @for (col of collections; track col) {
+                <option [value]="col.id">{{ col.name }}</option>
+              }
+            </select>
+            <small class="form-text text-muted">Only collections in the same bucket as this series are listed.</small>
+          </div>
+          <div class="mb-3">
+            <label for="move-target-root-folder" class="form-label">Target Root Folder (optional)</label>
+            <select class="form-select" id="move-target-root-folder" [(ngModel)]="selectedRootFolder" [ngModelOptions]="{standalone: true}" name="rootFolder">
+              <option [value]="null">Auto-select first root folder</option>
+              @for (folder of rootFolders; track folder) {
+                <option [value]="folder.id">{{ folder.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="move-files-switch" [(ngModel)]="moveFiles" [ngModelOptions]="{standalone: true}" name="moveFiles">
+            <label class="form-check-label" for="move-files-switch">Physically move files</label>
+          </div>
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="clear-custom-path-switch" [(ngModel)]="clearCustomPath" [ngModelOptions]="{standalone: true}" name="clearCustomPath">
+            <label class="form-check-label" for="clear-custom-path-switch">Clear custom path after move</label>
+          </div>
+          <div class="border rounded p-2 bg-light">
+            <div class="small text-muted">Dry Run Preview</div>
+            <pre class="dry-run-output">{{ dryRunOutput }}</pre>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onDryRun()" [disabled]="isDryRunning || isLoading">
+          {{ isDryRunning ? 'Generating...' : 'Preview (Dry Run)' }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onExecuteMove()" [disabled]="isLoading">
+          {{ isLoading ? 'Moving...' : 'Execute Move' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

@@ -1,0 +1,284 @@
+.about-container {
+  padding: 2.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.about-header {
+  margin-bottom: 2rem;
+}
+
+.header-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.display-4 {
+  font-size: 3.5rem;
+  font-weight: 300;
+  line-height: 1.2;
+  color: #212529;
+  margin-bottom: 0.5rem;
+}
+
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.version {
+  color: #6c757d;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+/* Main Content Grid */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.about-section {
+  width: 100%;
+}
+
+.full-width-section {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Angular Material Card Overrides */
+.about-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  margin-bottom: 1rem;
+}
+
+.about-card .mat-mdc-card-header {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 0.75rem 1.25rem;
+}
+
+.about-card .mat-mdc-card-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  margin: 0;
+}
+
+.about-card .mat-mdc-card-content {
+  padding: 1.25rem;
+}
+
+/* Typography */
+.about-card p {
+  color: #212529;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.about-card p:last-child {
+  margin-bottom: 0;
+}
+
+.about-card h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 0.75rem;
+}
+
+/* Lists */
+.features-list,
+.tech-list,
+.acknowledgements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-list li,
+.tech-list li,
+.acknowledgements-list li {
+  color: #212529;
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.features-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #198754;
+  font-weight: 700;
+}
+
+.tech-list li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #6c757d;
+}
+
+.acknowledgements-list li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #6c757d;
+}
+
+/* Links */
+.tech-link,
+.legal-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tech-link:hover,
+.legal-link:hover {
+  color: #0b5ed7;
+  text-decoration: underline;
+}
+
+/* Alert Info Box */
+.alert-info {
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.alert-heading {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0c5460;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.alert-info ul {
+  margin-bottom: 0;
+  padding-left: 1.25rem;
+}
+
+.alert-info ul li {
+  color: #0c5460;
+  margin-bottom: 0.25rem;
+}
+
+/* Integration Status Indicators */
+.integration-status {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-style: italic;
+  margin-left: 0.5rem;
+}
+
+.integration-status.not-working {
+  color: #dc3545;
+}
+
+.integration-status.not-working:before {
+  content: "✗";
+  margin-right: 0.25rem;
+  font-weight: bold;
+}
+
+.features-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+  .about-container {
+    background-color: #212529;
+  }
+  
+  .header-card,
+  .about-card {
+    background-color: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .about-card .mat-mdc-card-header {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: #4a5568;
+  }
+  
+  .about-card .mat-mdc-card-title {
+    color: #fff;
+  }
+  
+  .display-4 {
+    color: #fff;
+  }
+  
+  .lead {
+    color: #cbd5e0;
+  }
+  
+  .version {
+    color: #cbd5e0;
+  }
+  
+  .about-card p {
+    color: #e2e8f0;
+  }
+  
+  .about-card h6 {
+    color: #e2e8f0;
+  }
+  
+  .features-list li,
+  .tech-list li,
+  .acknowledgements-list li {
+    color: #e2e8f0;
+  }
+  
+  .alert-info {
+    background-color: #2c5282;
+    border-color: #4a7c9e;
+  }
+  
+  .alert-heading {
+    color: #bee3f8;
+  }
+  
+  .alert-info ul li {
+    color: #bee3f8;
+  }
+}

@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import argparse
+import subprocess
+from pathlib import Path
+from flask import Flask
+from flask_cors import CORS
+
+def setup_dev_environment():
+    """Set up development environment."""
+    # Create data directory if it doesn't exist
+    data_dir = Path("data")
+    data_dir.mkdir(exist_ok=True)
+    
+    # Create logs directory if it doesn't exist
+    logs_dir = Path("data/logs")
+    logs_dir.mkdir(exist_ok=True)
+    
+    # Create database directory if it doesn't exist
+    db_dir = Path("data/db")
+    db_dir.mkdir(exist_ok=True)
+    
+    # Create empty database file if it doesn't exist
+    db_file = db_dir / "readloom.db"
+    if not db_file.exists():
+        try:
+            db_file.touch()
+            print(f"Created empty database file at {db_file}")
+        except Exception as e:
+            print(f"Error creating database file: {e}")
+            return False
+    
+    print("Development environment set up successfully!")
+    return True
+
+def generate_test_data():
+    """Generate test data for development."""
+    try:
+        print("Generating test data in data\\db\\readloom.db")
+        
+        # Import necessary modules
+        from backend.internals.db import set_db_location, setup_db
+        
+        # Set database location
+        set_db_location("data/db")
+        
+        # Create database schema
+        print("Creating database schema...")
+        setup_db()
+        print("Database schema created successfully!")
+        
+        # Initialize settings
+        from backend.internals.settings import Settings
+        settings = Settings()
+        print("Settings initialized successfully!")
+        
+        # Generate test data
+        # This is where you would add code to generate test data
+        print("Test data generation complete!")
+        
+        print("Test data generated successfully!")
+        return True
+    except Exception as e:
+        print(f"Error generating test data: {e}")
+        return False
+
+def run_app():
+    """Run the Readloom application directly with Flask."""
+    try:
+        print("Starting Readloom on 127.0.0.1:7227...")
+        
+        # Set database location first
+        from backend.internals.db import set_db_location, setup_db
+        set_db_location("data/db")
+        
+        # Set up logging
+        from backend.base.logging import setup_logging, LOGGER
+        setup_logging("data/logs", "readloom.log")
+        LOGGER.info("Starting Readloom in development mode")
+        
+        # Initialize settings
+        from backend.internals.settings import Settings
+        settings = Settings()
+        LOGGER.info("Settings initialized")
+        
+        # Create Flask app
+        app = Flask(__name__)
+        app.config["SECRET_KEY"] = os.urandom(24)
+        app.config["JSON_SORT_KEYS"] = False
+        
+        # Enable CORS for all routes
+        CORS(app, resources={r"/*": {"origins": "*"}})
+        app.config['CORS_HEADERS'] = 'Content-Type'
+        
+        # Initialize metadata service
+        from backend.features.metadata_service import init_metadata_service
+        init_metadata_service()
+        
+        # Initialize AI providers
+        from backend.features.ai_providers import initialize_ai_providers
+        initialize_ai_providers()
+        
+        # Start periodic task manager
+        # DISABLED: Periodic task manager blocks Flask in development mode
+        # from backend.features.periodic_tasks import periodic_task_manager
+        # periodic_task_manager.start()
+        # LOGGER.info("Periodic task manager started")
+        
+        # Register blueprints from new backend/api structure
+        from backend.api import (
+            collections_api,
+            api_series_bp,
+            authors_api_bp,
+            rootfolders_api_bp,
+            metadata_api_bp,
+            ai_providers_api_bp,
+            notifications_api_bp,
+        )
+        
+        # Load remaining API modules from frontend (to be migrated)
+        from frontend.api_author_metadata import author_metadata_api_bp
+        from frontend.api_author_search import author_search_api_bp
+        from frontend.api_author_import import author_import_api_bp
+        from frontend.api_enhanced_book_import import enhanced_book_import_api_bp
+        from frontend.api_ebooks import ebooks_api_bp
+        from frontend.api_collection import collection_api
+        from frontend.api_folders import folders_api
+        from frontend.api_folder_browser import folder_browser_api_bp
+        from frontend.api_author_enrichment import author_enrichment_api_bp
+        # from frontend.ui_complete import ui_bp  # DISABLED: Old Jinja frontend - using Angular frontend instead
+        from frontend.image_proxy import image_proxy_bp
+        
+        # Register API blueprints from backend/api structure
+        app.register_blueprint(collections_api)
+        app.register_blueprint(api_series_bp)
+        app.register_blueprint(authors_api_bp)
+        app.register_blueprint(rootfolders_api_bp)
+        app.register_blueprint(metadata_api_bp)
+        app.register_blueprint(ai_providers_api_bp, url_prefix='/api')
+        app.register_blueprint(notifications_api_bp)
+        
+        # Register remaining API blueprints from frontend (to be migrated)
+        app.register_blueprint(author_metadata_api_bp)
+        app.register_blueprint(author_search_api_bp)
+        app.register_blueprint(author_import_api_bp)
+        app.register_blueprint(enhanced_book_import_api_bp)
+        app.register_blueprint(ebooks_api_bp)
+        app.register_blueprint(collection_api)
+        app.register_blueprint(folders_api)
+        app.register_blueprint(folder_browser_api_bp)
+        app.register_blueprint(author_enrichment_api_bp)
+        # app.register_blueprint(ui_bp)  # DISABLED: Old Jinja frontend - using Angular frontend instead
+        app.register_blueprint(image_proxy_bp)
+        
+        LOGGER.info("Old Jinja frontend routes disabled - using Angular frontend only")
+        LOGGER.info("Application initialized successfully")
+        print("\nOpen your browser and navigate to http://127.0.0.1:7227/ to view the application")
+        
+        # Run the app
+        app.run(host='0.0.0.0', port=7227, debug=True)
+        
+        return True
+    except Exception as e:
+        print(f"Error running Readloom: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def main():
+    """Main function."""
+    parser = argparse.ArgumentParser(description="Readloom development script")
+    parser.add_argument("--no-data", action="store_true", help="Skip test data generation")
+    args = parser.parse_args()
+    
+    # Set up development environment
+    if not setup_dev_environment():
+        return 1
+    
+    # Generate test data
+    if not args.no_data:
+        if not generate_test_data():
+            return 1
+    
+    # Run the application
+    if not run_app():
+        return 1
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

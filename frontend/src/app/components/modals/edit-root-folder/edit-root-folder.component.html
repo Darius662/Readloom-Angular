@@ -1,0 +1,50 @@
+<!-- Edit Root Folder Modal -->
+<div class="modal fade" id="editRootFolderModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="editRootFolderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editRootFolderModalLabel">Edit Root Folder</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <input type="hidden" [(ngModel)]="folderId" name="folderId">
+          <div class="mb-3">
+            <label for="editRootFolderName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="editRootFolderName" [(ngModel)]="name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="editRootFolderPath" class="form-label">Path</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="editRootFolderPath" [(ngModel)]="path" name="path" required>
+              <button class="btn btn-outline-secondary" type="button" (click)="onBrowseFolder()">
+                <i class="fas fa-folder-open"></i> Browse
+              </button>
+            </div>
+            <small class="form-text text-muted">Enter the full path to the folder (e.g., C:\Manga or /home/user/manga)</small>
+            <input type="file" id="edit-folder-picker" style="display: none;" webkitdirectory directory multiple (change)="onFolderSelected($event)">
+          </div>
+          <div class="mb-3">
+            <label for="editRootFolderContentType" class="form-label">Content Type</label>
+            <select class="form-select" id="editRootFolderContentType" [(ngModel)]="contentType" name="contentType">
+              @for (type of contentTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onUpdate()" [disabled]="isLoading">
+          {{ isLoading ? 'Updating...' : 'Update' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

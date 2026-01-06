@@ -1,0 +1,276 @@
+<div class="series-detail-page">
+  <app-loading-spinner [isLoading]="isLoading" message="Loading series..."></app-loading-spinner>
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  @if (!isLoading && series) {
+    <!-- Main Container -->
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <div class="series-header-content">
+          <div class="series-title-section">
+            <mat-card-title class="mat-h4 mat-strong mb-0">{{ series.title || series.name }}</mat-card-title>
+          </div>
+          <div class="series-actions">
+            <button mat-icon-button (click)="onEditSeries()" title="Edit Series">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onMoveSeries()" title="Move Series">
+              <mat-icon>swap_horiz</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDeleteSeries()" title="Remove Series" class="remove-btn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="series-detail-layout">
+          <div class="series-cover-section">
+            <img [src]="getCoverUrl(series.cover_url)" 
+                 [alt]="series.name"
+                 class="series-cover-image">
+          </div>
+          <div class="series-info-section">
+            <!-- Author -->
+            @if (series.author) {
+              <div class="series-detail-row">
+                <div class="series-detail-label">Author:</div>
+                <div class="series-detail-value">{{ series.author }}</div>
+              </div>
+            }
+
+            <!-- Publisher -->
+            @if (series.publisher) {
+              <div class="series-detail-row">
+                <div class="series-detail-label">Publisher:</div>
+                <div class="series-detail-value">{{ series.publisher }}</div>
+              </div>
+            }
+
+            <!-- Type/Genres -->
+            <div class="series-detail-row">
+              <div class="series-detail-label">Type:</div>
+              <div class="series-detail-value">
+                <div class="chips-container">
+                  <mat-chip class="type-chip">{{ series.type | titlecase }}</mat-chip>
+                  @if (series.subjects) {
+                    @for (subject of getSubjects(); track $index) {
+                      <mat-chip class="subject-chip">{{ subject }}</mat-chip>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            @if (series.description) {
+              <div class="series-detail-row">
+                <div class="series-detail-label">Description:</div>
+                <div class="series-detail-value">{{ series.description }}</div>
+              </div>
+            }
+
+            <!-- Status -->
+            <div class="series-detail-row">
+              <div class="series-detail-label">Status:</div>
+              <div class="series-detail-value">
+                <mat-chip [color]="getStatusColor()">{{ series.status | titlecase }}</mat-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- E-book Management Card -->
+    <mat-card class="mb-4">
+      <mat-card-header class="series-ebook-header">
+        <mat-card-title>E-book Management</mat-card-title>
+        <button mat-icon-button (click)="toggleEbookSection()">
+          <mat-icon>{{ showEbookSection ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+      </mat-card-header>
+      @if (showEbookSection) {
+        <mat-card-content>
+          <div class="ebook-section">
+            <div class="ebook-info">
+              <strong>Folder Location</strong>
+              <p class="ebook-description">Place your e-book files in this folder: <code>/ebooks/Manga/{{ series.name }}</code></p>
+            </div>
+            <div class="ebook-info">
+              <strong>Supported file formats:</strong> PDF, EPUB, CBZ, CBR, MOBI, AZW
+            </div>
+            <div class="ebook-info">
+              <strong>Naming convention:</strong> "Volume 1.pdf", "Vol 2.epub", "v3.cbz"
+            </div>
+            <div class="ebook-info">
+              <strong>To set a custom path for this series, use the Edit Series button above.</strong>
+            </div>
+            <div class="ebook-info">
+              <strong>Scan your data directory for e-books and automatically add them to the database</strong>
+              <div class="scan-button-container">
+                <button mat-raised-button color="primary" (click)="scanForEbooks()" [disabled]="isScanningEbooks">
+                  @if (isScanningEbooks) {
+                    <ng-container>
+                      <mat-icon class="spin">refresh</mat-icon>
+                      Scanning for E-books...
+                    </ng-container>
+                  } @else {
+                    <ng-container>
+                      <mat-icon>search</mat-icon>
+                      Scan for E-books
+                    </ng-container>
+                  }
+                </button>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="ebook-info">
+              <strong>E-book Files:</strong>
+              <p class="ebook-description">No e-book files uploaded</p>
+            </div>
+            <div class="ebook-info">
+              <button mat-raised-button color="primary" (click)="openUploadModal()">
+                <mat-icon>upload</mat-icon> Upload E-book File
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      }
+    </mat-card>
+
+    <!-- Two-Box Layout for Volumes and Chapters -->
+    <div class="series-content-layout">
+      <!-- Volumes Section -->
+      <mat-card class="content-box volumes-box">
+        <mat-card-header class="box-header">
+          <mat-card-title class="box-title">
+            <mat-icon>collections</mat-icon>
+            Volumes ({{ volumes.length }})
+          </mat-card-title>
+          <div class="header-actions">
+            <button mat-raised-button color="accent" (click)="checkForCovers()" class="check-covers-btn">
+              <mat-icon>download</mat-icon>
+              Check for Covers
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content class="box-content">
+          @if (volumes.length > 0) {
+            <div class="volumes-grid">
+              @for (volume of volumes; track volume.id) {
+                <mat-card class="volume-card" (click)="onVolumeClick(volume)">
+                  <div class="volume-cover-wrapper">
+                    @if (getVolumeCoverUrl(volume)) {
+                      <img [src]="getVolumeCoverUrl(volume)" [alt]="'Volume ' + volume.volume_number" class="volume-cover">
+                    } @else {
+                      <div class="volume-placeholder">
+                        <mat-icon>collections_bookmark</mat-icon>
+                        <span>Vol {{ volume.volume_number }}</span>
+                      </div>
+                    }
+                  </div>
+                  <div class="volume-info">
+                    <h6 class="volume-number">Volume {{ volume.volume_number }}</h6>
+                    @if (volume.title) {
+                      <p class="volume-title">{{ volume.title }}</p>
+                    }
+                    @if (volume.release_date) {
+                      <p class="volume-date">{{ volume.release_date | date: 'MMM d, yyyy' }}</p>
+                    }
+                  </div>
+                  <div class="volume-actions">
+                    <button mat-icon-button (click)="onEditVolume(volume); $event.stopPropagation()" title="Edit Volume">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="onDeleteVolume(volume); $event.stopPropagation()" title="Remove Volume" class="remove-btn">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </mat-card>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">collections</mat-icon>
+              <h5>No volumes found</h5>
+              <p>This series doesn't have any volumes yet.</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Chapters Section -->
+      <mat-card class="content-box chapters-box">
+        <mat-card-header class="box-header">
+          <mat-card-title class="box-title">
+            <mat-icon>menu_book</mat-icon>
+            Chapters ({{ chapters.length }})
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="box-content">
+          @if (chapters.length > 0) {
+            <div class="chapters-list">
+              @for (chapter of chapters; track chapter.id) {
+                <mat-card class="chapter-card" (click)="onChapterClick(chapter)">
+                  <mat-card-content>
+                    <div class="chapter-number-badge">
+                      <span class="number">{{ chapter.chapter_number }}</span>
+                    </div>
+                    <div class="chapter-content">
+                      <div class="chapter-details">
+                        <div class="chapter-title" [attr.data-chapter-number]="chapter.chapter_number">
+                          {{ chapter.title || '' }}
+                        </div>
+                      </div>
+                      <div class="chapter-meta">
+                        @if (chapter.release_date) {
+                          <div class="chapter-date">
+                            <mat-icon>event</mat-icon>
+                            {{ chapter.release_date | date: 'MMM d, yyyy' }}
+                          </div>
+                        }
+                        <div class="chapter-actions">
+                          <button mat-icon-button (click)="onChapterClick(chapter); $event.stopPropagation()" title="Read Chapter">
+                            <mat-icon>menu_book</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">menu_book</mat-icon>
+              <h5>No chapters found</h5>
+              <p>This series doesn't have any chapters yet.</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+  
+  <!-- Loading and Error States -->
+  @if (isLoading) {
+    <app-loading-spinner [isLoading]="true" message="Loading series details..."></app-loading-spinner>
+  }
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+  @if (!series && !isLoading && !error) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">auto_stories</mat-icon>
+          <h5>Series not found</h5>
+          <p>The requested series could not be found.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

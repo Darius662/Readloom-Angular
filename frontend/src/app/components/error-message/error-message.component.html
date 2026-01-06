@@ -1,0 +1,15 @@
+<mat-card class="error-message alert-dismissible fade show">
+  <mat-card-content class="error-content">
+    <div class="error-icon">
+      <mat-icon>error</mat-icon>
+    </div>
+    <div class="error-text">
+      <strong>Error:</strong> {{ message }}
+      @if (showDetails && details) {
+        <div class="error-details">
+          {{ details }}
+        </div>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

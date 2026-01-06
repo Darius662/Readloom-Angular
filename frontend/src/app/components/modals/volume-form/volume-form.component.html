@@ -1,0 +1,46 @@
+<!-- Volume Form Modal -->
+<div class="modal fade" id="volumeModal" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" tabindex="-1" aria-labelledby="volumeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="volumeModalLabel">{{ isEditMode ? 'Edit Volume' : 'Add Volume' }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="volume-number" class="form-label">Volume Number *</label>
+            <input type="text" class="form-control" id="volume-number" [(ngModel)]="number" [ngModelOptions]="{standalone: true}" name="number" required>
+          </div>
+          <div class="mb-3">
+            <label for="volume-title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="volume-title" [(ngModel)]="title" [ngModelOptions]="{standalone: true}" name="title">
+          </div>
+          <div class="mb-3">
+            <label for="volume-description" class="form-label">Description</label>
+            <textarea class="form-control" id="volume-description" [(ngModel)]="description" [ngModelOptions]="{standalone: true}" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="volume-release-date" class="form-label">Release Date</label>
+            <input type="date" class="form-control" id="volume-release-date" [(ngModel)]="releaseDate" [ngModelOptions]="{standalone: true}" name="releaseDate">
+          </div>
+          <div class="mb-3">
+            <label for="volume-cover-url" class="form-label">Cover URL</label>
+            <input type="url" class="form-control" id="volume-cover-url" [(ngModel)]="coverUrl" [ngModelOptions]="{standalone: true}" name="coverUrl">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="isLoading">
+          {{ isLoading ? 'Saving...' : 'Save Volume' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+@if (isVisible) {
+  <div class="modal-backdrop fade" [class.show]="isVisible"></div>
+}

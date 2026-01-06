@@ -1,0 +1,172 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalService } from '../../services/modal.service';
+import { ApiService } from '../../services/api.service';
+import { NotificationService } from '../../services/notification.service';
+import { SeriesService } from '../../services/series.service';
+import { Series } from '../../models/series.model';
+import { SearchDetailsComponent } from '../../components/modals/search-details/search-details.component';
+
+// Angular Material imports
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
+
+@Component({
+  selector: 'app-search',
+  imports: [
+    CommonModule, 
+    FormsModule,
+    MatTabsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatChipsModule
+  ],
+  templateUrl: './search.component.html',
+  styleUrls: ['./search.component.css'],
+  providers: []
+})
+export class SearchComponent implements OnInit {
+  contentType: 'book' | 'manga' = 'book';
+  searchQuery = '';
+  selectedProvider = '';
+  providers: any[] = [];
+  searchResults: any[] = [];
+  hasSearched = false;
+  isLoading = false;
+  noResults = false;
+
+  // Tab index mapping for Angular Material tabs
+  private tabMap = {
+    'book': 0,
+    'manga': 1
+  };
+
+  constructor(
+    private http: HttpClient,
+    private dialog: MatDialog,
+    private modalService: ModalService,
+    private apiService: ApiService,
+    private notificationService: NotificationService,
+    private seriesService: SeriesService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadProviders();
+  }
+
+  getTabIndex(): number {
+    return this.tabMap[this.contentType as keyof typeof this.tabMap] || 0;
+  }
+
+  setActiveTab(index: number): void {
+    const tabKeys = Object.keys(this.tabMap) as Array<keyof typeof this.tabMap>;
+    this.contentType = tabKeys[index] || 'book';
+    this.onContentTypeChange();
+  }
+
+  onContentTypeChange(): void {
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.hasSearched = false;
+    this.noResults = false;
+    this.selectedProvider = '';
+    this.filterProvidersForContentType();
+  }
+
+  loadProviders(): void {
+    this.http.get<any>('http://localhost:7227/api/metadata/providers').subscribe({
+      next: (response) => {
+        if (response.providers && Array.isArray(response.providers)) {
+          this.filterProvidersForContentType();
+        }
+      },
+      error: (err) => {
+        console.error('Error loading providers:', err);
+      }
+    });
+  }  this.filterProvidersForContentType();
+  }
+
+  onSearch(): void {
+    if (!this.searchQuery.trim()) {
+      this.notificationService.warning('Please enter a search term');
+      return;
+    }
+
+    this.hasSearched = true;
+    this.isLoading = true;
+    this.noResults = false;
+    this.searchResults = [];
+
+    const contentTypeParam = this.contentType === 'book' ? 'BOOK' : 'MANGA';
+    let url = `http://localhost:7227/api/metadata/search?query=${encodeURIComponent(this.searchQuery)}&search_type=title&content_type=${contentTypeParam}`;
+    
+    if (this.selectedProvider) {
+      url += `&provider=${this.selectedProvider}`;
+    }
+
+    this.http.get<any>(url).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        
+        if (response.results) {
+          let totalResults = 0;
+          Object.keys(response.results).forEach(providerName => {
+            const providerResults = response.results[providerName];
+            if (providerResults && Array.isArray(providerResults)) {
+              totalResults += providerResults.length;
+              providerResults.forEach((result: any) => {
+                result.provider = providerName;
+                this.searchResults.push(result);
+              });
+            }
+          });
+
+          if (totalResults === 0) {
+            this.noResults = true;
+          }
+        } else {
+          this.noResults = true;
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.noResults = true;
+        console.error('Search error:', err);
+        this.notificationService.error('Search failed. Please try again.');
+      }
+    });
+  }
+
+  viewDetails(result: any): void {
+    this.dialog.open(SearchDetailsComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: {
+        result: result,
+        contentType: this.contentType
+      },
+      panelClass: 'search-details-dialog'
+    });
+  }
+
+  getCoverUrl(coverUrl: string): string {
+    if (!coverUrl) return '/assets/no-cover.png';
+    return coverUrl;
+  }
+}

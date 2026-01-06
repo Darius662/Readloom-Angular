@@ -1,0 +1,425 @@
+{% extends "books_layout.html" %}
+
+{% block book_title %}Book Library{% endblock %}
+
+{% block book_content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Book Library</h5>
+                <div>
+                    <a href="{{ url_for('ui.books_search') if 'books_search' in url_for_map else '#' }}" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i> Search Books
+                    </a>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#scanBooksModal">
+                        <i class="fas fa-sync me-1"></i> Scan for Books
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="card-title mb-0">My Books <span class="badge bg-secondary">{{ recent_books|length }}</span></h6>
+                                <div class="d-flex gap-2">
+                                    <div class="input-group" style="width: 200px;">
+                                        <input type="text" class="form-control" id="bookFilterAuthor" placeholder="Filter by author...">
+                                        <button class="btn btn-outline-secondary" type="button" id="bookFilterAuthorBtn">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group" style="width: 200px;">
+                                        <input type="text" class="form-control" id="bookFilterName" placeholder="Filter by title...">
+                                        <button class="btn btn-outline-secondary" type="button" id="bookFilterNameBtn">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="text" class="form-control" id="bookFilterYear" placeholder="Year (YYYY)">
+                                        <button class="btn btn-outline-secondary" type="button" id="bookFilterYearBtn">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
+                                    </div>
+                                    <select class="form-select" id="bookLibraryFilter" style="width: 150px;">
+                                        <option value="">All Libraries</option>
+                                    </select>
+                                    <select class="form-select" id="bookRatingFilter" style="width: 150px;">
+                                        <option value="">All Ratings</option>
+                                        <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                                        <option value="4">⭐⭐⭐⭐ 4+ Stars</option>
+                                        <option value="3">⭐⭐⭐ 3+ Stars</option>
+                                        <option value="2">⭐⭐ 2+ Stars</option>
+                                        <option value="1">⭐ 1+ Stars</option>
+                                        <option value="0">Unrated</option>
+                                    </select>
+                                    <select class="form-select" id="bookProgressFilter" style="width: 150px;">
+                                        <option value="">All Progress</option>
+                                        <option value="100">✓ Completed (100%)</option>
+                                        <option value="75">In Progress (75%+)</option>
+                                        <option value="50">Half-way (50%+)</option>
+                                        <option value="25">Started (25%+)</option>
+                                        <option value="0">Not Started</option>
+                                    </select>
+                                    <select class="form-select" id="bookSortBy" style="width: 150px;">
+                                        <option value="author">Sort by Author</option>
+                                        <option value="title">Sort by Title</option>
+                                        <option value="release_date">Sort by Release Date</option>
+                                        <option value="rating">Sort by Rating</option>
+                                        <option value="progress">Sort by Progress</option>
+                                        <option value="library">Sort by Library</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-xxl-6 g-4" id="recentBooksGrid">
+                                    {% if recent_books %}
+                                        {% for book in recent_books %}
+                                            <div class="col">
+                                                <div class="card h-100">
+                                                    <!-- Book Cover with Progress Bar Overlay -->
+                                                    <div style="position: relative; overflow: hidden;">
+                                                        {% if book.cover_url %}
+                                                            <a href="{{ url_for('ui.book_view', book_id=book.id) }}" style="text-decoration: none; cursor: pointer; display: block;">
+                                                                <img src="{{ book.cover_url }}" class="card-img-top book-cover" alt="{{ book.title }}" style="cursor: pointer;">
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{{ url_for('ui.book_view', book_id=book.id) }}" style="text-decoration: none; cursor: pointer; display: block;">
+                                                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px; cursor: pointer;">
+                                                                    <i class="fas fa-book-open fa-3x text-muted"></i>
+                                                                </div>
+                                                            </a>
+                                                        {% endif %}
+                                                        
+                                                        <!-- Progress Bar Floating Island -->
+                                                        {% if book.reading_progress and book.reading_progress > 0 %}
+                                                            <div style="position: absolute; bottom: 12px; left: 12px; right: 12px; height: 28px; background-color: rgba(0, 0, 0, 0.75); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);">
+                                                                <div style="height: 100%; width: {{ book.reading_progress }}%; background: linear-gradient(90deg, #0dcaf0 0%, #00d4ff 100%); transition: width 0.3s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px;">
+                                                                    <span style="color: white; font-size: 0.75rem; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">{{ book.reading_progress }}%</span>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ book.title }}</h5>
+                                                        <p class="card-text text-muted">{{ book.author }}</p>
+                                                        <!-- Star Rating Display -->
+                                                        {% if book.star_rating and book.star_rating > 0 %}
+                                                            <div class="mb-2">
+                                                                <div class="star-rating-display">
+                                                                    {% for i in range(5) %}
+                                                                        <i class="fas fa-star {% if i < book.star_rating|int %}text-warning{% else %}text-muted{% endif %}" style="font-size: 0.9rem;"></i>
+                                                                    {% endfor %}
+                                                                    <span class="ms-1 small text-muted">({{ book.star_rating|int }}/5)</span>
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="mb-2">
+                                                                <span class="small text-muted">Not rated yet</span>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <a href="{{ url_for('ui.book_view', book_id=book.id) }}" class="btn btn-primary btn-sm w-100">
+                                                            <i class="fas fa-book-open me-1"></i> View Book
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="col-12 text-center py-4">
+                                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                                            <p>No books found in your library</p>
+                                            <a href="{{ url_for('ui.books_search') if 'books_search' in url_for_map else '#' }}" class="btn btn-primary">
+                                                <i class="fas fa-search me-1"></i> Search for Books
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Popular Books This Week</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-xxl-6 g-4" id="popularBooksGrid">
+                                    <div class="col-12 text-center py-4">
+                                        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                                        <p>Popular books data coming soon</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {# Book Collections section - commented out #}
+                {# {% if book_collections %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Book Collections</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="bookCollectionsGrid">
+                                    {% for collection in book_collections %}
+                                        <div class="col">
+                                            <div class="card h-100">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ collection.name }}</h5>
+                                                    <p class="card-text">{{ collection.description or 'No description' }}</p>
+                                                    <p class="card-text"><small class="text-muted">{{ collection.book_count or 0 }} book{% if collection.book_count != 1 %}s{% endif %}</small></p>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a href="{{ url_for('ui.collection_view', collection_id=collection.id) }}" class="btn btn-primary btn-sm">View Collection</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %} #}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scan Books Modal -->
+<div class="modal fade" id="scanBooksModal" tabindex="-1" aria-labelledby="scanBooksModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scanBooksModalLabel">Scan for Books</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scanBooksForm">
+                    <div class="mb-3">
+                        <label for="scanPath" class="form-label">Path to Scan</label>
+                        <input type="text" class="form-control" id="scanPath" placeholder="Leave empty to scan all root folders">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="scanRecursively" checked>
+                        <label class="form-check-label" for="scanRecursively">Scan recursively</label>
+                    </div>
+                </form>
+                <div id="scanProgress" class="progress d-none">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                </div>
+                <div id="scanResults" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="startScanBtn">Start Scan</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    $(document).ready(function() {
+        // Start scan button click
+        $('#startScanBtn').on('click', function() {
+            const path = $('#scanPath').val();
+            const recursive = $('#scanRecursively').is(':checked');
+            
+            // Show progress bar
+            $('#scanProgress').removeClass('d-none');
+            $('#scanResults').html('');
+            $('#startScanBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Scanning...');
+            
+            // Call API to scan for books
+            $.ajax({
+                url: '/api/ebooks/scan',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    custom_path: path || null,
+                    recursive: recursive,
+                    content_type: 'BOOK'
+                }),
+                success: function(response) {
+                    $('#startScanBtn').prop('disabled', false).html('Start Scan');
+                    
+                    if (response.stats) {
+                        const stats = response.stats;
+                        $('#scanResults').html(`
+                            <div class="alert alert-success">
+                                <h5>Scan Complete</h5>
+                                <p>Scanned: ${stats.scanned || 0} files</p>
+                                <p>Added: ${stats.added || 0} books</p>
+                                <p>Skipped: ${stats.skipped || 0} files</p>
+                                <p>Errors: ${stats.errors || 0}</p>
+                            </div>
+                        `);
+                        
+                        // Reload the page after a short delay
+                        setTimeout(function() {
+                            location.reload();
+                        }, 3000);
+                    } else {
+                        $('#scanResults').html(`
+                            <div class="alert alert-warning">
+                                <h5>Scan Complete</h5>
+                                <p>No results returned from the server.</p>
+                            </div>
+                        `);
+                    }
+                },
+                error: function(xhr) {
+                    $('#startScanBtn').prop('disabled', false).html('Start Scan');
+                    $('#scanResults').html(`
+                        <div class="alert alert-danger">
+                            <h5>Error</h5>
+                            <p>${xhr.responseJSON?.error || 'An error occurred during the scan'}</p>
+                        </div>
+                    `);
+                }
+            });
+        });
+        
+        // Load available libraries/collections
+        function loadLibraryFilter() {
+            $.ajax({
+                url: '/api/collections',
+                method: 'GET',
+                data: { content_type: 'BOOK' },
+                success: function(response) {
+                    if (response.collections && response.collections.length > 0) {
+                        const select = $('#bookLibraryFilter');
+                        response.collections.forEach(function(collection) {
+                            select.append(`<option value="${collection.id}">${collection.name}</option>`);
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading collections:', xhr);
+                }
+            });
+        }
+        
+        // Books filter and sort functionality
+        function loadFilteredBooks() {
+            const filterAuthor = $('#bookFilterAuthor').val();
+            const filterName = $('#bookFilterName').val();
+            const filterYear = $('#bookFilterYear').val();
+            const libraryFilter = $('#bookLibraryFilter').val();
+            const sortBy = $('#bookSortBy').val();
+            
+            // Save sort preference
+            preferences.save('books_sort_by', sortBy);
+            
+            $.ajax({
+                url: '/api/series/books/filtered',
+                method: 'GET',
+                data: {
+                    filter_author: filterAuthor,
+                    filter_name: filterName,
+                    filter_year: filterYear,
+                    library_id: libraryFilter,
+                    sort_by: sortBy
+                },
+                success: function(response) {
+                    if (response.success && response.books) {
+                        renderBooksGrid(response.books);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading filtered books:', xhr);
+                }
+            });
+        }
+        
+        function renderBooksGrid(books) {
+            const grid = $('#recentBooksGrid');
+            grid.empty();
+            
+            if (books.length === 0) {
+                grid.html(`
+                    <div class="col-12 text-center py-4">
+                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                        <p>No books found matching your filters</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            books.forEach(function(book) {
+                const coverHtml = book.cover_url 
+                    ? `<a href="/books/${book.id}" style="text-decoration: none; cursor: pointer; display: block;"><img src="${book.cover_url}" class="card-img-top book-cover" alt="${book.title}" style="cursor: pointer;"></a>`
+                    : `<a href="/books/${book.id}" style="text-decoration: none; cursor: pointer; display: block;"><div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px; cursor: pointer;"><i class="fas fa-book-open fa-3x text-muted"></i></div></a>`;
+                
+                const html = `
+                    <div class="col">
+                        <div class="card h-100">
+                            ${coverHtml}
+                            <div class="card-body">
+                                <h5 class="card-title">${book.title}</h5>
+                                <p class="card-text text-muted">${book.author || 'Unknown'}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/books/${book.id}" class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-book-open me-1"></i> View Book
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.append(html);
+            });
+        }
+        
+        // Restore saved sort preference on page load
+        const savedBooksSort = preferences.load('books_sort_by', 'author');
+        $('#bookSortBy').val(savedBooksSort);
+        
+        // Apply the saved sort preference on page load
+        loadFilteredBooks();
+        
+        // Event listeners for filter and sort
+        $('#bookFilterAuthorBtn').on('click', loadFilteredBooks);
+        $('#bookFilterNameBtn').on('click', loadFilteredBooks);
+        $('#bookFilterYearBtn').on('click', loadFilteredBooks);
+        $('#bookLibraryFilter').on('change', loadFilteredBooks);
+        $('#bookSortBy').on('change', loadFilteredBooks);
+        
+        // Allow Enter key to trigger filter
+        $('#bookFilterAuthor').on('keypress', function(e) {
+            if (e.which === 13) loadFilteredBooks();
+        });
+        $('#bookFilterName').on('keypress', function(e) {
+            if (e.which === 13) loadFilteredBooks();
+        });
+        $('#bookFilterYear').on('keypress', function(e) {
+            if (e.which === 13) loadFilteredBooks();
+        });
+        
+        // Load library filter on page load
+        loadLibraryFilter();
+    });
+</script>
+
+<style>
+    .book-cover {
+        height: 320px;
+        object-fit: cover;
+    }
+    
+    .card {
+        min-height: 450px;
+    }
+</style>
+{% endblock %}

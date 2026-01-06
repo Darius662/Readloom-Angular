@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - Reader - Readloom{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100" style="padding: 0;">
+    <!-- Reader Header -->
+    <div class="reader-header bg-dark text-white p-3 d-flex justify-content-between align-items-center" style="position: sticky; top: 0; z-index: 100;">
+        <div>
+            <h5 class="mb-0">{{ book.title }}</h5>
+            <small class="text-muted">{{ book.author }}</small>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="reader-controls">
+                <button class="btn btn-sm btn-outline-light" id="toggleSidebar" title="Toggle Navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-light" id="toggleSettings" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            <a href="/books/{{ book.id }}" class="btn btn-sm btn-outline-light">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-0 h-100" style="margin-top: -3px;">
+        <!-- Navigation Sidebar -->
+        <div class="col-md-3 bg-light border-end reader-sidebar" id="readerSidebar" style="max-height: calc(100vh - 80px); overflow-y: auto; display: none;">
+            <div class="p-3">
+                <h6 class="mb-3">Table of Contents</h6>
+                <div id="tocContainer">
+                    <p class="text-muted small">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Reader Area -->
+        <div class="col-md-9 reader-content" id="readerContent" style="height: calc(100vh - 80px); overflow-y: auto; background-color: #f5f5f5;">
+            <div class="p-4" id="contentArea">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-book-open fa-3x mb-3"></i>
+                    <p>Loading book content...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="modal fade" id="readerSettingsModal" tabindex="-1" aria-labelledby="readerSettingsLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="readerSettingsLabel">Reader Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fontSizeSlider" class="form-label">Font Size</label>
+                        <input type="range" class="form-range" id="fontSizeSlider" min="12" max="24" value="16">
+                        <small class="text-muted">Current: <span id="fontSizeValue">16</span>px</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lineHeightSlider" class="form-label">Line Height</label>
+                        <input type="range" class="form-range" id="lineHeightSlider" min="1" max="2" step="0.1" value="1.5">
+                        <small class="text-muted">Current: <span id="lineHeightValue">1.5</span></small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="themeSelect" class="form-label">Theme</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="sepia">Sepia</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .reader-header {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .reader-content {
+        background-color: #f5f5f5;
+    }
+
+    .reader-content.dark-theme {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+    }
+
+    .reader-content.sepia-theme {
+        background-color: #f4ecd8;
+        color: #5c4033;
+    }
+
+    #contentArea {
+        background-color: white;
+        margin: 20px;
+        padding: 40px;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        line-height: 1.6;
+    }
+
+    .reader-content.dark-theme #contentArea {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+    }
+
+    .reader-content.sepia-theme #contentArea {
+        background-color: #f4ecd8;
+        color: #5c4033;
+    }
+
+    .reader-sidebar {
+        display: none;
+    }
+
+    .reader-sidebar.show {
+        display: block;
+    }
+
+    .toc-item {
+        padding: 8px 0;
+        border-left: 3px solid transparent;
+        padding-left: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .toc-item:hover {
+        background-color: rgba(0,0,0,0.05);
+        border-left-color: #007bff;
+    }
+
+    .toc-item.active {
+        background-color: rgba(0,0,0,0.1);
+        border-left-color: #007bff;
+        font-weight: 600;
+    }
+
+    .page-break {
+        page-break-after: always;
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 1px solid #ddd;
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    const bookId = {{ book.id }};
+    const contentArea = $('#contentArea');
+    const readerContent = $('#readerContent');
+    const readerSidebar = $('#readerSidebar');
+    const toggleSidebar = $('#toggleSidebar');
+    const toggleSettings = $('#toggleSettings');
+    const settingsModal = new bootstrap.Modal(document.getElementById('readerSettingsModal'));
+    
+    let currentTheme = localStorage.getItem('readerTheme') || 'light';
+    let currentFontSize = parseInt(localStorage.getItem('readerFontSize')) || 16;
+    let currentLineHeight = parseFloat(localStorage.getItem('readerLineHeight')) || 1.5;
+
+    // Load book content
+    function loadBookContent() {
+        $.ajax({
+            url: `/api/books/${bookId}/content`,
+            method: 'GET',
+            success: function(response) {
+                if (response.content) {
+                    contentArea.html(response.content);
+                    applyReaderSettings();
+                } else {
+                    contentArea.html('<div class="alert alert-warning">Unable to load book content. Please check the file format.</div>');
+                }
+            },
+            error: function(xhr) {
+                contentArea.html('<div class="alert alert-danger">Error loading book content: ' + (xhr.responseJSON?.error || 'Unknown error') + '</div>');
+            }
+        });
+    }
+
+    // Toggle sidebar
+    toggleSidebar.on('click', function() {
+        readerSidebar.toggleClass('show');
+        if (readerSidebar.hasClass('show')) {
+            readerSidebar.css('display', 'block');
+        } else {
+            readerSidebar.css('display', 'none');
+        }
+    });
+
+    // Toggle settings
+    toggleSettings.on('click', function() {
+        settingsModal.show();
+    });
+
+    // Font size slider
+    $('#fontSizeSlider').on('input', function() {
+        currentFontSize = parseInt($(this).val());
+        $('#fontSizeValue').text(currentFontSize);
+        localStorage.setItem('readerFontSize', currentFontSize);
+        applyReaderSettings();
+    });
+
+    // Line height slider
+    $('#lineHeightSlider').on('input', function() {
+        currentLineHeight = parseFloat($(this).val());
+        $('#lineHeightValue').text(currentLineHeight);
+        localStorage.setItem('readerLineHeight', currentLineHeight);
+        applyReaderSettings();
+    });
+
+    // Theme selector
+    $('#themeSelect').on('change', function() {
+        currentTheme = $(this).val();
+        localStorage.setItem('readerTheme', currentTheme);
+        applyReaderSettings();
+    });
+
+    // Apply reader settings
+    function applyReaderSettings() {
+        readerContent.removeClass('dark-theme sepia-theme');
+        
+        if (currentTheme === 'dark') {
+            readerContent.addClass('dark-theme');
+        } else if (currentTheme === 'sepia') {
+            readerContent.addClass('sepia-theme');
+        }
+
+        contentArea.css({
+            'font-size': currentFontSize + 'px',
+            'line-height': currentLineHeight
+        });
+    }
+
+    // Keyboard navigation
+    $(document).on('keydown', function(e) {
+        if (e.key === 'ArrowRight') {
+            readerContent.scrollTop(readerContent.scrollTop() + 200);
+        } else if (e.key === 'ArrowLeft') {
+            readerContent.scrollTop(readerContent.scrollTop() - 200);
+        }
+    });
+
+    // Initialize
+    loadBookContent();
+    $('#themeSelect').val(currentTheme);
+    applyReaderSettings();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+<div class="header">
+  <h1>Collections</h1>
+  <button matButton="filled" (click)="onAdd()">
+    <mat-icon>add</mat-icon>
+    Add Collection
+  </button>
+</div>
+
+@if (collections.length > 0) {
+  <div class="collections-grid">
+    @for (collection of collections; track collection.id) {
+      <mat-card class="collection-card">
+        <mat-card-header>
+          <mat-card-title>{{ collection.name }}</mat-card-title>
+          <mat-card-subtitle>{{ collection.type }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (collection.description) {
+            <p>{{ collection.description }}</p>
+          }
+        </mat-card-content>
+        <mat-card-actions>
+          <button matButton (click)="onEdit(collection)">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          <button matButton (click)="onDelete(collection)">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+} @else {
+  <mat-card class="empty-state">
+    <mat-card-content>
+      <mat-icon>info</mat-icon>
+      <p>No collections yet. <a (click)="onAdd()">Create your first collection</a>.</p>
+    </mat-card-content>
+  </mat-card>
+}

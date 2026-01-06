@@ -1,0 +1,161 @@
+/* Calendar Container */
+.calendar-container {
+  padding: 2.5rem;
+  background-color: var(--mat-sys-color-surface);
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Calendar Header */
+.calendar-header {
+  margin-bottom: 2.5rem;
+}
+
+.calendar-header h1 {
+  color: var(--mat-sys-color-on-surface);
+  font-weight: 600;
+  font-size: 2rem;
+  margin: 0;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+/* Angular Material Card Overrides */
+.calendar-section,
+.releases-section {
+  background-color: var(--mat-sys-color-surface-container);
+  border: 1px solid var(--mat-sys-color-outline);
+  border-radius: 12px;
+  box-shadow: var(--mat-elevation-level1);
+  margin-bottom: 2rem;
+}
+
+.calendar-section .mat-mdc-card-header,
+.releases-section .mat-mdc-card-header {
+  background-color: var(--mat-sys-color-surface-variant);
+  border-bottom: 1px solid var(--mat-sys-color-outline-variant);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+
+.calendar-section .mat-mdc-card-title,
+.releases-section .mat-mdc-card-title {
+  font-weight: 600;
+  color: var(--mat-sys-color-on-surface-variant);
+  letter-spacing: -0.3px;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.calendar-section .mat-mdc-card-content,
+.releases-section .mat-mdc-card-content {
+  padding: 1.5rem;
+}
+
+/* Table Styling for Child Components */
+.calendar-section .table,
+.releases-section .table {
+  margin-bottom: 0;
+  background-color: transparent;
+}
+
+.calendar-section .table thead th,
+.releases-section .table thead th {
+  background-color: var(--mat-sys-color-surface-variant);
+  color: var(--mat-sys-color-on-surface-variant);
+  font-weight: 600;
+  border-bottom: 2px solid var(--mat-sys-color-outline);
+}
+
+.calendar-section .table tbody tr:hover,
+.releases-section .table tbody tr:hover {
+  background-color: var(--mat-sys-color-hover);
+}
+
+.calendar-section .table td,
+.releases-section .table td {
+  border-bottom: 1px solid var(--mat-sys-color-outline);
+  color: var(--mat-sys-color-on-surface);
+}
+
+.calendar-section .table-striped tbody tr:nth-child(odd),
+.releases-section .table-striped tbody tr:nth-child(odd) {
+  background-color: rgba(var(--mat-sys-color-primary), 0.02);
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+  .calendar-container {
+    background-color: var(--mat-sys-color-surface);
+  }
+  
+  .calendar-header h1 {
+    color: var(--mat-sys-color-on-surface);
+  }
+  
+  .calendar-section,
+  .releases-section {
+    background-color: var(--mat-sys-color-surface-container);
+    border-color: var(--mat-sys-color-outline);
+  }
+  
+  .calendar-section .mat-mdc-card-header,
+  .releases-section .mat-mdc-card-header {
+    background-color: var(--mat-sys-color-surface-variant);
+    border-bottom-color: var(--mat-sys-color-outline-variant);
+  }
+  
+  .calendar-section .mat-mdc-card-title,
+  .releases-section .mat-mdc-card-title {
+    color: var(--mat-sys-color-on-surface-variant);
+  }
+  
+  .calendar-section .table thead th,
+  .releases-section .table thead th {
+    background-color: var(--mat-sys-color-surface-variant);
+    color: var(--mat-sys-color-on-surface-variant);
+    border-bottom-color: var(--mat-sys-color-outline);
+  }
+  
+  .calendar-section .table tbody tr:hover,
+  .releases-section .table tbody tr:hover {
+    background-color: var(--mat-sys-color-hover);
+  }
+  
+  .calendar-section .table td,
+  .releases-section .table td {
+    border-bottom-color: var(--mat-sys-color-outline);
+    color: var(--mat-sys-color-on-surface);
+  }
+  
+  .calendar-section .table-striped tbody tr:nth-child(odd),
+  .releases-section .table-striped tbody tr:nth-child(odd) {
+    background-color: rgba(var(--mat-sys-color-primary), 0.05);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 1.5rem;
+  }
+  
+  .calendar-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .calendar-section .mat-mdc-card-header,
+  .releases-section .mat-mdc-card-header {
+    padding: 1rem 1.25rem;
+  }
+  
+  .calendar-section .mat-mdc-card-content,
+  .releases-section .mat-mdc-card-content {
+    padding: 1rem;
+  }
+}

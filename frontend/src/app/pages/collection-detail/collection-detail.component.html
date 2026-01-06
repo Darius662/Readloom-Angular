@@ -1,0 +1,87 @@
+<div class="collection-detail-container">
+  <app-loading-spinner [isLoading]="isLoading" message="Loading collection..."></app-loading-spinner>
+  @if (error) {
+    <app-error-message [message]="error"></app-error-message>
+  }
+
+  @if (!isLoading && collection) {
+    <div class="collection-content">
+      <div class="collection-header">
+        <div class="collection-info">
+          <h1>{{ collection.name }}</h1>
+          <p class="collection-type">{{ collection.type | titlecase }}</p>
+          @if (collection.description) {
+            <p class="collection-description">{{ collection.description }}</p>
+          }
+          <button class="btn btn-primary mt-3" (click)="onEditCollection()">
+            <i class="fas fa-edit"></i> Edit Collection
+          </button>
+        </div>
+      </div>
+      <!-- Statistics -->
+      @if (stats) {
+        <div class="stats-section">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Statistics</h5>
+            </div>
+            <div class="card-body">
+              <div class="stats-grid">
+                <div class="stat">
+                  <span class="stat-label">Total Items</span>
+                  <span class="stat-value">{{ stats.total_items }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Series</span>
+                  <span class="stat-value">{{ stats.total_series }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Chapters</span>
+                  <span class="stat-value">{{ stats.total_chapters }}</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-label">Volumes</span>
+                  <span class="stat-value">{{ stats.total_volumes }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      <!-- Items -->
+      <div class="items-section">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Items in Collection ({{ items.length }})</h5>
+          </div>
+          <div class="card-body">
+            @if (items.length > 0) {
+              <div class="items-list">
+                @for (item of items; track item) {
+                  <div class="item-row">
+                    <div class="item-info">
+                      <span class="item-id">ID: {{ item.series_id }}</span>
+                      @if (item.status) {
+                        <span class="item-status">{{ item.status | titlecase }}</span>
+                      }
+                    </div>
+                    <div class="item-actions">
+                      <button class="btn btn-sm btn-outline-danger" (click)="onRemoveItem(item)">
+                        <i class="fas fa-trash"></i> Remove
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            @if (items.length === 0) {
+              <p class="text-muted text-center">
+                No items in this collection yet.
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

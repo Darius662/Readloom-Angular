@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% set content_type = 'manga' %}
+
+{% block title %}{% block manga_title %}Manga{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Main Content - Full Width -->
+        <div class="col-12">
+            {% block manga_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<!-- New Collection Modal -->
+<div class="modal fade" id="newCollectionModal" tabindex="-1" aria-labelledby="newCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newCollectionModalLabel">New Manga Collection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newCollectionForm">
+                    <div class="mb-3">
+                        <label for="collectionName" class="form-label">Collection Name</label>
+                        <input type="text" class="form-control" id="collectionName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="collectionDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="collectionDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="isDefaultCollection">
+                        <label class="form-check-label" for="isDefaultCollection">Set as default collection for manga</label>
+                    </div>
+                    <input type="hidden" id="collectionContentType" value="MANGA">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCollectionBtn">Create Collection</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/persistent-preferences.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        // Create new collection
+        $('#saveCollectionBtn').on('click', function() {
+            const name = $('#collectionName').val();
+            const description = $('#collectionDescription').val();
+            const isDefault = $('#isDefaultCollection').is(':checked');
+            const contentType = $('#collectionContentType').val();
+            
+            if (!name) {
+                notificationManager.warning('Collection name is required');
+                return;
+            }
+            
+            $.ajax({
+                url: '/api/collections',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: name,
+                    description: description,
+                    is_default: isDefault,
+                    content_type: contentType
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        notificationManager.success('Collection created successfully');
+                        $('#newCollectionModal').modal('hide');
+                        
+                        // Reload the page to show the new collection
+                        location.reload();
+                    } else {
+                        notificationManager.error(response.message || 'Failed to create collection');
+                    }
+                },
+                error: function(xhr) {
+                    notificationManager.error(xhr.responseJSON?.error || 'Failed to create collection');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

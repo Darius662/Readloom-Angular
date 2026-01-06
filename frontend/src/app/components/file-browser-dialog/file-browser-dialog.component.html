@@ -1,0 +1,148 @@
+<mat-toolbar color="primary" class="dialog-toolbar">
+  <mat-toolbar-row>
+    <button mat-icon-button (click)="navigateHome()" matTooltip="Go to Home Directory">
+      <mat-icon>home</mat-icon>
+    </button>
+    <button mat-icon-button (click)="navigateUp()" matTooltip="Go Up One Level" [disabled]="!currentPath || currentPath === '/'">
+      <mat-icon>arrow_upward</mat-icon>
+    </button>
+    <span class="toolbar-spacer"></span>
+    <h3 matDialogTitle>{{ data.title || 'Select Folder' }}</h3>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button (click)="cancel()" matTooltip="Cancel">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<div mat-dialog-content class="dialog-content">
+  <!-- Current Path Display -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Current Path</mat-label>
+    <input matInput [value]="currentPath" readonly>
+    <mat-icon matSuffix>folder_open</mat-icon>
+  </mat-form-field>
+
+  <!-- Error Display -->
+  @if (error) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <div class="error-message">
+          <mat-icon color="warn">error</mat-icon>
+          <span>{{ error }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <span>Loading folders...</span>
+    </div>
+  }
+
+  <!-- Drives (Windows only) -->
+  @if (drives.length > 0) {
+    <mat-card class="drives-card">
+      <mat-card-header>
+        <mat-card-title>Drives</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-chip-listbox aria-label="Drives">
+          @for (drive of drives; track drive) {
+            <mat-chip-option (click)="navigateToDrive(drive)" class="drive-chip">
+              <mat-icon>storage</mat-icon>
+              {{ drive }}
+            </mat-chip-option>
+          }
+        </mat-chip-listbox>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Folders List -->
+  @if (browseResponse && !isLoading) {
+    <mat-card class="folders-card">
+      <mat-card-header>
+        <mat-card-title>
+          Folders
+          @if (folders.length > 0) {
+            <span class="item-count">({{ folders.length }})</span>
+          }
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="folders-content">
+        @if (folders.length === 0) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">folder_open</mat-icon>
+            <span>No folders found</span>
+          </div>
+        } @else {
+          <mat-nav-list class="folder-list">
+            @for (folder of folders; track folder.path) {
+              <mat-list-item 
+                class="folder-item"
+                (click)="navigateToFolder(folder)"
+                [class.selected]="selectedPath === folder.path">
+                <mat-icon matListItemIcon>{{ getIconForItem(folder) }}</mat-icon>
+                <div matListItemTitle class="folder-name">{{ folder.name }}</div>
+                <div matListItemLine class="folder-path">{{ folder.path }}</div>
+                @if (folder.size) {
+                  <div matListItemLine class="folder-meta">
+                    {{ formatFileSize(folder.size) }}
+                    @if (folder.modified) {
+                      <span class="separator">•</span>
+                      {{ formatDate(folder.modified) }}
+                    }
+                  </div>
+                }
+                <button mat-icon-button matListItemMeta (click)="selectItem(folder); $event.stopPropagation()">
+                  <mat-icon [color]="selectedPath === folder.path ? 'primary' : 'accent'">
+                    {{ selectedPath === folder.path ? 'check_circle' : 'radio_button_unchecked' }}
+                  </mat-icon>
+                </button>
+              </mat-list-item>
+            }
+          </mat-nav-list>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Select Current Directory Option -->
+    @if (data.allowFolderSelection) {
+      <mat-card class="select-current-card">
+        <mat-card-content>
+          <button 
+            mat-flat-button 
+            color="primary"
+            class="select-current-btn"
+            (click)="selectCurrentDirectory()"
+            [disabled]="!currentPath">
+            <mat-icon>check_circle</mat-icon>
+            Select Current Directory
+          </button>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <span class="action-spacer"></span>
+  @if (selectedPath) {
+    <div class="selected-info">
+      <small>Selected: {{ selectedName }}</small>
+    </div>
+  }
+  <button 
+    mat-raised-button 
+    color="primary"
+    (click)="confirm()"
+    [disabled]="!canConfirm()">
+    <mat-icon>check</mat-icon>
+    Select
+  </button>
+</div>

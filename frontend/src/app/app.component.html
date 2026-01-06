@@ -1,0 +1,42 @@
+<div class="app-layout">
+  <!-- Fixed header at top -->
+  <app-header (toggleSidebar)="onToggleSidebar()"></app-header>
+
+  <!-- Sidenav and main content below header -->
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav
+      #sidenav
+      [mode]="sidenavMode"
+      [opened]="sidenavOpened"
+      class="sidenav"
+      [class.mobile]="isMobile">
+      <app-sidebar [isCollapsed]="sidebarCollapsed"></app-sidebar>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content">
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <!-- Notifications overlay -->
+  <app-notification></app-notification>
+  
+  <!-- Toast notifications -->
+  <app-toast-notification></app-toast-notification>
+</div>
+
+<!-- Modals (outside main layout) -->
+<app-delete-confirmation></app-delete-confirmation>
+<app-book-details></app-book-details>
+<app-manga-details></app-manga-details>
+<app-import-success></app-import-success>
+<app-add-root-folder></app-add-root-folder>
+<app-edit-root-folder></app-edit-root-folder>
+<app-add-root-folder-collection></app-add-root-folder-collection>
+<app-folder-browser></app-folder-browser>
+<app-move-series></app-move-series>
+<app-volume-form></app-volume-form>
+<app-chapter-form></app-chapter-form>
+<app-edit-series></app-edit-series>
+<app-setup-wizard></app-setup-wizard>
+<app-link-root-folder></app-link-root-folder>

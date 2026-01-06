@@ -1,0 +1,61 @@
+/* Upcoming Releases Section */
+
+mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.35rem 1.5rem;
+}
+
+mat-card-content {
+  padding: 1.5rem;
+}
+
+.releases-card {
+  margin-bottom: 2rem;
+  height: 100%;
+}
+
+.releases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.release-item {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.release-item:last-child {
+  border-bottom: none;
+}
+
+.release-series {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.release-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.empty-message mat-icon {
+  font-size: 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}

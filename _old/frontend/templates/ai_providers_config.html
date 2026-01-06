@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+
+{% block title %}Readloom - AI Providers Configuration{% endblock %}
+
+{% block page_title %}AI Providers Configuration{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-brain me-2"></i>AI Providers Configuration
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Configure AI providers for accurate manga metadata extraction. All providers are completely free with no credit card required.</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Fallback Chain:</strong> Groq → Gemini → DeepSeek → Ollama → Web Scraping
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Provider Status -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Provider Status</h5>
+            </div>
+            <div class="card-body">
+                <div id="provider-status-container" class="row">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading provider status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Groq Provider -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Groq</h5>
+                <span class="badge bg-warning" id="groq-status">Not Configured</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted"><strong>Speed:</strong> ⚡⚡⚡ Fastest</p>
+                    <p class="text-muted"><strong>Accuracy:</strong> High</p>
+                    <p class="text-muted"><strong>Setup Time:</strong> 1 minute</p>
+                    <p class="text-muted"><strong>Cost:</strong> Free</p>
+                </div>
+                <p>Groq provides the fastest inference speed with a generous free tier.</p>
+                <form id="groq-form">
+                    <div class="mb-3">
+                        <label for="groq-api-key" class="form-label">API Key</label>
+                        <input type="password" class="form-control" id="groq-api-key" name="groq_api_key" placeholder="gsk_...">
+                        <div class="form-text">Get your free API key at <a href="https://groq.com/" target="_blank">groq.com</a></div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="groq-enabled" name="groq_enabled">
+                        <label class="form-check-label" for="groq-enabled">
+                            Enable Groq Provider
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="testProvider('groq')">
+                        <i class="fas fa-flask me-1"></i> Test
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="saveProvider('groq')">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini Provider -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Google Gemini</h5>
+                <span class="badge bg-warning" id="gemini-status">Not Configured</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted"><strong>Speed:</strong> ⚡⚡ Fast</p>
+                    <p class="text-muted"><strong>Accuracy:</strong> Very High</p>
+                    <p class="text-muted"><strong>Setup Time:</strong> 2 minutes</p>
+                    <p class="text-muted"><strong>Cost:</strong> Free</p>
+                </div>
+                <p>Google Gemini offers powerful reasoning with a 1M token context window.</p>
+                <form id="gemini-form">
+                    <div class="mb-3">
+                        <label for="gemini-api-key" class="form-label">API Key</label>
+                        <input type="password" class="form-control" id="gemini-api-key" name="gemini_api_key" placeholder="AIzaSy...">
+                        <div class="form-text">Get your free API key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="gemini-enabled" name="gemini_enabled">
+                        <label class="form-check-label" for="gemini-enabled">
+                            Enable Gemini Provider
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="testProvider('gemini')">
+                        <i class="fas fa-flask me-1"></i> Test
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="saveProvider('gemini')">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DeepSeek Provider -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">DeepSeek</h5>
+                <span class="badge bg-warning" id="deepseek-status">Not Configured</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted"><strong>Speed:</strong> ⚡⚡ Fast</p>
+                    <p class="text-muted"><strong>Accuracy:</strong> High</p>
+                    <p class="text-muted"><strong>Setup Time:</strong> 2 minutes</p>
+                    <p class="text-muted"><strong>Cost:</strong> Free</p>
+                </div>
+                <p>DeepSeek provides excellent reasoning models with good accuracy.</p>
+                <form id="deepseek-form">
+                    <div class="mb-3">
+                        <label for="deepseek-api-key" class="form-label">API Key</label>
+                        <input type="password" class="form-control" id="deepseek-api-key" name="deepseek_api_key" placeholder="sk-...">
+                        <div class="form-text">Get your free API key at <a href="https://platform.deepseek.com/" target="_blank">platform.deepseek.com</a></div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="deepseek-enabled" name="deepseek_enabled">
+                        <label class="form-check-label" for="deepseek-enabled">
+                            Enable DeepSeek Provider
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="testProvider('deepseek')">
+                        <i class="fas fa-flask me-1"></i> Test
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="saveProvider('deepseek')">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ollama Provider -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Ollama (Self-Hosted)</h5>
+                <span class="badge bg-warning" id="ollama-status">Not Configured</span>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted"><strong>Speed:</strong> ⚡ Slower (but local)</p>
+                    <p class="text-muted"><strong>Accuracy:</strong> Good</p>
+                    <p class="text-muted"><strong>Setup Time:</strong> 5 minutes</p>
+                    <p class="text-muted"><strong>Cost:</strong> Free</p>
+                </div>
+                <p>Ollama runs locally on your machine for complete privacy and offline capability.</p>
+                <form id="ollama-form">
+                    <div class="mb-3">
+                        <label for="ollama-base-url" class="form-label">Base URL</label>
+                        <input type="text" class="form-control" id="ollama-base-url" name="ollama_base_url" placeholder="http://localhost:11434" value="http://localhost:11434">
+                        <div class="form-text">URL where Ollama server is running</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ollama-model" class="form-label">Model</label>
+                        <input type="text" class="form-control" id="ollama-model" name="ollama_model" placeholder="llama2" value="llama2">
+                        <div class="form-text">Model to use (e.g., llama2, mistral, neural-chat)</div>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="ollama-enabled" name="ollama_enabled">
+                        <label class="form-check-label" for="ollama-enabled">
+                            Enable Ollama Provider
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="testProvider('ollama')">
+                        <i class="fas fa-flask me-1"></i> Test
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="saveProvider('ollama')">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Result Modal -->
+<div class="modal fade" id="testResultModal" tabindex="-1" aria-labelledby="testResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testResultModalLabel">Test Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="testResultBody">
+                <!-- Result will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Documentation Section -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Documentation</h5>
+            </div>
+            <div class="card-body">
+                <p>For more information about AI providers, see the documentation:</p>
+                <ul>
+                    <li><a href="https://github.com/Darius662/Readloom/blob/main/docs/AI_PROVIDERS_QUICKSTART.md" target="_blank">Quick Start Guide</a></li>
+                    <li><a href="https://github.com/Darius662/Readloom/blob/main/docs/AI_PROVIDERS.md" target="_blank">Full Documentation</a></li>
+                    <li><a href="https://github.com/Darius662/Readloom/blob/main/docs/MIGRATING_TO_AI_PROVIDERS.md" target="_blank">Migration Guide</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        loadProviderStatus();
+    });
+
+    function loadProviderStatus() {
+        $.ajax({
+            url: '/api/ai-providers/status',
+            method: 'GET',
+            success: function(data) {
+                updateProviderStatus(data);
+            },
+            error: function(error) {
+                console.error('Error loading provider status:', error);
+                $('#provider-status-container').html(
+                    '<div class="col-12"><div class="alert alert-warning">Could not load provider status</div></div>'
+                );
+            }
+        });
+    }
+
+    function updateProviderStatus(data) {
+        const container = $('#provider-status-container');
+        container.empty();
+
+        const providers = ['groq', 'gemini', 'deepseek', 'ollama'];
+        
+        providers.forEach(provider => {
+            const status = data.providers[provider];
+            const isAvailable = status && status.available;
+            const badgeClass = isAvailable ? 'bg-success' : 'bg-danger';
+            const statusText = isAvailable ? 'Available' : 'Not Available';
+            const icon = isAvailable ? 'fa-check-circle' : 'fa-times-circle';
+
+            const html = `
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">${provider.charAt(0).toUpperCase() + provider.slice(1)}</h6>
+                                <span class="badge ${badgeClass}">
+                                    <i class="fas ${icon} me-1"></i>${statusText}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.append(html);
+            
+            // Update status badges
+            $(`#${provider}-status`).removeClass('bg-warning bg-success bg-danger')
+                .addClass(badgeClass)
+                .text(statusText);
+        });
+    }
+
+    function saveProvider(provider) {
+        const form = $(`#${provider}-form`);
+        const data = {
+            provider: provider,
+            enabled: form.find(`#${provider}-enabled`).is(':checked')
+        };
+
+        // Add provider-specific fields
+        if (provider === 'groq') {
+            data.api_key = form.find('#groq-api-key').val();
+        } else if (provider === 'gemini') {
+            data.api_key = form.find('#gemini-api-key').val();
+        } else if (provider === 'deepseek') {
+            data.api_key = form.find('#deepseek-api-key').val();
+        } else if (provider === 'ollama') {
+            data.base_url = form.find('#ollama-base-url').val();
+            data.model = form.find('#ollama-model').val();
+        }
+
+        $.ajax({
+            url: '/api/ai-providers/config',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} provider configuration saved!`);
+                loadProviderStatus();
+            },
+            error: function(error) {
+                console.error('Error saving provider config:', error);
+                alert('Failed to save provider configuration');
+            }
+        });
+    }
+
+    function testProvider(provider) {
+        const button = event.target;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Testing...';
+
+        $.ajax({
+            url: '/api/ai-providers/test',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ provider: provider }),
+            success: function(response) {
+                showTestResult(provider, true, response.message || 'Test successful!');
+            },
+            error: function(error) {
+                let message = 'Unknown error';
+                
+                if (error.status === 404) {
+                    message = 'API endpoint not found. Please restart the server.';
+                } else if (error.responseJSON && error.responseJSON.error) {
+                    message = error.responseJSON.error;
+                } else if (error.responseJSON && error.responseJSON.message) {
+                    message = error.responseJSON.message;
+                } else if (error.statusText) {
+                    message = error.statusText;
+                }
+                
+                showTestResult(provider, false, message);
+            },
+            complete: function() {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-flask me-1"></i> Test';
+            }
+        });
+    }
+
+    function showTestResult(provider, success, message) {
+        const modal = new bootstrap.Modal(document.getElementById('testResultModal'));
+        const resultBody = $('#testResultBody');
+        
+        const alertClass = success ? 'alert-success' : 'alert-danger';
+        const icon = success ? 'fa-check-circle' : 'fa-times-circle';
+        
+        resultBody.html(`
+            <div class="alert ${alertClass}">
+                <i class="fas ${icon} me-2"></i>
+                <strong>${provider.charAt(0).toUpperCase() + provider.slice(1)} Test Result:</strong>
+                <p class="mt-2 mb-0">${message}</p>
+            </div>
+        `);
+        
+        modal.show();
+    }
+</script>
+{% endblock %}

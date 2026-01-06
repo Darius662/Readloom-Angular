@@ -1,0 +1,1228 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title or 'Dashboard' }}{% endblock %}
+
+{% block page_title %}{{ title or 'Dashboard' }}{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        --bs-body-text-align: left !important;
+    }
+    
+    * {
+        -webkit-text-size-adjust: 100% !important;
+    }
+    
+    div[style*="text-transform: uppercase"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.9rem !important;
+        text-align: left !important;
+    }
+    
+    .stats-card {
+        transition: all 0.3s;
+        border-radius: 10px;
+        overflow: visible !important;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(0);
+    }
+    
+    .stats-card .card-body {
+        overflow: visible !important;
+        display: block !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+    
+    .stats-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        text-align: right;
+        margin-top: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: inline-block !important;
+    }
+    
+    .stats-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 1rem;
+        color: currentColor !important;
+        font-weight: 500;
+        display: inline-block !important;
+        width: 100%;
+    }
+    
+    .upcoming-release {
+        transition: all 0.3s;
+        border-left: 4px solid transparent;
+    }
+    
+    .upcoming-release:hover {
+        transform: translateX(5px);
+    }
+    
+    .upcoming-release.volume {
+        border-left-color: #198754;
+    }
+    
+    .upcoming-release.chapter {
+        border-left-color: #0d6efd;
+    }
+    
+    .release-cover {
+        width: 50px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .recent-series {
+        transition: all 0.3s;
+    }
+    
+    .recent-series:hover {
+        transform: scale(1.03);
+    }
+    
+    .series-cover {
+        height: 320px;
+        object-fit: cover;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+    
+    .recent-series-card {
+        min-height: 450px;
+    }
+    
+    .collection-progress {
+        height: 8px;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 250px;
+    }
+    
+    @media (max-width: 768px) {
+        div[style*="text-transform: uppercase"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            font-size: 0.9rem !important;
+            color: white !important;
+            line-height: 1.2 !important;
+        }
+        
+        .stats-card {
+            min-height: auto !important;
+        }
+        
+        .stats-card .card-body {
+            padding: 1.5rem 1rem !important;
+            min-height: 120px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            overflow: visible !important;
+        }
+        
+        .stats-card .card-body > div:first-child {
+            display: block !important;
+        }
+        
+        .stats-icon {
+            font-size: 2rem !important;
+            margin-top: 0.5rem !important;
+        }
+        
+        .stats-number {
+            font-size: 1.5rem !important;
+            margin-bottom: 0.25rem !important;
+            display: block !important;
+        }
+        
+        .stats-label {
+            font-size: 0.75rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 0.5rem !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            color: white !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        div[style*="text-transform: uppercase"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            font-size: 0.9rem !important;
+            color: white !important;
+            line-height: 1.1 !important;
+        }
+        
+        .stats-card {
+            min-height: auto !important;
+        }
+        
+        .stats-card .card-body {
+            padding: 1rem !important;
+            min-height: 100px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            overflow: visible !important;
+        }
+        
+        .stats-card .card-body > div:first-child {
+            display: block !important;
+        }
+        
+        .stats-icon {
+            font-size: 1.75rem !important;
+            margin-top: 0.5rem !important;
+        }
+        
+        .stats-number {
+            font-size: 1.25rem !important;
+            margin-bottom: 0.25rem !important;
+            display: block !important;
+        }
+        
+        .stats-label {
+            font-size: 0.75rem !important;
+            line-height: 1.1 !important;
+            margin-bottom: 0.5rem !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            color: white !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="root-folders-warning" class="alert alert-warning mb-4 d-none" role="alert">
+    <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Root Folders Not Configured</h4>
+    <p>You need to configure at least one root folder before you can add series or scan for e-books.</p>
+    <hr>
+    <p class="mb-0">
+        <a href="{{ url_for('ui.root_folders') }}" class="btn btn-warning">Configure Root Folders</a>
+    </p>
+</div>
+
+<div id="all-content">
+        <div class="row">
+            <!-- Stats Cards -->
+            <div class="col-md-3 mb-4">
+                <a href="/manga" style="text-decoration: none; cursor: pointer;">
+                    <div style="background-color: #0d6efd; color: white; border-radius: 10px; padding: 1.5rem; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;">
+                        <div>
+                            <div id="manga-series-count" style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">0</div>
+                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; color: white;">Manga Series</div>
+                        </div>
+                        <div style="font-size: 2.5rem; text-align: right;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Books Card -->
+            <div class="col-md-3 mb-4">
+                <a href="/books" style="text-decoration: none; cursor: pointer;">
+                    <div style="background-color: #198754; color: white; border-radius: 10px; padding: 1.5rem; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;">
+                        <div>
+                            <div id="books-count" style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">0</div>
+                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; color: white;">Books</div>
+                        </div>
+                        <div style="font-size: 2.5rem; text-align: right;">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Authors Card -->
+            <div class="col-md-3 mb-4">
+                <a href="/authors" style="text-decoration: none; cursor: pointer;">
+                    <div style="background-color: #0dcaf0; color: white; border-radius: 10px; padding: 1.5rem; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;">
+                        <div>
+                            <div id="authors-count" style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">0</div>
+                            <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; color: white;">Authors</div>
+                        </div>
+                        <div style="font-size: 2.5rem; text-align: right;">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- VOLUMES CARD - HIDDEN -->
+            <!-- <div class="col-md-3 mb-4">
+                <div class="card stats-card bg-success text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stats-number" id="volumes-count">0</div>
+                                <div class="stats-label">Volumes</div>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+    
+    <!-- CHAPTERS CARD - HIDDEN -->
+    <!-- <div class="col-md-3 mb-4">
+        <div class="card stats-card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stats-number" id="chapters-count">0</div>
+                        <div class="stats-label">Chapters</div>
+                    </div>
+                    <div class="stats-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    
+    <div class="col-md-3 mb-4">
+        <div class="card stats-card bg-warning text-white h-100">
+            <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; overflow: visible;">
+                <div>
+                    <div class="stats-number" id="releases-today" style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">0</div>
+                    <div class="stats-label" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; color: white;">Today's Releases</div>
+                </div>
+                <div class="stats-icon" style="font-size: 2.5rem; text-align: right;">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upcoming Releases -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Upcoming Releases</h5>
+                <a href="{{ url_for('ui.calendar') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-calendar-alt me-1"></i> View Calendar
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="upcoming-releases">
+                    <div class="text-center py-5" id="loading-releases">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading upcoming releases...</p>
+                    </div>
+                    <div class="text-center py-5 d-none" id="no-releases">
+                        <i class="fas fa-calendar-times fa-3x mb-3 text-muted"></i>
+                        <h5>No upcoming releases</h5>
+                        <p class="text-muted">There are no upcoming releases in the next 7 days</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Collection Stats -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Collection Stats</h5>
+                <a href="{{ url_for('ui.collection') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-bookmark me-1"></i> View Collection
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="text-center py-5" id="loading-collection">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading collection stats...</p>
+                </div>
+                
+                <div id="collection-stats" class="d-none">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-book-open fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Owned Volumes</h6>
+                                    <h3 id="owned-volumes">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-check-circle fa-2x text-info"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Read Volumes</h6>
+                                    <h3 id="read-volumes">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Reading Progress</h6>
+                            <span id="reading-progress-percent">0%</span>
+                        </div>
+                        <div class="progress collection-progress">
+                            <div id="reading-progress-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Collection Value</h6>
+                            <span id="collection-value">$0.00</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="collection-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Series -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Series</h5>
+                <a href="{{ url_for('ui.series_list') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-list me-1"></i> View All Series
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 row-cols-xxl-6 g-4" id="recent-series">
+                    <div class="text-center py-5" id="loading-series">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading recent series...</p>
+                    </div>
+                    <div class="text-center py-5 d-none" id="no-series">
+                        <i class="fas fa-book fa-3x mb-3 text-muted"></i>
+                        <h5>No series found</h5>
+                        <p class="text-muted">Start by adding some series to your library</p>
+                        <a href="{{ url_for('ui.series_list') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> Add Series
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Track if a request is already in progress
+    let recentSeriesLoading = false;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tabs
+        initializeTabs();
+        
+        // Check if root folders are configured
+        checkRootFolders();
+        
+        // Load dashboard data
+        loadDashboardData();
+        
+        // Load upcoming releases
+        loadUpcomingReleases();
+        
+        // Load collection stats
+        loadCollectionStats();
+        
+        // Load recent series
+        loadRecentSeries();
+        
+        // Note: Dashboard doesn't have content type tabs for recent series
+        // Recent series always shows all content (books and manga)
+        
+        // Dashboard data
+        function loadDashboardData() {
+            fetch('/api/dashboard')
+                .then(response => response.json())
+                .then(data => {
+                    // Update manga series count
+                    document.getElementById('manga-series-count').textContent = data.stats.manga_series_count || 0;
+                    // Update books count
+                    document.getElementById('books-count').textContent = data.stats.books_count || 0;
+                    // Update authors count
+                    document.getElementById('authors-count').textContent = data.stats.authors_count || 0;
+                    // Update releases today
+                    document.getElementById('releases-today').textContent = data.stats.releases_today || 0;
+                })
+                .catch(error => {
+                    console.error('Error loading dashboard data:', error);
+                });
+        }
+        
+        // Upcoming releases
+        function loadUpcomingReleases() {
+            const releasesContainer = document.getElementById('upcoming-releases');
+            const loadingReleases = document.getElementById('loading-releases');
+            const noReleases = document.getElementById('no-releases');
+            
+            // Get today's date and 7 days from now
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            const nextWeekStr = nextWeek.toISOString().split('T')[0];
+            
+            fetch(`/api/calendar?start_date=${today}&end_date=${nextWeekStr}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loading
+                    loadingReleases.classList.add('d-none');
+                    
+                    // Show/hide no releases message
+                    if (data.events && data.events.length > 0) {
+                        noReleases.classList.add('d-none');
+                        
+                        // Sort events by date
+                        data.events.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        
+                        // Limit to 5 events
+                        const events = data.events.slice(0, 5);
+                        
+                        // Render events
+                        events.forEach(event => {
+                            const item = document.createElement('div');
+                            item.className = `list-group-item list-group-item-action upcoming-release ${event.type === 'VOLUME_RELEASE' ? 'volume' : 'chapter'}`;
+                            
+                            const row = document.createElement('div');
+                            row.className = 'row align-items-center';
+                            
+                            // Cover image
+                            const colImg = document.createElement('div');
+                            colImg.className = 'col-auto';
+                            
+                            const img = document.createElement('img');
+                            img.src = processImageUrl(event.series.cover_url);
+                            img.alt = 'Cover';
+                            img.className = 'release-cover';
+                            
+                            colImg.appendChild(img);
+                            
+                            // Event details
+                            const colDetails = document.createElement('div');
+                            colDetails.className = 'col';
+                            
+                            const title = document.createElement('h6');
+                            title.className = 'mb-0';
+                            title.textContent = event.title;
+                            
+                            const series = document.createElement('div');
+                            series.className = 'small text-muted';
+                            series.textContent = event.series.title;
+                            
+                            colDetails.appendChild(title);
+                            colDetails.appendChild(series);
+                            
+                            // Date and badge
+                            const colDate = document.createElement('div');
+                            colDate.className = 'col-auto text-end';
+                            
+                            const date = document.createElement('div');
+                            date.className = 'small text-muted';
+                            date.textContent = formatDate(event.date);
+                            
+                            const badge = document.createElement('span');
+                            badge.className = `badge ${event.type === 'VOLUME_RELEASE' ? 'bg-success' : 'bg-primary'}`;
+                            badge.textContent = event.type === 'VOLUME_RELEASE' ? 'Volume' : 'Chapter';
+                            
+                            colDate.appendChild(date);
+                            colDate.appendChild(document.createElement('br'));
+                            colDate.appendChild(badge);
+                            
+                            // Assemble row
+                            row.appendChild(colImg);
+                            row.appendChild(colDetails);
+                            row.appendChild(colDate);
+                            
+                            item.appendChild(row);
+                            releasesContainer.appendChild(item);
+                        });
+                    } else {
+                        noReleases.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading upcoming releases:', error);
+                    loadingReleases.classList.add('d-none');
+                    noReleases.classList.remove('d-none');
+                });
+        }
+        
+        // Collection stats
+        function loadCollectionStats() {
+            const loadingCollection = document.getElementById('loading-collection');
+            const collectionStats = document.getElementById('collection-stats');
+            
+            fetch('/api/collection/stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loading
+                    loadingCollection.classList.add('d-none');
+                    
+                    // Show stats
+                    collectionStats.classList.remove('d-none');
+                    
+                    // Update stats
+                    document.getElementById('owned-volumes').textContent = data.owned_volumes || 0;
+                    document.getElementById('read-volumes').textContent = data.read_volumes || 0;
+                    
+                    // Calculate reading progress
+                    const ownedVolumes = data.owned_volumes || 0;
+                    const readVolumes = data.read_volumes || 0;
+                    let progressPercent = 0;
+                    
+                    if (ownedVolumes > 0) {
+                        progressPercent = Math.round((readVolumes / ownedVolumes) * 100);
+                    }
+                    
+                    document.getElementById('reading-progress-percent').textContent = `${progressPercent}%`;
+                    document.getElementById('reading-progress-bar').style.width = `${progressPercent}%`;
+                    document.getElementById('reading-progress-bar').setAttribute('aria-valuenow', progressPercent);
+                    
+                    // Update collection value
+                    document.getElementById('collection-value').textContent = `$${(data.total_value || 0).toFixed(2)}`;
+                    
+                    // Create collection chart
+                    createCollectionChart(data);
+                })
+                .catch(error => {
+                    console.error('Error loading collection stats:', error);
+                    loadingCollection.classList.add('d-none');
+                });
+        }
+        
+        // Recent series
+        function loadRecentSeries() {
+            // Prevent multiple concurrent requests
+            if (recentSeriesLoading) {
+                console.warn('Recent series request already in progress, skipping duplicate request');
+                return;
+            }
+            
+            recentSeriesLoading = true;
+            
+            // Dashboard Recent Series shows all content (books and manga)
+            const contentType = 'all';
+            
+            console.log(`Loading recent series for content type: ${contentType}`);
+            
+            // Create abort controller for timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
+            // Fetch recent series
+            fetch(`/api/series/recent?content_type=${contentType}&limit=6`, {
+                signal: controller.signal
+            })
+                .then(response => {
+                    clearTimeout(timeoutId);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    recentSeriesLoading = false;
+                    
+                    // Hide loading
+                    document.getElementById('loading-series').classList.add('d-none');
+                    
+                    if (data.series && data.series.length > 0) {
+                        // Show series
+                        document.getElementById('no-series').classList.add('d-none');
+                        
+                        // Render series
+                        renderRecentSeries(data.series);
+                    } else {
+                        document.getElementById('no-series').classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    recentSeriesLoading = false;
+                    clearTimeout(timeoutId);
+                    console.error('Error loading recent series:', error);
+                    document.getElementById('loading-series').classList.add('d-none');
+                    document.getElementById('no-series').classList.remove('d-none');
+                    
+                    // Log timeout errors specifically
+                    if (error.name === 'AbortError') {
+                        console.error('Recent series request timed out after 10 seconds');
+                    }
+                });
+        }
+        
+        // Render recent series
+        function renderRecentSeries(series) {
+            const seriesContainer = document.getElementById('recent-series');
+            const loadingElement = document.getElementById('loading-series');
+            const noSeriesElement = document.getElementById('no-series');
+            
+            // Remove all child elements except loading and no-series elements
+            Array.from(seriesContainer.children).forEach(child => {
+                if (child !== loadingElement && child !== noSeriesElement) {
+                    seriesContainer.removeChild(child);
+                }
+            });
+            
+            series.forEach(item => {
+                // Create card
+                const col = document.createElement('div');
+                col.className = 'col mb-4';
+                
+                const card = document.createElement('div');
+                card.className = 'card h-100 recent-series-card';
+                
+                // Card image
+                const img = document.createElement('img');
+                img.src = processImageUrl(item.cover_url) || '/static/img/no-cover.png';
+                img.alt = item.title;
+                img.className = 'series-cover';
+                
+                // Card body
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+                
+                const title = document.createElement('h6');
+                title.className = 'card-title mb-1';
+                title.textContent = item.title;
+                
+                const author = document.createElement('p');
+                author.className = 'card-text small text-muted';
+                author.textContent = item.author || 'Unknown author';
+                
+                cardBody.appendChild(title);
+                cardBody.appendChild(author);
+                
+                // Card footer
+                const cardFooter = document.createElement('div');
+                cardFooter.className = 'card-footer bg-transparent';
+                
+                const link = document.createElement('a');
+                link.href = `/series/${item.id}`;
+                link.className = 'btn btn-sm btn-outline-primary w-100';
+                link.textContent = 'View Details';
+                
+                cardFooter.appendChild(link);
+                
+                // Assemble card
+                card.appendChild(img);
+                card.appendChild(cardBody);
+                card.appendChild(cardFooter);
+                
+                col.appendChild(card);
+                seriesContainer.appendChild(col);
+            });
+        }
+        
+        // Authors data
+        function loadAuthorsData() {
+            // Set default count to 0
+            document.getElementById('authors-count').textContent = '0';
+            
+            // Get authors count
+            fetch('/api/authors?limit=1')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        document.getElementById('authors-count').textContent = data.total || 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading authors count:', error);
+                    // Already set default count to 0, so no need to update
+                });
+            
+            // Get popular authors
+            fetch('/api/authors?limit=6&sort_by=book_count&sort_order=desc')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading
+                    document.getElementById('loading-authors').classList.add('d-none');
+                    
+                    if (data && data.success && data.authors && data.authors.length > 0) {
+                        // Show authors
+                        document.getElementById('no-authors').classList.add('d-none');
+                        
+                        // Render authors
+                        renderPopularAuthors(data.authors);
+                    } else {
+                        // Show no authors message
+                        document.getElementById('no-authors').classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading popular authors:', error);
+                    document.getElementById('loading-authors').classList.add('d-none');
+                    document.getElementById('no-authors').classList.remove('d-none');
+                });
+        }
+        
+        // Books data
+        function loadBooksData() {
+            // Get books count
+            fetch('/api/series?content_type=BOOK&limit=1')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        document.getElementById('books-count').textContent = data.total || 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading books count:', error);
+                    // Default count is already set to 0
+                });
+            
+            // Get recent books
+            fetch('/api/series?content_type=BOOK&limit=6&sort_by=updated_at&sort_order=desc')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading
+                    document.getElementById('loading-books').classList.add('d-none');
+                    
+                    if (data && data.success && data.series && data.series.length > 0) {
+                        // Show books
+                        document.getElementById('no-books').classList.add('d-none');
+                        
+                        // Render books
+                        renderRecentBooks(data.series);
+                    } else {
+                        // Show no books message
+                        document.getElementById('no-books').classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading recent books:', error);
+                    document.getElementById('loading-books').classList.add('d-none');
+                    document.getElementById('no-books').classList.remove('d-none');
+                });
+        }
+        
+        // Render recent books
+        function renderRecentBooks(books) {
+            const booksContainer = document.getElementById('recent-books');
+            const loadingElement = document.getElementById('loading-books');
+            const noBooksElement = document.getElementById('no-books');
+            
+            // Remove all child elements except loading and no-books elements
+            Array.from(booksContainer.children).forEach(child => {
+                if (child !== loadingElement && child !== noBooksElement) {
+                    booksContainer.removeChild(child);
+                }
+            });
+            
+            books.forEach(book => {
+                // Create book card
+                const col = document.createElement('div');
+                col.className = 'col-md-4 col-lg-2 mb-4';
+                
+                const card = document.createElement('div');
+                card.className = 'card h-100';
+                
+                // Card image
+                const img = document.createElement('img');
+                img.src = processImageUrl(book.cover_url) || '/static/img/no-cover.png';
+                img.alt = book.title;
+                img.className = 'series-cover';
+                
+                // Card body
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+                
+                const title = document.createElement('h6');
+                title.className = 'card-title mb-1';
+                title.textContent = book.title;
+                
+                const author = document.createElement('p');
+                author.className = 'card-text small text-muted';
+                author.textContent = book.author || 'Unknown author';
+                
+                cardBody.appendChild(title);
+                cardBody.appendChild(author);
+                
+                // Card footer
+                const cardFooter = document.createElement('div');
+                cardFooter.className = 'card-footer bg-transparent';
+                
+                const link = document.createElement('a');
+                link.href = `/series/${book.id}`;
+                link.className = 'btn btn-sm btn-outline-primary w-100';
+                link.textContent = 'View Details';
+                
+                cardFooter.appendChild(link);
+                
+                // Assemble card
+                card.appendChild(img);
+                card.appendChild(cardBody);
+                card.appendChild(cardFooter);
+                
+                col.appendChild(card);
+                booksContainer.appendChild(col);
+            });
+        }
+        
+        // Manga data
+        function loadMangaData() {
+            // Get manga count
+            fetch('/api/series?content_type=MANGA&limit=1')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        document.getElementById('manga-count').textContent = data.total || 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading manga count:', error);
+                    // Default count is already set to 0
+                });
+            
+            // Get recent manga
+            fetch('/api/series?content_type=MANGA&limit=6&sort_by=updated_at&sort_order=desc')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading
+                    document.getElementById('loading-manga').classList.add('d-none');
+                    
+                    if (data && data.success && data.series && data.series.length > 0) {
+                        // Show manga
+                        document.getElementById('no-manga').classList.add('d-none');
+                        
+                        // Render manga
+                        renderRecentManga(data.series);
+                    } else {
+                        // Show no manga message
+                        document.getElementById('no-manga').classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading recent manga:', error);
+                    document.getElementById('loading-manga').classList.add('d-none');
+                    document.getElementById('no-manga').classList.remove('d-none');
+                });
+        }
+        
+        // Render recent manga
+        function renderRecentManga(manga) {
+            const mangaContainer = document.getElementById('recent-manga');
+            const loadingElement = document.getElementById('loading-manga');
+            const noMangaElement = document.getElementById('no-manga');
+            
+            // Remove all child elements except loading and no-manga elements
+            Array.from(mangaContainer.children).forEach(child => {
+                if (child !== loadingElement && child !== noMangaElement) {
+                    mangaContainer.removeChild(child);
+                }
+            });
+            
+            manga.forEach(item => {
+                // Create manga card
+                const col = document.createElement('div');
+                col.className = 'col-md-4 col-lg-2 mb-4';
+                
+                const card = document.createElement('div');
+                card.className = 'card h-100';
+                
+                // Card image
+                const img = document.createElement('img');
+                img.src = processImageUrl(item.cover_url) || '/static/img/no-cover.png';
+                img.alt = item.title;
+                img.className = 'series-cover';
+                
+                // Card body
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+                
+                const title = document.createElement('h6');
+                title.className = 'card-title mb-1';
+                title.textContent = item.title;
+                
+                const author = document.createElement('p');
+                author.className = 'card-text small text-muted';
+                author.textContent = item.author || 'Unknown author';
+                
+                cardBody.appendChild(title);
+                cardBody.appendChild(author);
+                
+                // Card footer
+                const cardFooter = document.createElement('div');
+                cardFooter.className = 'card-footer bg-transparent';
+                
+                const link = document.createElement('a');
+                link.href = `/series/${item.id}`;
+                link.className = 'btn btn-sm btn-outline-primary w-100';
+                link.textContent = 'View Details';
+                
+                cardFooter.appendChild(link);
+                
+                // Assemble card
+                card.appendChild(img);
+                card.appendChild(cardBody);
+                card.appendChild(cardFooter);
+                
+                col.appendChild(card);
+                mangaContainer.appendChild(col);
+            });
+        }
+        
+        // Render popular authors
+        function renderPopularAuthors(authors) {
+            const authorsContainer = document.getElementById('popular-authors');
+            const loadingElement = document.getElementById('loading-authors');
+            const noAuthorsElement = document.getElementById('no-authors');
+            
+            // Remove all child elements except loading and no-authors elements
+            Array.from(authorsContainer.children).forEach(child => {
+                if (child !== loadingElement && child !== noAuthorsElement) {
+                    authorsContainer.removeChild(child);
+                }
+            });
+            
+            authors.forEach(author => {
+                // Create author card
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-3';
+                
+                const card = document.createElement('div');
+                card.className = 'card h-100';
+                
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+                
+                // Author name
+                const authorName = document.createElement('h5');
+                authorName.className = 'card-title';
+                authorName.textContent = author.name || 'Unknown Author';
+                
+                // Author info
+                const authorInfo = document.createElement('p');
+                authorInfo.className = 'card-text';
+                authorInfo.innerHTML = `<small class="text-muted">Books: ${author.book_count || 0}</small>`;
+                
+                // Card footer
+                const cardFooter = document.createElement('div');
+                cardFooter.className = 'card-footer bg-transparent';
+                
+                const viewLink = document.createElement('a');
+                viewLink.href = `/authors/${author.id}`;
+                viewLink.className = 'btn btn-sm btn-outline-primary';
+                viewLink.innerHTML = '<i class="fas fa-eye me-1"></i> View';
+                
+                // Assemble card
+                cardBody.appendChild(authorName);
+                cardBody.appendChild(authorInfo);
+                cardFooter.appendChild(viewLink);
+                
+                card.appendChild(cardBody);
+                card.appendChild(cardFooter);
+                
+                col.appendChild(card);
+                authorsContainer.appendChild(col);
+            });
+        }
+        
+        // Create collection chart
+        function createCollectionChart(data) {
+            const ctx = document.getElementById('collection-chart').getContext('2d');
+            
+            // Calculate percentages
+            const ownedVolumes = data.owned_volumes || 0;
+            const readVolumes = data.read_volumes || 0;
+            const unreadVolumes = ownedVolumes - readVolumes;
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Read', 'Unread'],
+                    datasets: [{
+                        data: [readVolumes, unreadVolumes],
+                        backgroundColor: ['#0dcaf0', '#6c757d'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+        
+        // Check if root folders are configured
+        function checkRootFolders() {
+            // Check if we just updated root folders from another page
+            const rootFoldersUpdated = localStorage.getItem('rootFoldersUpdated');
+            if (rootFoldersUpdated === 'true') {
+                // Clear the flag
+                localStorage.removeItem('rootFoldersUpdated');
+                // Hide the warning immediately
+                document.getElementById('root-folders-warning').classList.add('d-none');
+                console.log('Root folders were updated, hiding warning');
+                return;
+            }
+            
+            fetch('/api/rootfolders/check-configured')
+                .then(response => response.json())
+                .then(data => {
+                    const rootFoldersWarning = document.getElementById('root-folders-warning');
+                    console.log('Root folders configured:', data.configured, 'Count:', data.count);
+                    if (data.configured) {
+                        rootFoldersWarning.classList.add('d-none');
+                    } else {
+                        rootFoldersWarning.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking root folders:', error);
+                    // Show warning by default if there's an error
+                    document.getElementById('root-folders-warning').classList.remove('d-none');
+                });
+        }
+        
+        // Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+            
+            if (date.toDateString() === today.toDateString()) {
+                return 'Today';
+            } else if (date.toDateString() === tomorrow.toDateString()) {
+                return 'Tomorrow';
+            } else {
+                return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            }
+        }
+        
+        // Initialize tabs
+        function initializeTabs() {
+            // Get all tab buttons
+            const tabButtons = document.querySelectorAll('#contentTypeTabs .nav-link');
+            
+            // Add click event listeners to each tab button
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    // Remove active class from all tabs
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+                    
+                    // Get target tab content
+                    const targetId = this.getAttribute('data-bs-target');
+                    const targetContent = document.querySelector(targetId);
+                    
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+                    
+                    // Show target tab content
+                    if (targetContent) {
+                        targetContent.classList.add('show', 'active');
+                    }
+                });
+            });
+        }
+        
+        // Process image URL
+        function processImageUrl(url) {
+            if (!url) return null;
+            
+            // If URL is already a proxy URL or absolute URL, return as is
+            if (url.startsWith('/api/image-proxy') || url.startsWith('http')) {
+                return url;
+            }
+            
+            // Otherwise, proxy the URL
+            return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+        }
+    });
+</script>
+{% endblock %}

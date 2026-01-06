@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications Demo{% endblock %}
+
+{% block styles %}
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="mb-4">Notification System Demo</h1>
+            <p class="text-muted mb-4">Click buttons below to test different notification layouts</p>
+
+            <!-- NotificationManager (Custom In-App) Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">NotificationManager (Custom In-App)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <button class="btn btn-success w-100" onclick="notificationManager.success('Operation completed successfully!')">
+                                <i class="fas fa-check-circle me-2"></i>Success
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-danger w-100" onclick="notificationManager.error('An error occurred. Please try again.')">
+                                <i class="fas fa-exclamation-circle me-2"></i>Error
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-warning w-100" onclick="notificationManager.warning('This action cannot be undone.')">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Warning
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-info w-100" onclick="notificationManager.info('Here is some helpful information.')">
+                                <i class="fas fa-info-circle me-2"></i>Info
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-secondary w-100" onclick="testConfirmDialog()">
+                                <i class="fas fa-question-circle me-2"></i>Confirm Dialog
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-secondary w-100" onclick="notificationManager.clearAll()">
+                                <i class="fas fa-trash me-2"></i>Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <small><strong>Location:</strong> Top-right corner with slide-in animation</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bootstrap Toast Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Bootstrap Toast Notifications</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <button class="btn btn-success w-100" onclick="showBootstrapToast('success', 'Success!', 'Your changes have been saved.')">
+                                <i class="fas fa-check-circle me-2"></i>Success Toast
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-danger w-100" onclick="showBootstrapToast('error', 'Error!', 'Something went wrong.')">
+                                <i class="fas fa-exclamation-circle me-2"></i>Error Toast
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-warning w-100" onclick="showBootstrapToast('warning', 'Warning!', 'Please review your input.')">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Warning Toast
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-info w-100" onclick="showBootstrapToast('info', 'Info', 'Here is some information.')">
+                                <i class="fas fa-info-circle me-2"></i>Info Toast
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <small><strong>Location:</strong> Bottom-right corner (Bootstrap default)</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multiple Notifications Section -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Multiple Notifications</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary w-100" onclick="testMultipleNotifications()">
+                                <i class="fas fa-layer-group me-2"></i>Show 3 Notifications
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-primary w-100" onclick="testLongMessage()">
+                                <i class="fas fa-align-left me-2"></i>Long Message
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <small><strong>Test:</strong> Stack multiple notifications and test with longer messages</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize NotificationManager
+const notificationManager = new NotificationManager();
+
+// Test confirm dialog
+function testConfirmDialog() {
+    notificationManager.confirm('Are you sure you want to proceed?', 
+        () => {
+            notificationManager.success('You confirmed the action!');
+        },
+        () => {
+            notificationManager.info('You cancelled the action.');
+        }
+    );
+}
+
+// Bootstrap toast helper
+function showBootstrapToast(type, title, message) {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong> ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+    
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+    
+    const toastElement = document.createElement('div');
+    toastElement.innerHTML = toastHtml;
+    toastContainer.appendChild(toastElement.firstElementChild);
+    
+    const toast = new bootstrap.Toast(toastContainer.lastElementChild);
+    toast.show();
+}
+
+// Test multiple notifications
+function testMultipleNotifications() {
+    notificationManager.success('First notification - Success!');
+    setTimeout(() => {
+        notificationManager.warning('Second notification - Warning!');
+    }, 500);
+    setTimeout(() => {
+        notificationManager.info('Third notification - Info');
+    }, 1000);
+}
+
+// Test long message
+function testLongMessage() {
+    const longMessage = 'This is a longer notification message to test how the notification system handles text wrapping and layout with more content. It should display nicely without breaking the layout.';
+    notificationManager.show(longMessage, 'info', 6000);
+}
+</script>
+{% endblock %}

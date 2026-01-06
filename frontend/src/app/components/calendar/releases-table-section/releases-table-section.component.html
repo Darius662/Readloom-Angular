@@ -1,0 +1,74 @@
+<mat-card class="releases-card">
+  <mat-card-header>
+    <mat-card-title>Release Schedule</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (releases.length > 0) {
+      <div class="table-container">
+        <table mat-table [dataSource]="releases" class="releases-table">
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let event">{{ event.releaseDate | date: 'MMM d, yyyy' }}</td>
+          </ng-container>
+
+          <!-- Series Column -->
+          <ng-container matColumnDef="series">
+            <th mat-header-cell *matHeaderCellDef>Content Type</th>
+            <td mat-cell *matCellDef="let event">
+              <div class="series-info">
+                <mat-icon class="content-type-icon">{{ getContentTypeIcon(event.contentType) }}</mat-icon>
+                <span>{{ event.contentType }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Release Column -->
+          <ng-container matColumnDef="release">
+            <th mat-header-cell *matHeaderCellDef>Release</th>
+            <td mat-cell *matCellDef="let event">
+              <span class="release-number">{{ event.seriesTitle }} - {{ event.type === 'chapter' ? 'Ch.' : 'Vol.' }} {{ event.number }}</span>
+              @if (event.title) {
+                <span class="release-title">{{ event.title }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let event">
+              <mat-chip 
+                class="type-chip"
+                [color]="event.type === 'chapter' ? 'primary' : 'accent'">
+                {{ event.type }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let event">
+              <mat-chip 
+                class="status-chip"
+                [color]="event.is_confirmed ? 'primary' : 'warn'">
+                {{ event.is_confirmed ? 'Confirmed' : 'Predicted' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    }
+    @if (releases.length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">event_busy</mat-icon>
+        <p class="empty-text">No release dates found in the database.</p>
+        <p class="empty-subtext">Release dates will appear here once they are added to your library.</p>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

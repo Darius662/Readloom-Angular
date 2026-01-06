@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cover Display Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .cover-test { margin: 10px; border: 1px solid #ccc; padding: 10px; display: inline-block; }
+        .cover-img { width: 150px; height: 200px; object-fit: cover; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Cover Display Test</h1>
+    <p>Testing if cover images load correctly...</p>
+    
+    <div id="covers-container"></div>
+    
+    <script>
+        async function testCovers() {
+            const container = document.getElementById('covers-container');
+            
+            try {
+                // Get volumes from API
+                const response = await fetch('http://localhost:7227/api/series/6/volumes');
+                const volumes = await response.json();
+                
+                console.log('Got volumes:', volumes);
+                
+                // Test first 5 volumes
+                for (let i = 0; i < Math.min(5, volumes.length); i++) {
+                    const volume = volumes[i];
+                    const volumeId = volume.id;
+                    const volumeNumber = volume.volume_number;
+                    
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'cover-test';
+                    
+                    // Simulate frontend logic
+                    let coverUrl = null;
+                    if (volume.cover_path) {
+                        coverUrl = `http://localhost:7227/api/cover-art/volume/${volumeId}`;
+                    } else if (volume.cover_url) {
+                        coverUrl = volume.cover_url.startsWith('http') ? 
+                            volume.cover_url : 
+                            `http://localhost:7227${volume.cover_url}`;
+                    }
+                    
+                    testDiv.innerHTML = `
+                        <h3>Volume ${volumeNumber}</h3>
+                        <p><strong>Cover Path:</strong> ${volume.cover_path || 'None'}</p>
+                        <p><strong>Cover URL:</strong> ${volume.cover_url || 'None'}</p>
+                        <p><strong>Generated URL:</strong> ${coverUrl || 'None'}</p>
+                        <div class="image-container">
+                            ${coverUrl ? 
+                                `<img src="${coverUrl}" class="cover-img" 
+                                      onerror="this.nextElementSibling.innerHTML='❌ Failed to load'" 
+                                      onload="this.nextElementSibling.innerHTML='✅ Loaded successfully'">` : 
+                                '❌ No cover available'}
+                            <div class="status"></div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(testDiv);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Run test
+        testCovers();
+    </script>
+</body>
+</html>

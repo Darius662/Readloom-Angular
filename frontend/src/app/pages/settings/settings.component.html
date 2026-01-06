@@ -1,0 +1,870 @@
+<div class="settings-page">
+  <!-- Main Settings Card with Tabs in Header -->
+  <mat-card class="settings-main-card">
+    <!-- Tab Navigation in Card Header -->
+    <mat-card-header class="settings-tabs-header">
+      <mat-tab-group [selectedIndex]="getTabIndex()" (selectedIndexChange)="setActiveTab($event)" class="settings-tabs">
+        <mat-tab label="General">
+          <mat-icon matTabIcon>settings</mat-icon>
+          <ng-template matTabContent>
+            <mat-card-content class="settings-tab-content">
+              <h5 class="mat-headline-5 settings-section-title">General Settings</h5>
+              <form class="settings-form">
+                <!-- Host Setting -->
+                <div class="settings-form-row">
+                  <div class="settings-form-label">
+                    <label for="host">Host</label>
+                  </div>
+                  <div class="settings-form-input">
+                    <mat-form-field appearance="outline" class="compact-form-field">
+                      <input matInput [(ngModel)]="generalSettings.host" [ngModelOptions]="{standalone: true}" id="host" placeholder="0.0.0.0">
+                      <mat-hint>The host to bind the server to (e.g., 0.0.0.0)</mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Port Setting -->
+                <div class="settings-form-row">
+                  <div class="settings-form-label">
+                    <label for="port">Port</label>
+                  </div>
+                  <div class="settings-form-input">
+                    <mat-form-field appearance="outline" class="compact-form-field">
+                      <input matInput type="number" [(ngModel)]="generalSettings.port" [ngModelOptions]="{standalone: true}" id="port" placeholder="7227">
+                      <mat-hint>The port to bind the server to (e.g., 7227)</mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- URL Base Setting -->
+                <div class="settings-form-row">
+                  <div class="settings-form-label">
+                    <label for="urlBase">URL Base</label>
+                  </div>
+                  <div class="settings-form-input">
+                    <mat-form-field appearance="outline" class="compact-form-field">
+                      <input matInput [(ngModel)]="generalSettings.urlBase" [ngModelOptions]="{standalone: true}" id="urlBase" placeholder="/readloom">
+                      <mat-hint>The base URL for the application (e.g., /readloom)</mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Task Interval Setting -->
+                <div class="settings-form-row">
+                  <div class="settings-form-label">
+                    <label for="taskInterval">Task Interval</label>
+                  </div>
+                  <div class="settings-form-input">
+                    <mat-form-field appearance="outline" class="compact-form-field">
+                      <input matInput type="number" [(ngModel)]="generalSettings.taskInterval" [ngModelOptions]="{standalone: true}" id="taskInterval" placeholder="Task interval in minutes">
+                      <mat-hint>How often background tasks should run (time in minutes)</mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <!-- Metadata Cache Setting -->
+                <div class="settings-form-row">
+                  <div class="settings-form-label">
+                    <label for="metadataCache">Metadata Cache</label>
+                  </div>
+                  <div class="settings-form-input">
+                    <mat-form-field appearance="outline" class="compact-form-field">
+                      <input matInput type="number" [(ngModel)]="generalSettings.metadataCache" [ngModelOptions]="{standalone: true}" id="metadataCache" placeholder="Cache duration in days">
+                      <mat-hint>How long to cache metadata (time in days)</mat-hint>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" class="me-2" (click)="saveGeneralSettings()">
+                    <mat-icon class="me-1">save</mat-icon>
+                    Save Settings
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Collections">
+          <mat-icon matTabIcon>folder</mat-icon>
+          <ng-template matTabContent>
+            <mat-card class="settings-card mb-4">
+              <mat-card-header class="d-flex justify-content-between align-items-center">
+                <mat-card-title>Collections Management</mat-card-title>
+                <button mat-raised-button color="primary" (click)="onAddCollection()">
+                  <mat-icon class="me-1">add</mat-icon>
+                  Add Collection
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                <!-- Collections Table -->
+                <div class="table-container">
+                  <table mat-table [dataSource]="collections" class="settings-table">
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                      <th mat-header-cell *matHeaderCellDef>Name</th>
+                      <td mat-cell *matCellDef="let collection">{{ collection.name }}</td>
+                    </ng-container>
+
+                    <!-- Type Column -->
+                    <ng-container matColumnDef="type">
+                      <th mat-header-cell *matHeaderCellDef>Type</th>
+                      <td mat-cell *matCellDef="let collection">{{ collection.type }}</td>
+                    </ng-container>
+
+                    <!-- Items Count Column -->
+                    <ng-container matColumnDef="itemsCount">
+                      <th mat-header-cell *matHeaderCellDef>Items</th>
+                      <td mat-cell *matCellDef="let collection">{{ collection.itemsCount || 0 }}</td>
+                    </ng-container>
+
+                    <!-- View Column -->
+                    <ng-container matColumnDef="view">
+                      <th mat-header-cell *matHeaderCellDef>View</th>
+                      <td mat-cell *matCellDef="let collection">
+                        <button mat-icon-button color="primary" (click)="onViewCollection(collection)" matTooltip="View collection details">
+                          <mat-icon>visibility</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef>Actions</th>
+                      <td mat-cell *matCellDef="let collection">
+                        <button mat-icon-button color="primary" (click)="onEditCollection(collection)" matTooltip="Edit Collection">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="onDeleteCollection(collection)" matTooltip="Delete Collection">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['name', 'type', 'itemsCount', 'view', 'actions']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['name', 'type', 'itemsCount', 'view', 'actions'];"></tr>
+                  </table>
+
+                  @if (collections.length === 0) {
+                    <mat-card class="empty-state-card">
+                      <mat-card-content class="text-center py-5">
+                        <mat-icon class="empty-icon">folder_open</mat-icon>
+                        <h5>No collections found</h5>
+                        <p>Create your first collection to get started.</p>
+                      </mat-card-content>
+                    </mat-card>
+                  }
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Root Folders Section -->
+            <mat-card class="settings-card">
+              <mat-card-header class="d-flex justify-content-between align-items-center">
+                <mat-card-title>Root Folders</mat-card-title>
+                <button mat-raised-button color="primary" (click)="onAddRootFolder()">
+                  <mat-icon class="me-1">add</mat-icon>
+                  Add Root Folder
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="table-container">
+                  <table mat-table [dataSource]="rootFolders" class="settings-table">
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="name">
+                      <th mat-header-cell *matHeaderCellDef>Name</th>
+                      <td mat-cell *matCellDef="let folder">{{ folder.name }}</td>
+                    </ng-container>
+
+                    <!-- Path Column -->
+                    <ng-container matColumnDef="path">
+                      <th mat-header-cell *matHeaderCellDef>Path</th>
+                      <td mat-cell *matCellDef="let folder">{{ folder.path }}</td>
+                    </ng-container>
+
+                    <!-- Content Type Column -->
+                    <ng-container matColumnDef="content_type">
+                      <th mat-header-cell *matHeaderCellDef>Content Type</th>
+                      <td mat-cell *matCellDef="let folder">{{ folder.content_type }}</td>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                      <th mat-header-cell *matHeaderCellDef>Status</th>
+                      <td mat-cell *matCellDef="let folder">
+                        <mat-icon class="status-success">check_circle</mat-icon>
+                      </td>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef>Actions</th>
+                      <td mat-cell *matCellDef="let folder">
+                        <button mat-icon-button color="primary" (click)="onEditRootFolder(folder)" matTooltip="Edit Root Folder">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="onDeleteRootFolder(folder)" matTooltip="Delete Root Folder">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['name', 'path', 'content_type', 'status', 'actions']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['name', 'path', 'content_type', 'status', 'actions'];"></tr>
+                  </table>
+
+                  @if (rootFolders.length === 0) {
+                    <mat-card class="empty-state-card">
+                      <mat-card-content class="text-center py-5">
+                        <mat-icon class="empty-icon">folder</mat-icon>
+                        <h5>No root folders found</h5>
+                        <p>Add your first root folder to start organizing your content.</p>
+                      </mat-card-content>
+                    </mat-card>
+                  }
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Collection Details Section -->
+            @if (selectedCollection) {
+              <mat-card class="collection-details-card settings-card">
+                <mat-card-header>
+                  <mat-card-title>
+                    <mat-icon class="me-2">{{ selectedCollection.type === 'manga' ? 'menu_book' : 'book' }}</mat-icon>
+                    {{ selectedCollection.name }}
+                  </mat-card-title>
+                  <button mat-icon-button (click)="onCloseCollectionDetails()" matTooltip="Close details">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </mat-card-header>
+                <mat-card-content>
+                  <!-- Root Folders -->
+                  <div class="root-folders-section">
+                    <div class="section-header">
+                      <h6>Root Folders ({{ selectedCollectionRootFolders.length }})</h6>
+                      <button mat-stroked-button color="primary" (click)="onLinkRootFolder()">
+                        <mat-icon class="me-1">link</mat-icon>
+                        Link Folder
+                      </button>
+                    </div>
+                    @if (selectedCollectionRootFolders.length > 0) {
+                      <div class="folders-list">
+                        @for (folder of selectedCollectionRootFolders; track folder.id) {
+                          <div class="folder-item">
+                            <div class="folder-info">
+                              <mat-icon class="folder-icon">folder</mat-icon>
+                              <div class="folder-details">
+                                <div class="folder-name">{{ folder.name }}</div>
+                                <div class="folder-path">{{ folder.path }}</div>
+                              </div>
+                            </div>
+                            <button mat-icon-button color="warn" (click)="onUnlinkRootFolder(folder)" matTooltip="Unlink this folder">
+                              <mat-icon>link_off</mat-icon>
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="empty-folders">
+                        <mat-icon>folder_off</mat-icon>
+                        <p>No root folders linked. Click "Link Folder" to add folders to this collection.</p>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Library Items -->
+                  <div class="library-items-section">
+                    <div class="section-header">
+                      <h6>Library Items ({{ selectedCollectionSeries.length }})</h6>
+                    </div>
+                    @if (selectedCollectionSeries.length > 0) {
+                      <div class="items-grid">
+                        @for (series of selectedCollectionSeries; track series.id) {
+                          <div class="item-card">
+                            <mat-icon class="item-icon">{{ series.content_type === 'manga' ? 'menu_book' : 'book' }}</mat-icon>
+                            <div class="item-details">
+                              <div class="item-title">{{ series.title }}</div>
+                              <div class="item-type">{{ series.content_type }}</div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="empty-items">
+                        <mat-icon>auto_stories</mat-icon>
+                        <p>No library items found in this collection.</p>
+                      </div>
+                    }
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Calendar">
+          <mat-icon matTabIcon>calendar_today</mat-icon>
+          <ng-template matTabContent>
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>Calendar Settings</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form class="settings-form">
+                  <!-- Default View -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="defaultView">Default View</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <mat-select [(ngModel)]="calendarSettings.defaultView" [ngModelOptions]="{standalone: true}" id="defaultView" placeholder="Select default view">
+                          <mat-option value="month">Month</mat-option>
+                          <mat-option value="week">Week</mat-option>
+                          <mat-option value="day">Day</mat-option>
+                        </mat-select>
+                        <mat-hint>Default calendar view when opening calendar page</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- First Day of Week -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="firstDayOfWeek">First Day of Week</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <mat-select [(ngModel)]="calendarSettings.firstDayOfWeek" [ngModelOptions]="{standalone: true}" id="firstDayOfWeek" placeholder="Select first day">
+                          <mat-option value="0">Sunday</mat-option>
+                          <mat-option value="1">Monday</mat-option>
+                          <mat-option value="2">Tuesday</mat-option>
+                          <mat-option value="3">Wednesday</mat-option>
+                          <mat-option value="4">Thursday</mat-option>
+                          <mat-option value="5">Friday</mat-option>
+                          <mat-option value="6">Saturday</mat-option>
+                        </mat-select>
+                        <mat-hint>Set the first day of the week in calendar view</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Calendar Range -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="calendarRange">Calendar Range</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <input matInput type="number" [(ngModel)]="calendarSettings.calendarRange" [ngModelOptions]="{standalone: true}" id="calendarRange" placeholder="Calendar range in days">
+                        <mat-hint>Calendar range in days (time in days)</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Calendar Refresh -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="calendarRefresh">Calendar Refresh</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <input matInput type="number" [(ngModel)]="calendarSettings.calendarRefresh" [ngModelOptions]="{standalone: true}" id="calendarRefresh" placeholder="Calendar refresh interval in hours">
+                        <mat-hint>Calendar refresh interval in hours (time in hours)</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Highlight Owned Items -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label>Owned Items</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-slide-toggle [(ngModel)]="calendarSettings.highlightOwned" [ngModelOptions]="{standalone: true}">
+                        Highlight owned items in calendar
+                      </mat-slide-toggle>
+                      <mat-hint>Highlight items you own in the calendar</mat-hint>
+                    </div>
+                  </div>
+
+                  <div class="form-actions">
+                    <button mat-raised-button color="primary" class="me-2" (click)="saveCalendarSettings()">
+                      <mat-icon class="me-1">save</mat-icon>
+                      Save Calendar Settings
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Logging">
+          <mat-icon matTabIcon>description</mat-icon>
+          <ng-template matTabContent>
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>Logging Configuration</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form class="settings-form">
+                  <!-- Log Level -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="logLevel">Log Level</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <mat-select [(ngModel)]="loggingSettings.level" [ngModelOptions]="{standalone: true}" id="logLevel" placeholder="Select log level">
+                          <mat-option value="DEBUG">Debug</mat-option>
+                          <mat-option value="INFO">Info</mat-option>
+                          <mat-option value="WARNING">Warning</mat-option>
+                          <mat-option value="ERROR">Error</mat-option>
+                          <mat-option value="CRITICAL">Critical</mat-option>
+                        </mat-select>
+                        <mat-hint>Set the minimum log level to record</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Max File Size -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="maxFileSize">Max File Size</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <input matInput type="number" [(ngModel)]="loggingSettings.maxFileSize" [ngModelOptions]="{standalone: true}" id="maxFileSize" placeholder="Max file size in MB">
+                        <mat-hint>Maximum log file size before rotation (size in MB)</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- Backup Count -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="backupCount">Backup Count</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <input matInput type="number" [(ngModel)]="loggingSettings.backupCount" [ngModelOptions]="{standalone: true}" id="backupCount" placeholder="Number of backup files">
+                        <mat-hint>Number of backup log files to keep</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div class="form-actions">
+                    <button mat-raised-button color="primary" class="me-2" (click)="saveLoggingSettings()">
+                      <mat-icon class="me-1">save</mat-icon>
+                      Save Logging Settings
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Integrations">
+          <mat-icon matTabIcon>integration_instructions</mat-icon>
+          <ng-template matTabContent>
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>External Integrations</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form class="settings-form">
+                  <!-- Metadata Providers Card -->
+                  <mat-card class="integration-card">
+                    <mat-card-header class="integration-header">
+                      <mat-card-title>
+                        <mat-icon class="integration-icon">search</mat-icon>
+                        Metadata Providers
+                      </mat-card-title>
+                      <mat-chip class="status-chip" color="primary">Available</mat-chip>
+                    </mat-card-header>
+                    <mat-card-content class="integration-content">
+                      <p class="integration-description">Configure metadata providers for e-book search and import</p>
+                      <p>Readloom can search and import e-books from various external sources.</p>
+                      <p><strong>Available providers include:</strong></p>
+                      <ul class="integration-list">
+                        <li>MangaFire - Popular e-book aggregator</li>
+                        <li>MyAnimeList (MAL) - Comprehensive anime/e-book database</li>
+                        <li>Manga-API - General-purpose e-book API</li>
+                        <li>Google Books - Millions of books</li>
+                        <li>Open Library - Free, open database of books</li>
+                        <li>ISBNdb - Comprehensive book database</li>
+                      </ul>
+                      <div class="integration-actions">
+                        <button mat-raised-button color="primary" (click)="configureIntegration('metadataProviders')">
+                          <mat-icon class="me-1">settings</mat-icon>
+                          Configure
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+
+                  <!-- AI Providers Card -->
+                  <mat-card class="integration-card">
+                    <mat-card-header class="integration-header">
+                      <mat-card-title>
+                        <mat-icon class="integration-icon">smart_toy</mat-icon>
+                        AI Providers
+                      </mat-card-title>
+                      <mat-chip class="status-chip" color="accent">New</mat-chip>
+                    </mat-card-header>
+                    <mat-card-content class="integration-content">
+                      <p class="integration-description">Use AI to extract accurate manga metadata</p>
+                      <p>Readloom now supports multiple AI providers for accurate manga metadata extraction including volumes, chapters, and release dates.</p>
+                      <p><strong>Available providers:</strong></p>
+                      <ul class="integration-list">
+                        <li><strong>Groq</strong> - Fastest, free, 1 minute setup</li>
+                        <li><strong>Google Gemini</strong> - Powerful, free tier, 2 minutes setup</li>
+                        <li><strong>OpenAI GPT</strong> - Most capable, paid plans</li>
+                        <li><strong>Claude</strong> - Excellent reasoning, paid plans</li>
+                      </ul>
+                      <div class="integration-actions">
+                        <button mat-raised-button color="primary" (click)="configureIntegration('aiProviders')">
+                          <mat-icon class="me-1">settings</mat-icon>
+                          Configure
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+
+                  <!-- Home Assistant Placeholder -->
+                  <mat-card class="integration-card placeholder-card">
+                    <mat-card-header class="integration-header">
+                      <mat-card-title>
+                        <mat-icon class="integration-icon">home</mat-icon>
+                        Home Assistant
+                      </mat-card-title>
+                      <mat-chip class="status-chip" color="warn">Coming Soon</mat-chip>
+                    </mat-card-header>
+                    <mat-card-content class="integration-content">
+                      <p class="integration-description">Integrate Readloom with your Home Assistant instance</p>
+                      <p>Connect Readloom to your smart home system for enhanced automation and control.</p>
+                      <p><strong>Planned features:</strong></p>
+                      <ul class="integration-list">
+                        <li>Real-time release notifications</li>
+                        <li>Library status sensors</li>
+                        <li>Automation triggers for new releases</li>
+                        <li>Dashboard integration</li>
+                      </ul>
+                      <div class="integration-actions">
+                        <button mat-stroked-button disabled>
+                          <mat-icon class="me-1">schedule</mat-icon>
+                          Coming Soon
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+
+                  <!-- Homarr Placeholder -->
+                  <mat-card class="integration-card placeholder-card">
+                    <mat-card-header class="integration-header">
+                      <mat-card-title>
+                        <mat-icon class="integration-icon">dashboard</mat-icon>
+                        Homarr
+                      </mat-card-title>
+                      <mat-chip class="status-chip" color="warn">Coming Soon</mat-chip>
+                    </mat-card-header>
+                    <mat-card-content class="integration-content">
+                      <p class="integration-description">Integrate Readloom with your Homarr dashboard</p>
+                      <p>Add Readloom to your Homarr dashboard for quick access and overview.</p>
+                      <p><strong>Planned features:</strong></p>
+                      <ul class="integration-list">
+                        <li>Dashboard widget for recent releases</li>
+                        <li>Quick access to Readloom interface</li>
+                        <li>Library statistics display</li>
+                        <li>System status monitoring</li>
+                      </ul>
+                      <div class="integration-actions">
+                        <button mat-stroked-button disabled>
+                          <mat-icon class="me-1">schedule</mat-icon>
+                          Coming Soon
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+
+                  <div class="form-actions">
+                    <button mat-raised-button color="primary" class="me-2" (click)="saveIntegrationsSettings()">
+                      <mat-icon class="me-1">save</mat-icon>
+                      Save Integrations
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Data Sync">
+          <mat-icon matTabIcon>sync</mat-icon>
+          <ng-template matTabContent>
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>Data Synchronization</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <form class="settings-form">
+                  <!-- Enable Auto Sync -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label>Enable Auto Sync</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-slide-toggle [(ngModel)]="dataSyncSettings.enableAutoSync" [ngModelOptions]="{standalone: true}">
+                        Enable automatic data synchronization
+                      </mat-slide-toggle>
+                      <mat-hint>Automatically sync data with external services</mat-hint>
+                    </div>
+                  </div>
+
+                  <!-- Sync on Startup -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label>Sync on Startup</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-slide-toggle [(ngModel)]="dataSyncSettings.syncOnStartup" [ngModelOptions]="{standalone: true}">
+                        Sync data when application starts
+                      </mat-slide-toggle>
+                      <mat-hint>Perform sync when application starts</mat-hint>
+                    </div>
+                  </div>
+
+                  <!-- Auto Sync Interval -->
+                  <div class="settings-form-row">
+                    <div class="settings-form-label">
+                      <label for="autoSyncInterval">Auto Sync Interval</label>
+                    </div>
+                    <div class="settings-form-input">
+                      <mat-form-field appearance="outline" class="compact-form-field">
+                        <mat-label>Auto Sync Interval</mat-label>
+                        <mat-select [(ngModel)]="dataSyncSettings.autoSyncInterval" [ngModelOptions]="{standalone: true}" id="autoSyncInterval">
+                          <mat-option value="30">30 minutes</mat-option>
+                          <mat-option value="60">1 hour</mat-option>
+                          <mat-option value="120">2 hours</mat-option>
+                          <mat-option value="180">3 hours</mat-option>
+                          <mat-option value="240">4 hours</mat-option>
+                          <mat-option value="360">6 hours</mat-option>
+                          <mat-option value="480">8 hours</mat-option>
+                          <mat-option value="720">12 hours</mat-option>
+                          <mat-option value="1440">24 hours</mat-option>
+                        </mat-select>
+                        <mat-hint>How often to perform automatic sync (30 minutes to 24 hours)</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <!-- README Sync Section -->
+                  <div class="readme-sync-section">
+                    <p class="readme-sync-description">Sync database data to README files for backup and portability.</p>
+                    
+                    <!-- Author README Sync Card -->
+                    <mat-card class="readme-sync-card">
+                      <mat-card-header class="readme-sync-header">
+                        <mat-card-title class="readme-sync-title">
+                          Author README Sync
+                          <mat-icon class="info-icon" matTooltip="Synchronize author data from the database to README.md files in author folders. Merge Mode: When enabled, existing README data is preserved. Database values update existing fields, but data only in README files is kept.">info</mat-icon>
+                        </mat-card-title>
+                        <mat-chip class="utility-chip" color="primary">Utility</mat-chip>
+                      </mat-card-header>
+                      <mat-card-content class="readme-sync-content">
+                        <p class="readme-sync-text">Synchronize author data from the database to README.md files in author folders.</p>
+                        <div class="merge-option">
+                          <mat-checkbox [(ngModel)]="dataSyncSettings.authorMergeMode" [ngModelOptions]="{standalone: true}">
+                            Merge with existing README data (preserve non-database values)
+                          </mat-checkbox>
+                        </div>
+                        <div class="sync-status" id="authorSyncStatus"></div>
+                        <button mat-raised-button color="primary" (click)="syncAuthorReadme()">
+                          <mat-icon class="me-1">sync</mat-icon>
+                          Sync Author READMEs
+                        </button>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Book README Sync Card -->
+                    <mat-card class="readme-sync-card">
+                      <mat-card-header class="readme-sync-header">
+                        <mat-card-title class="readme-sync-title">
+                          Book README Sync
+                          <mat-icon class="info-icon" matTooltip="Synchronize book data from the database to README.txt files in book folders. Merge Mode: When enabled, existing README data is preserved. Database values update existing fields, but data only in README files is kept.">info</mat-icon>
+                        </mat-card-title>
+                        <mat-chip class="utility-chip" color="primary">Utility</mat-chip>
+                      </mat-card-header>
+                      <mat-card-content class="readme-sync-content">
+                        <p class="readme-sync-text">Synchronize book data from the database to README.txt files in book folders.</p>
+                        <div class="merge-option">
+                          <mat-checkbox [(ngModel)]="dataSyncSettings.bookMergeMode" [ngModelOptions]="{standalone: true}">
+                            Merge with existing README data (preserve non-database values)
+                          </mat-checkbox>
+                        </div>
+                        <div class="sync-status" id="bookSyncStatus"></div>
+                        <button mat-raised-button color="primary" (click)="syncBookReadme()">
+                          <mat-icon class="me-1">sync</mat-icon>
+                          Sync Book READMEs
+                        </button>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Manga README Sync Card -->
+                    <mat-card class="readme-sync-card">
+                      <mat-card-header class="readme-sync-header">
+                        <mat-card-title class="readme-sync-title">
+                          Manga README Sync
+                          <mat-icon class="info-icon" matTooltip="Synchronize manga data from the database to README.txt files in manga folders. Merge Mode: When enabled, existing README data is preserved. Database values update existing fields, but data only in README files is kept.">info</mat-icon>
+                        </mat-card-title>
+                        <mat-chip class="utility-chip" color="primary">Utility</mat-chip>
+                      </mat-card-header>
+                      <mat-card-content class="readme-sync-content">
+                        <p class="readme-sync-text">Synchronize manga data from the database to README.txt files in manga folders.</p>
+                        <div class="merge-option">
+                          <mat-checkbox [(ngModel)]="dataSyncSettings.mangaMergeMode" [ngModelOptions]="{standalone: true}">
+                            Merge with existing README data (preserve non-database values)
+                          </mat-checkbox>
+                        </div>
+                        <div class="sync-status" id="mangaSyncStatus"></div>
+                        <button mat-raised-button color="primary" (click)="syncMangaReadme()">
+                          <mat-icon class="me-1">sync</mat-icon>
+                          Sync Manga READMEs
+                        </button>
+                      </mat-card-content>
+                    </mat-card>
+                  </div>
+
+                  <div class="form-actions">
+                    <button mat-raised-button color="primary" class="me-2" (click)="saveDataSyncSettings()">
+                      <mat-icon class="me-1">save</mat-icon>
+                      Save Sync Settings
+                    </button>
+                    <button mat-stroked-button color="primary" (click)="triggerSyncNow()" class="me-2">
+                      <mat-icon class="me-1">sync</mat-icon>
+                      Sync Now
+                    </button>
+                  </div>
+                </form>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </mat-tab>
+
+        <mat-tab label="Notifications">
+          <mat-icon matTabIcon>notifications</mat-icon>
+          <ng-template matTabContent>
+            <mat-card class="settings-card">
+              <mat-card-header>
+                <mat-card-title>Notification System Demo</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="notifications-demo">
+                  <h6 class="demo-title">Notification System Demo</h6>
+                  <p class="demo-description">Click buttons below to test different notification layouts</p>
+
+                  <!-- NotificationManager (Angular Material Cards) Section -->
+                  <mat-card class="demo-card">
+                    <mat-card-header class="demo-header primary-header">
+                      <mat-card-title class="demo-header-title">NotificationManager (Material Cards)</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content class="demo-content">
+                      <div class="demo-buttons-grid">
+                        <button mat-raised-button color="primary" class="demo-button success-button" (click)="showMaterialSuccess()">
+                          <mat-icon class="me-2">check_circle</mat-icon>
+                          Material Success
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button error-button" (click)="showMaterialError()">
+                          <mat-icon class="me-2">error</mat-icon>
+                          Material Error
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button warning-button" (click)="showMaterialWarning()">
+                          <mat-icon class="me-2">warning</mat-icon>
+                          Material Warning
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button info-button" (click)="showMaterialInfo()">
+                          <mat-icon class="me-2">info</mat-icon>
+                          Material Info
+                        </button>
+                        <button mat-stroked-button color="primary" class="demo-button" (click)="showMaterialConfirm()">
+                          <mat-icon class="me-2">help</mat-icon>
+                          Material Confirm
+                        </button>
+                        <button mat-stroked-button color="primary" class="demo-button" (click)="clearMaterialNotifications()">
+                          <mat-icon class="me-2">clear_all</mat-icon>
+                          Clear Material
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button" (click)="showMaterialMultiple()">
+                          <mat-icon class="me-2">layers</mat-icon>
+                          Show 3 Material
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button" (click)="showMaterialLong()">
+                          <mat-icon class="me-2">align_left</mat-icon>
+                          Material Long
+                        </button>
+                      </div>
+                      <div class="demo-info">
+                        <small><strong>Location:</strong> Top-right corner with Material Cards (top: 70px)</small>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+
+                  <!-- Toast Notification (Custom Toasts) Section -->
+                  <mat-card class="demo-card">
+                    <mat-card-header class="demo-header info-header">
+                      <mat-card-title class="demo-header-title">Toast Notifications (Custom)</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content class="demo-content">
+                      <div class="demo-buttons-grid">
+                        <button mat-raised-button color="primary" class="demo-button success-button" (click)="showToastSuccess()">
+                          <mat-icon class="me-2">check_circle</mat-icon>
+                          Toast Success
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button error-button" (click)="showToastError()">
+                          <mat-icon class="me-2">error</mat-icon>
+                          Toast Error
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button warning-button" (click)="showToastWarning()">
+                          <mat-icon class="me-2">warning</mat-icon>
+                          Toast Warning
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button info-button" (click)="showToastInfo()">
+                          <mat-icon class="me-2">info</mat-icon>
+                          Toast Info
+                        </button>
+                        <button mat-stroked-button color="primary" class="demo-button" (click)="showToastConfirm()">
+                          <mat-icon class="me-2">help</mat-icon>
+                          Toast Confirm
+                        </button>
+                        <button mat-stroked-button color="primary" class="demo-button" (click)="clearToastNotifications()">
+                          <mat-icon class="me-2">clear_all</mat-icon>
+                          Clear Toast
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button" (click)="showToastMultiple()">
+                          <mat-icon class="me-2">layers</mat-icon>
+                          Show 3 Toast
+                        </button>
+                        <button mat-raised-button color="primary" class="demo-button" (click)="showToastLong()">
+                          <mat-icon class="me-2">align_left</mat-icon>
+                          Toast Long
+                        </button>
+                      </div>
+                      <div class="demo-info">
+                        <small><strong>Location:</strong> Top-right corner with Custom Toasts (top: 80px)</small>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-header>
+  </mat-card>
+</div>
+                                                                                                                                          

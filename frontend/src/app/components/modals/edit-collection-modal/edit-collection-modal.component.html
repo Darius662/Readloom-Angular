@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Edit Collection</h2>
+
+<mat-dialog-content>
+  <form>
+    <div class="form-group">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Collection Name</mat-label>
+      <input matInput [(ngModel)]="form.name" [ngModelOptions]="{standalone: true}" name="name" placeholder="e.g., My Manga Collection">
+    </mat-form-field>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="form.description" [ngModelOptions]="{standalone: true}" name="description" placeholder="Optional description" rows="3"></textarea>
+    </mat-form-field>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Content Type</mat-label>
+      <mat-select [(ngModel)]="form.content_type" [ngModelOptions]="{standalone: true}">
+        @for (type of contentTypes; track type.value) {
+          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="form-group checkbox-group">
+    <mat-checkbox [(ngModel)]="form.is_default" [ngModelOptions]="{standalone: true}">
+      Set as default collection
+    </mat-checkbox>
+  </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Update Collection</button>
+</mat-dialog-actions>

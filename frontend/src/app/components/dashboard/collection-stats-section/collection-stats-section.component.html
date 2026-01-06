@@ -1,0 +1,65 @@
+<mat-card class="stats-card">
+  <mat-card-header>
+    <mat-card-title>Collection Stats</mat-card-title>
+    <button matButton="outlined">
+      <mat-icon>folder</mat-icon>
+      View Collection
+    </button>
+  </mat-card-header>
+  <mat-divider />
+  <mat-card-content>
+    <!-- Top Stats Row -->
+    <div class="stats-top-row">
+      <div class="stat-item">
+        <mat-icon class="stat-icon owned">library_books</mat-icon>
+        <div class="stat-info">
+          <span class="stat-label">Owned Volumes</span>
+          <span class="stat-value">{{ stats.ownedVolumes }}</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <mat-icon class="stat-icon read">check_circle</mat-icon>
+        <div class="stat-info">
+          <span class="stat-label">Read Volumes</span>
+          <span class="stat-value">{{ stats.readVolumes }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reading Progress -->
+    <div class="stat-row">
+      <div class="progress-row">
+        <span class="stat-label">Reading Progress</span>
+        <span class="progress-text">{{ stats.readingProgress }}%</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="stats.readingProgress"></mat-progress-bar>
+    </div>
+
+    <!-- Collection Value -->
+    <div class="stat-row">
+      <span class="stat-label">Collection Value</span>
+      <span class="stat-value-large">{{ stats.collectionValue | currency }}</span>
+    </div>
+
+    <!-- Donut Chart -->
+    <div class="chart-container">
+      <div class="donut-chart">
+        <svg viewBox="0 0 100 100" class="donut-svg">
+          <circle cx="50" cy="50" r="40" class="donut-background"></circle>
+          <circle cx="50" cy="50" r="40" class="donut-fill" [style.stroke-dasharray]="stats.readingProgress + ' 100'"></circle>
+        </svg>
+        <div class="chart-label">{{ stats.readingProgress }}%</div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <span class="legend-color read"></span>
+          <span class="legend-label">Read</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color unread"></span>
+          <span class="legend-label">Unread</span>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
